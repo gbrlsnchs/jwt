@@ -85,6 +85,10 @@ func (r *RSASHA) String() jwtcrypto.SigningMethod {
 
 // Verify verifies a signature using RSA private and public keys.
 func (r *RSASHA) Verify(digest, sig []byte) (bool, error) {
+	if r.PublicKey == nil {
+		return false, nil
+	}
+
 	sha := r.Hash.New()
 
 	if _, err := sha.Write(digest); err != nil {

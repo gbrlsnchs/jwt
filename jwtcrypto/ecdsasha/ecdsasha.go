@@ -88,6 +88,10 @@ func (e *ECDSASHA) String() jwtcrypto.SigningMethod {
 
 // Verify verifies a signature using ECDSA private and public keys.
 func (e *ECDSASHA) Verify(digest, _ []byte) (bool, error) {
+	if e.PublicKey == nil {
+		return false, nil
+	}
+
 	sha := e.Hash.New()
 	sum := sha.Sum(nil)
 
