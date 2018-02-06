@@ -12,6 +12,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Travis CI configuration file.
 - Makefile.
 - Git ignore file.
-- Editorconfig file.
+- EditorConfig file.
 - This package's source code, including examples and tests.
 - Go dep files.
