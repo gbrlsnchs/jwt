@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2018-02-06
+### Added
+- New test cases.
+- Claims' timestamps validation.
+
+### Changed
+- Tests organization.
+- Use `time.After` and `time.Before` for validating timestamps.
+- `jwtcrypto/none.None` now implements `jwtcrypto.Signer`.
+
+### Fixed
+- Panicking when private or public keys are `nil`.
+
 ## 0.1.0 - 2018-02-06
 ### Added
 - This changelog file.
@@ -15,3 +28,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - EditorConfig file.
 - This package's source code, including examples and tests.
 - Go dep files.
+
+[0.2.0]: https://github.com/gbrlsnchs/jwt/compare/v0.1.0...v0.2.0
