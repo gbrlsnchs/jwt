@@ -13,8 +13,8 @@ func (n *None) HasKey() bool {
 }
 
 // Sign simply returns a message as is.
-func (n *None) Sign(digest []byte) ([]byte, error) {
-	return digest, nil
+func (n *None) Sign(_ []byte) ([]byte, error) {
+	return nil, nil
 }
 
 func (n *None) String() jwtcrypto.SigningMethod {
