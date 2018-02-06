@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gbrlsnchs/jwt/jwtcrypto"
 	"github.com/gbrlsnchs/jwt/jwtcrypto/hmacsha"
+	"github.com/gbrlsnchs/jwt/jwtcrypto/none"
 	"github.com/gbrlsnchs/jwt/jwtutil"
 )
 
@@ -16,6 +18,8 @@ import (
 //
 // It only validates the signature.
 func Parse(digest string, verif jwtcrypto.Verifier) (*JWT, error) {
+	now := time.Now()
+
 	if verif == nil {
 		verif = hmacsha.New256("")
 	}
@@ -52,17 +56,22 @@ func Parse(digest string, verif jwtcrypto.Verifier) (*JWT, error) {
 	}
 
 	// Prevent "none" vulnerability.
-	if jot.Header.Algorithm == jwtcrypto.None && verif.HasKey() {
-		return nil, errors.New("github.com/gbrlsnchs/jwt.Parse: JWT uses \"none\" algorithm but server expects to use a key")
-	}
+	if alg := jot.Header.Algorithm; alg == jwtcrypto.None {
+		if verif.HasKey() {
+			return nil, errors.New("github.com/gbrlsnchs/jwt.Parse: JWT uses \"none\" algorithm but a key exists")
+		}
 
-	// Prevent algorithm mismatch abuse.
-	if jot.Header.Algorithm != jwtcrypto.None && jot.Header.Algorithm != verif.String() {
+		verif = &none.None{}
+	} else if alg != verif.String() {
 		return nil, fmt.Errorf(
 			"github.com/gbrlsnchs/jwt.Parse: JWT signing match mismatch (want %s, got %s)",
 			verif.String(),
-			jot.Header.Algorithm,
+			alg,
 		)
+	}
+
+	if err = jot.validate(now); err != nil {
+		return nil, fmt.Errorf("github.com/gbrlsnchs/jwt.Parse: %v", err)
 	}
 
 	var sig bytes.Buffer

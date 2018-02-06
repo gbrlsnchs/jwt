@@ -15,9 +15,7 @@ type JWT struct {
 	Claims *Claims
 }
 
-func (j *JWT) validate(n int64) error {
-	now := time.Unix(n, 0)
-
+func (j *JWT) validate(now time.Time) error {
 	if iat := j.Claims.Standard.IssuedAt; iat != 0 {
 		if iat := time.Unix(iat, 0); iat.After(now) {
 			return errors.New("JWT was issued in the future")
