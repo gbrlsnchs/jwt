@@ -50,6 +50,18 @@ func (r *RSASHA) HasKey() bool {
 
 // Sign signs a message using an RSA private key.
 func (r *RSASHA) Sign(digest []byte) ([]byte, error) {
+	var err error
+
+	// Generate key when no private key
+	// is used for not panicking.
+	if r.PrivateKey == nil {
+		r.PrivateKey, err = rsa.GenerateKey(rand.Reader, 2048)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// Use SHA256 as default algorithm.
 	if r.Hash < crypto.SHA256 || r.Hash > crypto.SHA512 {
 		r.Hash = crypto.SHA256
@@ -57,7 +69,7 @@ func (r *RSASHA) Sign(digest []byte) ([]byte, error) {
 
 	sha := r.Hash.New()
 
-	if _, err := sha.Write(digest); err != nil {
+	if _, err = sha.Write(digest); err != nil {
 		return nil, err
 	}
 

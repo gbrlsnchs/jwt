@@ -3,6 +3,7 @@ package ecdsasha
 import (
 	"crypto"
 	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 
 	"github.com/gbrlsnchs/jwt/jwtcrypto"
@@ -50,14 +51,34 @@ func (e *ECDSASHA) HasKey() bool {
 
 // Sign signs a message using an ECDSA private key.
 func (e *ECDSASHA) Sign(digest []byte) ([]byte, error) {
+	var err error
+
 	// Use SHA256 as default algorithm.
 	if e.Hash < crypto.SHA256 || e.Hash > crypto.SHA512 {
 		e.Hash = crypto.SHA256
 	}
 
+	// Generate key when no private key
+	// is used for not panicking.
+	if e.PrivateKey == nil {
+		c := elliptic.P256()
+
+		if e.Hash == crypto.SHA384 {
+			c = elliptic.P384()
+		} else if e.Hash == crypto.SHA512 {
+			c = elliptic.P521()
+		}
+
+		e.PrivateKey, err = ecdsa.GenerateKey(c, rand.Reader)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	sha := e.Hash.New()
 
-	if _, err := sha.Write(digest); err != nil {
+	if _, err = sha.Write(digest); err != nil {
 		return nil, err
 	}
 
