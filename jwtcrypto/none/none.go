@@ -8,6 +8,10 @@ func (n *None) HasKey() bool {
 	return false
 }
 
+func (n *None) Sign(digest []byte) ([]byte, error) {
+	return digest, nil
+}
+
 func (n *None) String() jwtcrypto.SigningMethod {
 	return jwtcrypto.None
 }
