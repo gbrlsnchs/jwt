@@ -1,6 +1,10 @@
 package jwt
 
-import "time"
+import (
+	"errors"
+	"fmt"
+	"time"
+)
 
 // JWT represents a JSON Web Token.
 //
@@ -11,26 +15,26 @@ type JWT struct {
 	Claims *Claims
 }
 
-// IsValid returns whether a JWT has
-// valid timestamps when they're not zeroed.
-func (j *JWT) IsValid() bool {
-	now := time.Now().Unix()
+func (j *JWT) validate(n int64) error {
+	now := time.Unix(n, 0)
 
-	if j.Claims == nil {
-		return true
+	if iat := j.Claims.Standard.IssuedAt; iat != 0 {
+		if iat := time.Unix(iat, 0); iat.After(now) {
+			return errors.New("JWT was issued in the future")
+		}
 	}
 
-	if j.Claims.Standard.IssuedAt >= now {
-		return false
+	if nbf := j.Claims.Standard.NotBefore; nbf != 0 {
+		if nbf := time.Unix(nbf, 0); !nbf.IsZero() && nbf.After(now) {
+			return fmt.Errorf("JWT should not be valid until %s", nbf.String())
+		}
 	}
 
-	if nbf := j.Claims.Standard.NotBefore; nbf > 0 && nbf >= now {
-		return false
+	if exp := j.Claims.Standard.ExpirationTime; exp != 0 {
+		if exp := time.Unix(exp, 0); !exp.IsZero() && exp.Before(now) {
+			return fmt.Errorf("JWT expired on %s", exp.String())
+		}
 	}
 
-	if exp := j.Claims.Standard.ExpirationTime; exp > 0 && exp <= now {
-		return false
-	}
-
-	return true
+	return nil
 }
