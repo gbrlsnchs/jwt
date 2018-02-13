@@ -162,6 +162,25 @@ func TestECDSA(t *testing.T) {
 	runTests(t, tests)
 }
 
+func TestNone(t *testing.T) {
+	tests := []*testTable{
+		{
+			signer: None(),
+		},
+		{
+			signer: HS256("secret"),
+			verif:  None(),
+		},
+		{
+			signer:     None(),
+			verif:      HS256("secret"),
+			parsingErr: true,
+		},
+	}
+
+	runTests(t, tests)
+}
+
 func runTests(t *testing.T, tests []*testTable) {
 	for _, tt := range tests {
 		token, err := Sign(tt.signer, tt.opts)
@@ -198,7 +217,7 @@ func runTests(t *testing.T, tests []*testTable) {
 			continue
 		}
 
-		t.Logf("Token with %s: %s\n", tt.signer.String(), token)
+		t.Logf("Token + %s: %s\n", tt.signer.String(), token)
 		t.Logf("JWT: %#v\n", jot)
 	}
 }
