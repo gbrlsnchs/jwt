@@ -7,12 +7,8 @@ import (
 )
 
 var (
-	// ErrInvalidSignature is returned when a token's
-	// signature is invalidated by a signer.
 	ErrInvalidSignature = errors.New("jwt.Parse: token has invalid signature")
-	// ErrMalformedToken is returned when a token
-	// doesn't contain a valid format of "header.payload.signature".
-	ErrMalformedToken = errors.New("jwt.Parse: token is malformed")
+	ErrMalformedToken   = errors.New("jwt.Parse: token is malformed")
 )
 
 // Parse parses a string token using a specific signer and returns

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for "none" method.
 - Tests for "none" method.
 
+### Fixed
+- Message in `ErrECDSASigLen`.
+
+### Removed
+- Comments from custom errors, since they are self-explanatory.
+
 ## [0.3.0] - 2018-02-13
 ### Changed
 - Package structure.

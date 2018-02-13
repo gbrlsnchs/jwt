@@ -14,7 +14,7 @@ var (
 	ErrNoECDSAPrivKey = errors.New("jwt.(Signer).Sign: ECDSA private key is nil")
 	ErrNoECDSAPubKey  = errors.New("jwt.(Signer).Sign: ECDSA public key is nil")
 	ErrECSDAInvalid   = errors.New("jwt.(Signer).Verify: ECDSA validation failed")
-	ErrECDSASigLen    = errors.New("jwt.(Signer).Verify: ECDSA signature unexpected size")
+	ErrECDSASigLen    = errors.New("jwt.(Signer).Verify: ECDSA signature has unexpected size")
 )
 
 type ecdsasha struct {

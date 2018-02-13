@@ -6,9 +6,7 @@ import (
 	"time"
 )
 
-var (
-	ErrNoSigner = errors.New("jwt.Sign: signer is nil")
-)
+var ErrNoSigner = errors.New("jwt.Sign: signer is nil")
 
 // Sign builds a full JWT and signs its last part.
 func Sign(s Signer, opts *Options) (string, error) {
