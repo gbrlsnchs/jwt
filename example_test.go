@@ -7,45 +7,54 @@ import (
 	"time"
 
 	"github.com/gbrlsnchs/jwt"
-	"github.com/gbrlsnchs/jwt/jwtcrypto/hmacsha"
-	"github.com/gbrlsnchs/jwt/jwtutil"
 )
 
-func ExampleSign() {
-	claims := &jwt.Claims{
-		Standard: &jwt.StdClaims{
-			ExpirationTime: time.Now().Add(24 * time.Hour).Unix(),
-		},
-		Public: jwt.Payload{
-			"admin": true,
-		},
+func Example() {
+	now := time.Now()
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	jot, err := jwt.FromRequest(r, jwt.HS256("secret"))
+
+	if err != nil {
+		// ...
 	}
-	token, err := jwt.Sign(hmacsha.New512("foobar_sounds_safe"), &jwt.JWT{Claims: claims})
+
+	if jot.Algorithm() != jwt.MethodHS256 ||
+		!jot.ExpirationTime().IsZero() &&
+			now.After(jot.ExpirationTime()) ||
+		now.Before(jot.NotBefore()) {
+		// Repudiate token.
+	}
+
+	token, err := jwt.Sign(jwt.HS256("secret"), &jwt.Options{Timestamp: true})
+
+	if err != nil {
+		// ...
+	}
+
+	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(token))
+}
+
+func ExampleParse() {
+	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M"
+	jot, err := jwt.Parse(jwt.HS256("secret"), token)
+
+	if err != nil {
+		// ...
+	}
+
+	fmt.Println(jot)
+}
+
+func ExampleSign() {
+	nextYear := time.Now().Add(24 * 30 * 12 * time.Hour)
+	token, err := jwt.Sign(jwt.HS256("secret"), &jwt.Options{ExpirationTime: nextYear})
 
 	if err != nil {
 		// ...
 	}
 
 	fmt.Println(token)
-}
-
-func ExampleParse() {
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	s := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M"
-
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", s))
-
-	token, err := jwtutil.BearerToken(r)
-
-	if err != nil {
-		// Token could not be extracted.
-	}
-
-	jot, err := jwt.Parse(token, hmacsha.New256("foobar_sounds_safe"))
-
-	if err != nil {
-		// Unable to parse, can be due to malformed token.
-	}
-
-	fmt.Printf("%#v\n", jot)
 }

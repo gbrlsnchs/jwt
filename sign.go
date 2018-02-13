@@ -2,57 +2,76 @@ package jwt
 
 import (
 	"encoding/json"
-
-	"github.com/gbrlsnchs/jwt/jwtcrypto"
-	"github.com/gbrlsnchs/jwt/jwtcrypto/hmacsha"
-	"github.com/gbrlsnchs/jwt/jwtutil"
+	"errors"
+	"time"
 )
 
-// Sign generates a new JWT token and returns it encoded.
-//
-// Standard claims are set according to the opts variable,
-// while public (and also private) claims are set according
-// to the pub variable.
-func Sign(signer jwtcrypto.Signer, jot *JWT) (string, error) {
-	if signer == nil {
-		signer = hmacsha.New256("")
+var (
+	ErrNoSigner = errors.New("jwt.Sign: signer is nil")
+)
+
+// Sign builds a full JWT and signs its last part.
+func Sign(s Signer, opts *Options) (string, error) {
+	now := time.Now()
+
+	if s == nil {
+		return "", ErrNoSigner
 	}
 
-	if jot == nil {
-		jot = &JWT{}
+	if opts == nil {
+		opts = &Options{}
 	}
 
-	if jot.Header == nil {
-		jot.Header = &Header{}
+	jot := &JWT{
+		header: &header{
+			Algorithm: s.String(),
+			KeyID:     opts.KeyID,
+			Type:      "JWT",
+		},
+		claims: &claims{
+			aud: opts.Audience,
+			exp: opts.ExpirationTime,
+			iss: opts.Issuer,
+			nbf: opts.NotBefore,
+			sub: opts.Subject,
+			pub: make(map[string]interface{}),
+		},
 	}
 
-	jot.Header.Algorithm = signer.String()
-	jot.Header.Type = "JWT"
-
-	if jot.Claims == nil {
-		jot.Claims = &Claims{}
+	for k, v := range opts.Public {
+		jot.claims.pub[k] = v
 	}
 
-	header, err := json.Marshal(jot.Header)
+	if opts.Timestamp {
+		jot.claims.iat = now
+	}
+
+	var token []byte
+	p, err := json.Marshal(jot.header)
 
 	if err != nil {
 		return "", err
 	}
 
-	claims, err := json.Marshal(jot.Claims)
+	token = append(token, encode(p)...)
+
+	p, err = json.Marshal(jot.claims)
 
 	if err != nil {
 		return "", err
 	}
 
-	header64 := jwtutil.Encode(header)
-	claims64 := jwtutil.Encode(claims)
-	meta := []byte(header64 + Separator + claims64)
-	sig, err := signer.Sign(meta)
+	token = append(token, '.')
+	token = append(token, encode(p)...)
+
+	p, err = s.Sign(token)
 
 	if err != nil {
 		return "", err
 	}
 
-	return string(meta) + Separator + jwtutil.Encode(sig), nil
+	token = append(token, '.')
+	token = append(token, encode(p)...)
+
+	return string(token), nil
 }

@@ -2,37 +2,83 @@ package jwt
 
 import (
 	"errors"
-	"fmt"
+	"net/http"
+	"strings"
 	"time"
 )
 
-// JWT represents a JSON Web Token.
-//
-// Its claims and header properties
-// are narrowed for JWT usage.
+// ErrEmptyHeader is returned when no token
+// exists in the "Authorization" header.
+var ErrEmptyHeader = errors.New("jwt.FromRequest: no token could be extracted from header")
+
+// JWT is a JSON Web Token.
 type JWT struct {
-	Header *Header
-	Claims *Claims
+	header *header
+	claims *claims
 }
 
-func (j *JWT) validate(now time.Time) error {
-	if iat := j.Claims.Standard.IssuedAt; iat != 0 {
-		if iat := time.Unix(iat, 0); iat.After(now) {
-			return errors.New("JWT was issued in the future")
-		}
+// FromRequest extracts a token string
+// from the "Authorization" header, which
+// should contain the "Bearer <token>" pattern.
+func FromRequest(r *http.Request, s Signer) (*JWT, error) {
+	auth := r.Header.Get("Authorization")
+
+	if i := strings.IndexByte(auth, ' '); i >= 0 {
+		return Parse(s, auth[i+1:])
 	}
 
-	if nbf := j.Claims.Standard.NotBefore; nbf != 0 {
-		if nbf := time.Unix(nbf, 0); !nbf.IsZero() && nbf.After(now) {
-			return fmt.Errorf("JWT should not be valid until %s", nbf.String())
-		}
-	}
+	return nil, ErrEmptyHeader
+}
 
-	if exp := j.Claims.Standard.ExpirationTime; exp != 0 {
-		if exp := time.Unix(exp, 0); !exp.IsZero() && exp.Before(now) {
-			return fmt.Errorf("JWT expired on %s", exp.String())
-		}
-	}
+// Algorithm returns the "alg" claim
+// from a JWT's header.
+func (j *JWT) Algorithm() string {
+	return j.header.Algorithm
+}
 
-	return nil
+// Audience returns the "aud" claim
+// from a JWT's payload.
+func (j *JWT) Audience() string {
+	return j.claims.aud
+}
+
+// ExpirationTime returns the "exp" claim
+// from a JWT's payload.
+func (j *JWT) ExpirationTime() time.Time {
+	return j.claims.exp
+}
+
+// IssuedAt returns the "iat" claim
+// from a JWT's payload.
+func (j *JWT) IssuedAt() time.Time {
+	return j.claims.iat
+}
+
+// Issuer returns the "iss" claim
+// from a JWT's payload.
+func (j *JWT) Issuer() string {
+	return j.claims.iss
+}
+
+// KeyID returns the "kid" claim
+// from a JWT's header.
+func (j *JWT) KeyID() string {
+	return j.header.KeyID
+}
+
+// NotBefore returns the "nbf" claim
+// from a JWT's payload.
+func (j *JWT) NotBefore() time.Time {
+	return j.claims.nbf
+}
+
+// Public returns all public claims set.
+func (j *JWT) Public() map[string]interface{} {
+	return j.claims.pub
+}
+
+// Subject returns the "sub" claim
+// from a JWT's payload.
+func (j *JWT) Subject() string {
+	return j.claims.sub
 }

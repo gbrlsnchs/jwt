@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Removed
 - Additional packages (`jwtcrypto` and `jwtutil`).
+- Reshape package.
 
 ## [0.2.0] - 2018-02-06
 ### Added
@@ -33,4 +34,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - This package's source code, including examples and tests.
 - Go dep files.
 
+[Unreleased]: https://github.com/gbrlsnchs/jwt/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/gbrlsnchs/jwt/compare/v0.1.0...v0.2.0
