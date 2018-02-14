@@ -30,6 +30,7 @@ func Sign(s Signer, opts *Options) (string, error) {
 			aud: opts.Audience,
 			exp: opts.ExpirationTime,
 			iss: opts.Issuer,
+			jti: opts.JWTID,
 			nbf: opts.NotBefore,
 			sub: opts.Subject,
 			pub: make(map[string]interface{}),

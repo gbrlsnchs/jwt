@@ -10,6 +10,7 @@ type claims struct {
 	exp time.Time
 	iat time.Time
 	iss string
+	jti string
 	nbf time.Time
 	sub string
 	pub map[string]interface{}
@@ -21,27 +22,31 @@ func (c *claims) MarshalJSON() ([]byte, error) {
 	}
 
 	if len(c.aud) > 0 {
-		c.pub["aud"] = c.aud
+		c.pub[audKey] = c.aud
 	}
 
 	if !c.exp.IsZero() {
-		c.pub["exp"] = c.exp.Unix()
+		c.pub[expKey] = c.exp.Unix()
 	}
 
 	if !c.iat.IsZero() {
-		c.pub["iat"] = c.iat.Unix()
+		c.pub[iatKey] = c.iat.Unix()
 	}
 
 	if len(c.iss) > 0 {
-		c.pub["iss"] = c.iss
+		c.pub[issKey] = c.iss
+	}
+
+	if len(c.jti) > 0 {
+		c.pub[jtiKey] = c.jti
 	}
 
 	if !c.nbf.IsZero() {
-		c.pub["nbf"] = c.nbf.Unix()
+		c.pub[nbfKey] = c.nbf.Unix()
 	}
 
 	if len(c.sub) > 0 {
-		c.pub["sub"] = c.sub
+		c.pub[subKey] = c.sub
 	}
 
 	return json.Marshal(c.pub)
@@ -54,41 +59,47 @@ func (c *claims) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	if v, ok := c.pub["aud"].(string); ok {
+	if v, ok := c.pub[audKey].(string); ok {
 		c.aud = v
 	}
 
-	delete(c.pub, "aud")
+	delete(c.pub, audKey)
 
-	if v, ok := c.pub["exp"].(float64); ok {
+	if v, ok := c.pub[expKey].(float64); ok {
 		c.exp = time.Unix(int64(v), 0)
 	}
 
-	delete(c.pub, "exp")
+	delete(c.pub, expKey)
 
-	if v, ok := c.pub["iat"].(float64); ok {
+	if v, ok := c.pub[iatKey].(float64); ok {
 		c.iat = time.Unix(int64(v), 0)
 	}
 
-	delete(c.pub, "iat")
+	delete(c.pub, iatKey)
 
-	if v, ok := c.pub["iss"].(string); ok {
+	if v, ok := c.pub[issKey].(string); ok {
 		c.iss = v
 	}
 
-	delete(c.pub, "iss")
+	delete(c.pub, issKey)
 
-	if v, ok := c.pub["nbf"].(float64); ok {
+	if v, ok := c.pub[jtiKey].(string); ok {
+		c.jti = v
+	}
+
+	delete(c.pub, jtiKey)
+
+	if v, ok := c.pub[nbfKey].(float64); ok {
 		c.nbf = time.Unix(int64(v), 0)
 	}
 
-	delete(c.pub, "nbf")
+	delete(c.pub, nbfKey)
 
-	if v, ok := c.pub["sub"].(string); ok {
+	if v, ok := c.pub[subKey].(string); ok {
 		c.sub = v
 	}
 
-	delete(c.pub, "sub")
+	delete(c.pub, subKey)
 
 	return nil
 }

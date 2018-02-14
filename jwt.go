@@ -60,6 +60,12 @@ func (j *JWT) Issuer() string {
 	return j.claims.iss
 }
 
+// JWTID returns the "jti" claim
+// from a JWT's payload.
+func (j *JWT) JWTID() string {
+	return j.claims.jti
+}
+
 // KeyID returns the "kid" claim
 // from a JWT's header.
 func (j *JWT) KeyID() string {
