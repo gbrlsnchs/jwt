@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for "none" method.
 - Tests for "none" method.
 - JWTID claim.
+- Custom validation via array of validation functions.
 
 ### Fixed
 - Message in `ErrECDSASigLen`.
