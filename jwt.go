@@ -20,11 +20,11 @@ type JWT struct {
 // FromRequest extracts a token string
 // from the "Authorization" header, which
 // should contain the "Bearer <token>" pattern.
-func FromRequest(r *http.Request, s Signer) (*JWT, error) {
+func FromRequest(r *http.Request, s Signer, vfuncs ...ValidationFunc) (*JWT, error) {
 	auth := r.Header.Get("Authorization")
 
 	if i := strings.IndexByte(auth, ' '); i >= 0 {
-		return Parse(s, auth[i+1:])
+		return Parse(s, auth[i+1:], vfuncs...)
 	}
 
 	return nil, ErrEmptyHeader
