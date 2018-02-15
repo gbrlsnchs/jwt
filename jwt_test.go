@@ -205,7 +205,15 @@ func runTests(t *testing.T, tests []*testTable) {
 			s = tt.verif
 		}
 
-		jot, err := FromRequest(r, s)
+		token, err = FromRequest(r)
+
+		if err != nil {
+			t.Errorf("%v\n", err)
+
+			continue
+		}
+
+		err = token.Verify(s)
 
 		if want, got := tt.parsingErr, err != nil; want != got {
 			t.Errorf("jwt.Parse: want %t, got %t\n", want, got)
@@ -217,7 +225,6 @@ func runTests(t *testing.T, tests []*testTable) {
 			continue
 		}
 
-		t.Logf("Token + %s: %s\n", tt.signer.String(), token)
-		t.Logf("JWT: %#v\n", jot)
+		t.Logf("Token + %s: %s\n", tt.signer.String(), token.String())
 	}
 }
