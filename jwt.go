@@ -1,7 +1,10 @@
 package jwt
 
 import (
+	"encoding/json"
 	"errors"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -9,14 +12,59 @@ import (
 // validators when parsing a JWT string.
 type ValidatorFunc func(jot *JWT) error
 
-// ErrEmptyHeader is returned when no token
-// exists in the "Authorization" header.
-var ErrEmptyHeader = errors.New("jwt.FromRequest: no token could be extracted from header")
+var (
+	// ErrEmptyAuthorization is an error that indicates that the
+	// "Authorization" header and, thus, extracting a token is impossible.
+	ErrEmptyAuthorization = errors.New("jwt: no token could be extracted from header")
+	// ErrMalformedToken indicates a token doesn't have a valid format,
+	// as per the RFC 7519, section 7.2.
+	ErrMalformedToken = errors.New("jwt: malformed token")
+)
 
 // JWT is a JSON Web Token.
 type JWT struct {
 	header *header
 	claims *claims
+	raw    string
+	sep    int
+}
+
+// FromRequest builds a JWT from the token contained
+// in the "Authorization" header.
+func FromRequest(r *http.Request) (*JWT, error) {
+	auth := r.Header.Get("Authorization")
+	i := strings.IndexByte(auth, ' ')
+
+	if i < 0 {
+		return nil, ErrEmptyAuthorization
+	}
+
+	return FromString(auth[i+1:])
+}
+
+// FromString builds a JWT from a string representation
+// of a JSON Web Token.
+func FromString(s string) (*JWT, error) {
+	sep1 := strings.IndexByte(s, '.')
+
+	if sep1 < 0 {
+		return nil, ErrMalformedToken
+	}
+
+	sep2 := strings.IndexByte(s[sep1+1:], '.')
+
+	if sep2 < 0 {
+		return nil, ErrMalformedToken
+	}
+
+	sep2 += sep1 + 1
+	jot := &JWT{raw: s, sep: sep2}
+
+	if err := jot.build(); err != nil {
+		return nil, err
+	}
+
+	return jot, nil
 }
 
 // Algorithm returns the "alg" claim
@@ -29,6 +77,12 @@ func (j *JWT) Algorithm() string {
 // from the JWT's payload.
 func (j *JWT) Audience() string {
 	return j.claims.aud
+}
+
+// Bytes returns a representation of the JWT
+// as an array of bytes.
+func (j *JWT) Bytes() []byte {
+	return []byte(j.raw)
 }
 
 // ExpirationTime returns the "exp" claim
@@ -78,6 +132,10 @@ func (j *JWT) Subject() string {
 	return j.claims.sub
 }
 
+func (j *JWT) String() string {
+	return j.raw
+}
+
 // Validate iterates over custom validator functions to validate the JWT.
 func (j *JWT) Validate(vfuncs ...ValidatorFunc) error {
 	for _, vfunc := range vfuncs {
@@ -87,4 +145,46 @@ func (j *JWT) Validate(vfuncs ...ValidatorFunc) error {
 	}
 
 	return nil
+}
+
+// Verify verifies the Token's signature.
+func (j *JWT) Verify(s Signer) error {
+	sig, err := decode(j.raw[j.sep+1:])
+
+	if err != nil {
+		return err
+	}
+
+	return s.Verify([]byte(j.raw[:j.sep]), sig)
+}
+
+func (j *JWT) build() error {
+	p1, p2 := j.parts()
+	dec, err := decode(p1)
+
+	if err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(dec, &j.header); err != nil {
+		return err
+	}
+
+	dec, err = decode(p2)
+
+	if err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(dec, &j.claims); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (j *JWT) parts() (string, string) {
+	sep := strings.IndexByte(j.raw[:j.sep], '.')
+
+	return j.raw[:sep], j.raw[sep+1 : j.sep]
 }

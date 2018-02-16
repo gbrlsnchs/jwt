@@ -9,11 +9,11 @@ import (
 var ErrNoSigner = errors.New("jwt.Sign: signer is nil")
 
 // Sign builds a full JWT and signs its last part.
-func Sign(s Signer, opts *Options) (Token, error) {
+func Sign(s Signer, opts *Options) (string, error) {
 	now := time.Now()
 
 	if s == nil {
-		return nil, ErrNoSigner
+		return "", ErrNoSigner
 	}
 
 	if opts == nil {
@@ -49,7 +49,7 @@ func Sign(s Signer, opts *Options) (Token, error) {
 	p, err := json.Marshal(jot.header)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	token = append(token, encode(p)...)
@@ -57,7 +57,7 @@ func Sign(s Signer, opts *Options) (Token, error) {
 	p, err = json.Marshal(jot.claims)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	token = append(token, '.')
@@ -66,11 +66,11 @@ func Sign(s Signer, opts *Options) (Token, error) {
 	p, err = s.Sign(token)
 
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	token = append(token, '.')
 	token = append(token, encode(p)...)
 
-	return NewToken(string(token))
+	return string(token), nil
 }
