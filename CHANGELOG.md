@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for "none" method.
 - Tests for "none" method.
 - Missing JWTID claim.
-- `Token` type for abstraction purposes.
 - Plugable validation via validator functions.
+
+### Changed
+- `(*JWT).JWTID` method name to `(*JWT).ID`.
 
 ### Fixed
 - Message in `ErrECDSASigLen`.
