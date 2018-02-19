@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,12 +14,18 @@ import (
 type ValidatorFunc func(jot *JWT) error
 
 var (
-	// ErrEmptyAuthorization is an error that indicates that the
-	// "Authorization" header and, thus, extracting a token is impossible.
+	// ErrEmptyAuthorization indicates that the "Authorization" header
+	// doesn't have a token and, thus, extracting a token is impossible.
 	ErrEmptyAuthorization = errors.New("jwt: no token could be extracted from header")
-	// ErrMalformedToken indicates a token doesn't have a valid format,
-	// as per the RFC 7519, section 7.2.
+	// ErrMalformedToken indicates a token doesn't have
+	// a valid format, as per the RFC 7519, section 7.2.
 	ErrMalformedToken = errors.New("jwt: malformed token")
+	// ErrNilCtxKey indicates that no context key is set for retrieving
+	// JWTs from context objects. This error is resolved if a key is set.
+	ErrNilCtxKey = errors.New("jwt: JWT context key is a nil value")
+	// ErrCtxAssertion indicates a JWT could not be extracted from a context object
+	// because the value it holds can not be asserted to a JWT pointer.
+	ErrCtxAssertion = errors.New("jwt: unable to assert context value into JWT pointer")
 )
 
 // JWT is a JSON Web Token.
@@ -27,6 +34,21 @@ type JWT struct {
 	claims *claims
 	raw    string
 	sep    int
+}
+
+// FromContext extracts a JWT object from a given context.
+func FromContext(ctx context.Context) (*JWT, error) {
+	if ctxKey == nil {
+		return nil, ErrNilCtxKey
+	}
+
+	jot, ok := ctx.Value(ctxKey).(*JWT)
+
+	if !ok {
+		return nil, ErrCtxAssertion
+	}
+
+	return jot, nil
 }
 
 // FromRequest builds a JWT from the token contained
