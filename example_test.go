@@ -1,6 +1,7 @@
 package jwt_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -59,6 +60,27 @@ func Example() {
 	w.Header().Set("Authorization", auth)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(token))
+}
+
+func ExampleFromContext() {
+	jot, err := jwt.FromString("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M")
+
+	if err != nil {
+		// Handle malformed token...
+	}
+
+	jwtCtxKey := "JWT"
+
+	jwt.SetCtxKey(jwtCtxKey)
+
+	ctx := context.WithValue(context.Background(), jwtCtxKey, jot)
+	jot, err = jwt.FromContext(ctx)
+
+	if err != nil {
+		// Handle JWT absence from context...
+	}
+
+	fmt.Println(jot)
 }
 
 func ExampleFromString() {
