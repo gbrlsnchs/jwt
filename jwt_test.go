@@ -30,9 +30,24 @@ func TestFromContext(t *testing.T) {
 
 	ctx = context.WithValue(ctx, ctxKey, &JWT{})
 	_, err = FromContext(ctx)
-	var nilErr error
 
-	if want, got := nilErr, err; want != got {
+	if want, got := (error)(nil), err; want != got {
+		errorf(t, want, got)
+	}
+}
+
+func TestFromCookie(t *testing.T) {
+	c := &http.Cookie{Name: "test"}
+	_, err := FromCookie(c)
+
+	if want, got := ErrMalformedToken, err; want != got {
+		errorf(t, want, got)
+	}
+
+	c.Value = JWTMockup
+	_, err = FromCookie(c)
+
+	if want, got := (error)(nil), err; want != got {
 		errorf(t, want, got)
 	}
 }
@@ -56,9 +71,8 @@ func TestFromRequest(t *testing.T) {
 	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", JWTMockup))
 
 	_, err = FromRequest(r)
-	var nilErr error
 
-	if want, got := nilErr, err; want != got {
+	if want, got := (error)(nil), err; want != got {
 		errorf(t, want, got)
 	}
 }

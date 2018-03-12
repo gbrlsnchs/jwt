@@ -51,6 +51,11 @@ func FromContext(ctx context.Context) (*JWT, error) {
 	return jot, nil
 }
 
+// FromCookie extracts a JWT object from a given cookie.
+func FromCookie(c *http.Cookie) (*JWT, error) {
+	return FromString(c.Value)
+}
+
 // FromRequest builds a JWT from the token contained
 // in the "Authorization" header.
 func FromRequest(r *http.Request) (*JWT, error) {

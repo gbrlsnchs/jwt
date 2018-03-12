@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - `FromContext` function to extract a JWT object from a context.
+- `FromCookie` function to extract a JWT object from a cookie.
 
 ### Changed
 - Split tests into several files in order to organize them.
