@@ -13,23 +13,21 @@ import (
 
 func TestFromContext(t *testing.T) {
 	ctx := context.Background()
-	_, err := FromContext(ctx)
+	_, err := FromContext(ctx, nil)
 
 	if want, got := ErrNilCtxKey, err; want != got {
 		errorf(t, want, got)
 	}
 
-	ctxKey := "test"
-	SetCtxKey(ctxKey)
-
-	_, err = FromContext(ctx)
+	key := "test"
+	_, err = FromContext(ctx, key)
 
 	if want, got := ErrCtxAssertion, err; want != got {
 		errorf(t, want, got)
 	}
 
-	ctx = context.WithValue(ctx, ctxKey, &JWT{})
-	_, err = FromContext(ctx)
+	ctx = context.WithValue(ctx, key, &JWT{})
+	_, err = FromContext(ctx, key)
 
 	if want, got := (error)(nil), err; want != got {
 		errorf(t, want, got)

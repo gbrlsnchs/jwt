@@ -37,12 +37,12 @@ type JWT struct {
 }
 
 // FromContext extracts a JWT object from a given context.
-func FromContext(ctx context.Context) (*JWT, error) {
-	if ctxKey == nil {
+func FromContext(ctx context.Context, key interface{}) (*JWT, error) {
+	if key == nil {
 		return nil, ErrNilCtxKey
 	}
 
-	jot, ok := ctx.Value(ctxKey).(*JWT)
+	jot, ok := ctx.Value(key).(*JWT)
 
 	if !ok {
 		return nil, ErrCtxAssertion

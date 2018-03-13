@@ -69,12 +69,9 @@ func ExampleFromContext() {
 		// Handle malformed token...
 	}
 
-	jwtCtxKey := "JWT"
-
-	jwt.SetCtxKey(jwtCtxKey)
-
-	ctx := context.WithValue(context.Background(), jwtCtxKey, jot)
-	jot, err = jwt.FromContext(ctx)
+	key := "JWT"
+	ctx := context.WithValue(context.Background(), key, jot)
+	jot, err = jwt.FromContext(ctx, key)
 
 	if err != nil {
 		// Handle JWT absence from context...

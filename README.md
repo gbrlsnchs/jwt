@@ -17,107 +17,78 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"time"
+	"testing"
 
-	"github.com/gbrlsnchs/jwt"
+	. "github.com/gbrlsnchs/jwt"
+	. "github.com/gbrlsnchs/jwt/internal"
 )
 
-func Example() {
-	// Timestamp the exact moment this function runs
-	// for validating purposes.
-	now := time.Now()
-	// Mock an HTTP request for showing off token extraction.
-	w := httptest.NewRecorder()
+func TestFromContext(t *testing.T) {
+	ctx := context.Background()
+	_, err := FromContext(ctx, nil)
+
+	if want, got := ErrNilCtxKey, err; want != got {
+		errorf(t, want, got)
+	}
+
+	key := "test"
+	_, err = FromContext(ctx, key)
+
+	if want, got := ErrCtxAssertion, err; want != got {
+		errorf(t, want, got)
+	}
+
+	ctx = context.WithValue(ctx, key, &JWT{})
+	_, err = FromContext(ctx, key)
+
+	if want, got := (error)(nil), err; want != got {
+		errorf(t, want, got)
+	}
+}
+
+func TestFromCookie(t *testing.T) {
+	c := &http.Cookie{Name: "test"}
+	_, err := FromCookie(c)
+
+	if want, got := ErrMalformedToken, err; want != got {
+		errorf(t, want, got)
+	}
+
+	c.Value = JWTMockup
+	_, err = FromCookie(c)
+
+	if want, got := (error)(nil), err; want != got {
+		errorf(t, want, got)
+	}
+}
+
+func TestFromRequest(t *testing.T) {
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	// Build JWT from the incoming request.
-	jot, err := jwt.FromRequest(r)
+	_, err := FromRequest(r)
 
-	if err != nil {
-		// Handle malformed token...
+	if want, got := ErrEmptyAuthorization, err; want != got {
+		errorf(t, want, got)
 	}
 
-	if err = jot.Verify(jwt.HS256("secret")); err != nil {
-		// Handle verification error...
+	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", "bad_token"))
+
+	_, err = FromRequest(r)
+
+	if want, got := ErrMalformedToken, err; want != got {
+		errorf(t, want, got)
 	}
 
-	// Define validators for validating the JWT. If desired, there
-	// could be custom validators too, e.g. to validate public claims.
-	algValidator := jwt.AlgorithmValidator(jwt.MethodHS256)
-	audValidator := jwt.AudienceValidator("test")
-	expValidator := jwt.ExpirationTimeValidator(now)
+	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", JWTMockup))
 
-	if err = jot.Validate(algValidator, audValidator, expValidator); err != nil {
-		switch err {
-		case jwt.ErrAlgorithmMismatch:
-			// Handle "alg" mismatch...
+	_, err = FromRequest(r)
 
-		case jwt.ErrAudienceMismatch:
-			// Handle "aud" mismatch...
-
-		case jwt.ErrTokenExpired:
-			// Handle "exp" being expired...
-		}
+	if want, got := (error)(nil), err; want != got {
+		errorf(t, want, got)
 	}
-
-	// "Sign" issues a raw string, but if desired, one could also
-	// use "FromString" method to have a JWT object.
-	token, err := jwt.Sign(jwt.HS256("secret"), &jwt.Options{Timestamp: true})
-
-	if err != nil {
-		// ...
-	}
-
-	auth := fmt.Sprintf("Bearer %s", token)
-
-	w.Header().Set("Authorization", auth)
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(token))
 }
 
-func ExampleFromContext() {
-	jot, err := jwt.FromString("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M")
-
-	if err != nil {
-		// Handle malformed token...
-	}
-
-	jwtCtxKey := "JWT"
-
-	jwt.SetCtxKey(jwtCtxKey)
-
-	ctx := context.WithValue(context.Background(), jwtCtxKey, jot)
-	jot, err = jwt.FromContext(ctx)
-
-	if err != nil {
-		// Handle JWT absence from context...
-	}
-
-	fmt.Println(jot)
-}
-
-func ExampleFromString() {
-	jot, err := jwt.FromString("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M")
-
-	if err != nil {
-		// Handle malformed token...
-	}
-
-	if err = jot.Verify(jwt.HS256("secret")); err != nil {
-		// Handle verification error...
-	}
-
-	fmt.Println(jot)
-}
-
-func ExampleSign() {
-	nextYear := time.Now().Add(24 * 30 * 12 * time.Hour)
-	token, err := jwt.Sign(jwt.HS256("secret"), &jwt.Options{ExpirationTime: nextYear})
-
-	if err != nil {
-		// ...
-	}
-
-	fmt.Println(token)
+func errorf(t *testing.T, want, got interface{}) {
+	t.Errorf("want %v, got %v\n", want, got)
 }
 ```
 
