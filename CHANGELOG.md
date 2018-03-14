@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
 - `FromContext` now receives a context key as additional parameter.
+- `FromContext` now tries to build a JWT if value in context is a string.
 
 ## [0.5.0] - 2018-03-12
 ### Added

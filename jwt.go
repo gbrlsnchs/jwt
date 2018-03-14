@@ -42,7 +42,13 @@ func FromContext(ctx context.Context, key interface{}) (*JWT, error) {
 		return nil, ErrNilCtxKey
 	}
 
-	jot, ok := ctx.Value(key).(*JWT)
+	v := ctx.Value(key)
+
+	if token, ok := v.(string); ok {
+		return FromString(token)
+	}
+
+	jot, ok := v.(*JWT)
 
 	if !ok {
 		return nil, ErrCtxAssertion

@@ -32,6 +32,13 @@ func TestFromContext(t *testing.T) {
 	if want, got := (error)(nil), err; want != got {
 		errorf(t, want, got)
 	}
+
+	ctx = context.WithValue(ctx, key, JWTMockup)
+	_, err = FromContext(ctx, key)
+
+	if want, got := (error)(nil), err; want != got {
+		errorf(t, want, got)
+	}
 }
 
 func TestFromCookie(t *testing.T) {
