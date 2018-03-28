@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Split tests into several files in order to organize them.
 
+### Fixed
+- Example in README file.
+
 ## [0.4.0] - 2018-02-16
 ### Added
 - Support for "none" method.
