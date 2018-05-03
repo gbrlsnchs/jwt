@@ -1,4 +1,6 @@
 # jwt (JSON Web Token for Go)
+[![JWT Compatible](https://jwt.io/img/badge.svg)](https://jwt.io)
+
 [![Build Status](https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master)](https://travis-ci.org/gbrlsnchs/jwt)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
 
