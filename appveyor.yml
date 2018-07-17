@@ -1,6 +1,7 @@
 version: "{build}"
 clone_folder: c:\gopath\src\github.com\gbrlsnchs\jwt
 environment:
+  GOPATH: c:\gopath
 build: false
 deploy: false
 install:
