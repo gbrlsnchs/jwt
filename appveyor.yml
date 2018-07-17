@@ -6,4 +6,4 @@ environment:
 build: false
 deploy: false
 test_script:
-  - for %%g in (go18 go19 go110) do (c:\%%g\go.exe test -v ./... & IF ERRORLEVEL == 1 EXIT 1)
+  - for %%g in (go18 go19 go110) do (c:\%%g\bin\go.exe test -v ./... & IF ERRORLEVEL == 1 EXIT 1)
