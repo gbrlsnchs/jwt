@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.1] - 2018-07-19
 ### Fixed
-- Wrap Travis CI Golang versions in quotes (for parsing issues, see [this](https://github.com/travis-ci/travis-ci/issues/9247))
+- Wrap Travis CI Golang versions in quotes (for parsing issues, see [this](https://github.com/travis-ci/travis-ci/issues/9247)).
 
 ## [1.0.0] - 2018-07-19
 ### Added
