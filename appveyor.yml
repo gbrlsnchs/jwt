@@ -4,10 +4,5 @@ environment:
   GOPATH: c:\gopath
 build: false
 deploy: false
-install:
-  - echo %GOPATH%
-  - echo %PATH%
-  - dir c:\go19
-  - dir c:\go110
 test_script:
   - for %%g in (go19 go110) do (set GOROOT=c:\%%g&& c:\%%g\bin\go.exe test -v ./... & IF ERRORLEVEL == 1 EXIT 1)
