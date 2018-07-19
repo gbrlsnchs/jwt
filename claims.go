@@ -53,9 +53,7 @@ func (c *claims) MarshalJSON() ([]byte, error) {
 }
 
 func (c *claims) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &c.pub)
-
-	if err != nil {
+	if err := json.Unmarshal(b, &c.pub); err != nil {
 		return err
 	}
 

@@ -182,9 +182,12 @@ func (j *JWT) Validate(vfuncs ...ValidatorFunc) error {
 
 // Verify verifies the Token's signature.
 func (j *JWT) Verify(s Signer) error {
-	sig, err := decode(j.raw[j.sep+1:])
+	var (
+		sig []byte
+		err error
+	)
 
-	if err != nil {
+	if sig, err = decode(j.raw[j.sep+1:]); err != nil {
 		return err
 	}
 
@@ -192,10 +195,13 @@ func (j *JWT) Verify(s Signer) error {
 }
 
 func (j *JWT) build() error {
-	p1, p2 := j.parts()
-	dec, err := decode(p1)
+	var (
+		p1, p2 = j.parts()
+		dec    []byte
+		err    error
+	)
 
-	if err != nil {
+	if dec, err = decode(p1); err != nil {
 		return err
 	}
 
@@ -203,9 +209,7 @@ func (j *JWT) build() error {
 		return err
 	}
 
-	dec, err = decode(p2)
-
-	if err != nil {
+	if dec, err = decode(p2); err != nil {
 		return err
 	}
 

@@ -59,7 +59,7 @@ func (h *hmacsha) Verify(msg, sig []byte) error {
 		return err
 	}
 
-	if valid := hmac.Equal(sig, sig2); !valid {
+	if !hmac.Equal(sig, sig2) {
 		return ErrHMACInvalid
 	}
 

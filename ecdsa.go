@@ -88,15 +88,13 @@ func (e *ecdsasha) Verify(msg, sig []byte) error {
 
 	r := big.NewInt(0).SetBytes(sig[:byteSize])
 	s := big.NewInt(0).SetBytes(sig[byteSize:])
-
 	hh := e.hash()
-	var err error
 
-	if _, err = hh.Write(msg); err != nil {
+	if _, err := hh.Write(msg); err != nil {
 		return err
 	}
 
-	if valid := ecdsa.Verify(e.pub, hh.Sum(nil), r, s); !valid {
+	if !ecdsa.Verify(e.pub, hh.Sum(nil), r, s) {
 		return ErrECSDAInvalid
 	}
 
