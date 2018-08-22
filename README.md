@@ -21,7 +21,7 @@ Also, it supports header and payload validators and all hashing algorithms (both
 ## Usage
 Full documentation [here].
 
-## Examples
+## Example
 ### Issue a JWT
 ```go
 // Set the options.
