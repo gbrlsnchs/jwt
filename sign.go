@@ -40,26 +40,31 @@ func Sign(s Signer, opt *Options) (string, error) {
 	if opt.Timestamp {
 		jot.claims.iat = now
 	}
-	var token []byte
-	p, err := json.Marshal(jot.header)
-	if err != nil {
+
+	var (
+		b   []byte
+		err error
+	)
+	if b, err = json.Marshal(jot.header); err != nil {
 		return "", err
 	}
+	encHeader := encode(b)
 
-	token = append(token, encode(p)...)
-	p, err = json.Marshal(jot.claims)
-	if err != nil {
+	if b, err = json.Marshal(jot.claims); err != nil {
 		return "", err
 	}
+	encClaims := encode(b)
 
+	token := make([]byte, 0, len(encHeader)+len(encClaims)+hashSize(s)+2) // avoid expensive reallocation by setting enough capacity
+	token = append(token, encHeader...)
 	token = append(token, '.')
-	token = append(token, encode(p)...)
-	p, err = s.Sign(token)
+	token = append(token, encClaims...)
+
+	b, err = s.Sign(token)
 	if err != nil {
 		return "", err
 	}
-
 	token = append(token, '.')
-	token = append(token, encode(p)...)
+	token = append(token, encode(b)...)
 	return string(token), nil
 }
