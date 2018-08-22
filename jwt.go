@@ -23,6 +23,10 @@ var (
 	// ErrNilCtxKey indicates that no context key is set for retrieving
 	// JWTs from context objects. This error is resolved if a key is set.
 	ErrNilCtxKey = errors.New("jwt: JWT context key is a nil value")
+	// ErrNilCtxValue indicates the context value is nil.
+	// This mitigates possible nil pointer reference problems
+	// and avoids tiring and unnecessary JWT pointer checking.
+	ErrNilCtxValue = errors.New("jwt: context value is nil")
 	// ErrCtxAssertion indicates a JWT could not be extracted from a context object
 	// because the value it holds can not be asserted to a JWT pointer.
 	ErrCtxAssertion = errors.New("jwt: unable to assert context value into JWT pointer")
@@ -41,12 +45,13 @@ func FromContext(ctx context.Context, key interface{}) (*JWT, error) {
 	if key == nil {
 		return nil, ErrNilCtxKey
 	}
-
 	v := ctx.Value(key)
+	if v == nil {
+		return nil, ErrNilCtxValue
+	}
 	if token, ok := v.(string); ok {
 		return FromString(token)
 	}
-
 	jot, ok := v.(*JWT)
 	if !ok {
 		return nil, ErrCtxAssertion
