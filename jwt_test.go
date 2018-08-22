@@ -15,6 +15,10 @@ const key = byte(0)
 const mock = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.
 TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ`
+const mockNone = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.`
+const mockMalformed = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9`
 
 func TestFromContext(t *testing.T) {
 	testCases := []struct {
@@ -40,11 +44,20 @@ func TestFromContext(t *testing.T) {
 		},
 		{
 			key: key,
+			jot: mockNone,
+		},
+		{
+			key: key,
+			jot: mockMalformed,
+			err: ErrMalformedToken,
+		},
+		{
+			key: key,
 			jot: &JWT{},
 		},
 	}
 	for _, tc := range testCases {
-		t.Run(fmt.Sprint(tc.key), func(t *testing.T) {
+		t.Run("", func(t *testing.T) {
 			ctx := context.Background()
 			if tc.key != nil {
 				ctx = context.WithValue(ctx, tc.key, tc.jot)
