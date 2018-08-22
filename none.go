@@ -9,8 +9,8 @@ func None() Signer {
 	return &none{}
 }
 
-func (n *none) Sign(msg []byte) ([]byte, error) {
-	return msg, nil
+func (n *none) Sign(_ []byte) ([]byte, error) {
+	return nil, nil
 }
 
 func (n *none) String() string {
