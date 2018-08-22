@@ -52,7 +52,6 @@ func TestFromContext(t *testing.T) {
 }
 
 func TestFromCookie(t *testing.T) {
-	const name = "doge"
 	testCases := []struct {
 		jot string
 		err error
