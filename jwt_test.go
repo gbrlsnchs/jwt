@@ -11,33 +11,49 @@ import (
 	. "github.com/gbrlsnchs/jwt/internal"
 )
 
+const key = byte(0)
+const mock = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.
+TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ`
+
 func TestFromContext(t *testing.T) {
-	ctx := context.Background()
-	_, err := FromContext(ctx, nil)
-
-	if want, got := ErrNilCtxKey, err; want != got {
-		errorf(t, want, got)
+	testCases := []struct {
+		jot interface{}
+		key interface{}
+		err error
+	}{
+		{
+			err: ErrNilCtxKey,
+		},
+		{
+			key: key,
+			jot: 1,
+			err: ErrCtxAssertion,
+		},
+		{
+			key: key,
+			err: ErrNilCtxValue,
+		},
+		{
+			key: key,
+			jot: mock,
+		},
+		{
+			key: key,
+			jot: &JWT{},
+		},
 	}
-
-	key := "test"
-	_, err = FromContext(ctx, key)
-
-	if want, got := ErrCtxAssertion, err; want != got {
-		errorf(t, want, got)
-	}
-
-	ctx = context.WithValue(ctx, key, &JWT{})
-	_, err = FromContext(ctx, key)
-
-	if want, got := (error)(nil), err; want != got {
-		errorf(t, want, got)
-	}
-
-	ctx = context.WithValue(ctx, key, JWTMockup)
-	_, err = FromContext(ctx, key)
-
-	if want, got := (error)(nil), err; want != got {
-		errorf(t, want, got)
+	for _, tc := range testCases {
+		t.Run(fmt.Sprint(tc.key), func(t *testing.T) {
+			ctx := context.Background()
+			if tc.key != nil {
+				ctx = context.WithValue(ctx, tc.key, tc.jot)
+			}
+			_, err := FromContext(ctx, tc.key)
+			if want, got := tc.err, err; want != got {
+				t.Errorf("want %v, got %v", want, got)
+			}
+		})
 	}
 }
 
@@ -73,7 +89,7 @@ func TestFromRequest(t *testing.T) {
 		errorf(t, want, got)
 	}
 
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", JWTMockup))
+	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", mock))
 
 	_, err = FromRequest(r)
 
