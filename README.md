@@ -21,113 +21,58 @@ Also, it supports header and payload validators and all hashing algorithms (both
 ## Usage
 Full documentation [here].
 
-## Example (from `example_test.go`)
+## Examples
+### Issue a JWT
 ```go
-package jwt_test
-
-import (
-	"context"
-	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"time"
-
-	"github.com/gbrlsnchs/jwt"
-)
-
-func Example() {
-	// Timestamp the exact moment this function runs
-	// for validating purposes.
-	now := time.Now()
-	// Mock an HTTP request for showing off token extraction.
-	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	// Build JWT from the incoming request.
-	jot, err := jwt.FromRequest(r)
-
-	if err != nil {
-		// Handle malformed token...
-	}
-
-	if err = jot.Verify(jwt.HS256("secret")); err != nil {
-		// Handle verification error...
-	}
-
-	// Define validators for validating the JWT. If desired, there
-	// could be custom validators too, e.g. to validate public claims.
-	algValidator := jwt.AlgorithmValidator(jwt.MethodHS256)
-	audValidator := jwt.AudienceValidator("test")
-	expValidator := jwt.ExpirationTimeValidator(now)
-
-	if err = jot.Validate(algValidator, audValidator, expValidator); err != nil {
-		switch err {
-		case jwt.ErrAlgorithmMismatch:
-			// Handle "alg" mismatch...
-
-		case jwt.ErrAudienceMismatch:
-			// Handle "aud" mismatch...
-
-		case jwt.ErrTokenExpired:
-			// Handle "exp" being expired...
-		}
-	}
-
-	// "Sign" issues a raw string, but if desired, one could also
-	// use "FromString" method to have a JWT object.
-	token, err := jwt.Sign(jwt.HS256("secret"), &jwt.Options{Timestamp: true})
-
-	if err != nil {
-		// ...
-	}
-
-	auth := fmt.Sprintf("Bearer %s", token)
-
-	w.Header().Set("Authorization", auth)
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(token))
+// Set the options.
+now := time.Now()
+opt := &jwt.Options{
+	JWTID:          "unique_id",
+	Timestamp:      true,
+	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour),
+	NotBefore:      now.Add(30 * time.Minute),
+	Subject:        "123",
+	Audience:       "admin",
+	Issuer:         "auth_server",
+	KeyID:          "my_key",
+	Public:         map[string]interface{}{"foo": "bar", "myBool": true},
 }
 
-func ExampleFromContext() {
-	jot, err := jwt.FromString("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M")
+// Define a signer.
+sig := jwt.HS256("my_53cr37")
 
-	if err != nil {
-		// Handle malformed token...
-	}
-
-	key := "JWT"
-	ctx := context.WithValue(context.Background(), key, jot)
-	jot, err = jwt.FromContext(ctx, key)
-
-	if err != nil {
-		// Handle JWT absence from context...
-	}
-
-	fmt.Println(jot)
+// Issue a new token.
+token, err := jwt.Sign(sig, opt)
+if err != nil {
+	// ...
 }
+log.Print(token)
+```
 
-func ExampleFromString() {
-	jot, err := jwt.FromString("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.t-IDcSemACt8x4iTMCda8Yhe3iZaWbvV5XKSTbuAn0M")
-
-	if err != nil {
-		// Handle malformed token...
-	}
-
-	if err = jot.Verify(jwt.HS256("secret")); err != nil {
-		// Handle verification error...
-	}
-
-	fmt.Println(jot)
+### Verify a JWT
+```go
+now := time.Now()
+sig := jwt.HS256("my_53cr37")
+jot, err := jwt.Verify(sig)
+if err != nil {
+	// token is invalid
 }
+```
 
-func ExampleSign() {
-	nextYear := time.Now().Add(24 * 30 * 12 * time.Hour)
-	token, err := jwt.Sign(jwt.HS256("secret"), &jwt.Options{ExpirationTime: nextYear})
-
-	if err != nil {
-		// ...
+### Validate a JWT
+```go
+algValidator := jwt.AlgorithmValidator(jwt.MethodHS256)
+expValidator := jwt.ExpirationTimeValidator(now)
+audValidator := jwt.AudienceValidator("admin")
+if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
+	switch err {
+	case jwt.ErrAlgorithmMismatch:
+		// handle "alg" mismatch
+	case jwt.ErrTokenExpired:
+		// handle "exp" being expired
 	}
-
-	fmt.Println(token)
+	case jwt.ErrAudienceMismatch:
+		// handle "aud" mismatch
 }
 ```
 
