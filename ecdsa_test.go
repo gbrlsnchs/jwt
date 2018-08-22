@@ -7,75 +7,59 @@ import (
 	"testing"
 
 	. "github.com/gbrlsnchs/jwt"
-	. "github.com/gbrlsnchs/jwt/internal"
 )
 
 func TestECDSA(t *testing.T) {
-	ecdsa256Priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	priv256, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 
 	if err != nil {
-		t.Fatalf("%v\n", err)
+		t.Fatalf("%v", err)
 	}
+	pub256 := &priv256.PublicKey
 
-	ecdsa256Pub := &ecdsa256Priv.PublicKey
-	ecdsa256Priv2, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-
+	priv2562, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		t.Fatalf("%v\n", err)
+		t.Fatalf("%v", err)
 	}
+	pub2562 := &priv2562.PublicKey
 
-	ecdsa256Pub2 := &ecdsa256Priv2.PublicKey
-	ecdsa384Priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-
+	priv384, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
-		t.Fatalf("%v\n", err)
+		t.Fatalf("%v", err)
 	}
-
-	ecdsa384Pub := &ecdsa384Priv.PublicKey
-	ecdsa384Priv2, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-
+	pub384 := &priv384.PublicKey
+	priv3842, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
-		t.Fatalf("%v\n", err)
+		t.Fatalf("%v", err)
 	}
+	pub3842 := &priv3842.PublicKey
 
-	ecdsa384Pub2 := &ecdsa384Priv2.PublicKey
-	ecdsa512Priv, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-
+	priv512, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
-		t.Fatalf("%v\n", err)
+		t.Fatalf("%v", err)
 	}
-
-	ecdsa512Pub := &ecdsa512Priv.PublicKey
-	ecdsa512Priv2, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-
+	pub512 := &priv512.PublicKey
+	priv5122, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
-		t.Fatalf("%v\n", err)
+		t.Fatalf("%v", err)
 	}
-
-	ecdsa512Pub2 := &ecdsa512Priv2.PublicKey
-	tests := []*TestTable{
-		{
-			Signer: ES256(ecdsa256Priv, ecdsa256Pub),
-		},
-		{
-			Signer:     ES256(ecdsa256Priv, ecdsa256Pub2),
-			ParsingErr: true,
-		},
-		{
-			Signer: ES384(ecdsa384Priv, ecdsa384Pub),
-		},
-		{
-			Signer:     ES384(ecdsa384Priv, ecdsa384Pub2),
-			ParsingErr: true,
-		},
-		{
-			Signer: ES512(ecdsa512Priv, ecdsa512Pub),
-		},
-		{
-			Signer:     ES512(ecdsa512Priv, ecdsa512Pub2),
-			ParsingErr: true,
-		},
+	pub5122 := &priv5122.PublicKey
+	testCases := []struct {
+		s, v                   Signer
+		errOnSign, errOnVerify bool
+	}{
+		{s: ES256(nil, pub256), errOnSign: true},
+		{s: ES256(priv256, nil), errOnVerify: true},
+		{s: ES256(priv256, pub256)},
+		{s: ES256(priv256, pub2562), errOnVerify: true},
+		{s: ES384(priv384, pub384)},
+		{s: ES384(priv384, pub3842), errOnVerify: true},
+		{s: ES512(priv512, pub512)},
+		{s: ES512(priv512, pub5122), errOnVerify: true},
 	}
-
-	RunTests(t, tests)
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			run(t, tc.s, tc.v, tc.errOnSign, tc.errOnVerify)
+		})
+	}
 }
