@@ -57,7 +57,7 @@ func TestFromCookie(t *testing.T) {
 		jot string
 		err error
 	}{
-		{jot: "", err: ErrMalformedToken},
+		{err: ErrMalformedToken},
 		{jot: mock},
 		{jot: mockNone},
 		{jot: mockMalformed, err: ErrMalformedToken},
@@ -74,30 +74,27 @@ func TestFromCookie(t *testing.T) {
 }
 
 func TestFromRequest(t *testing.T) {
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	_, err := FromRequest(r)
-
-	if want, got := ErrEmptyAuthorization, err; want != got {
-		errorf(t, want, got)
+	testCases := []struct {
+		jot        string
+		err        error
+		headerless bool
+	}{
+		{headerless: true, err: ErrEmptyAuthorization},
+		{err: ErrMalformedToken},
+		{jot: mock},
+		{jot: mockNone},
+		{jot: mockMalformed, err: ErrMalformedToken},
 	}
-
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", "bad_token"))
-
-	_, err = FromRequest(r)
-
-	if want, got := ErrMalformedToken, err; want != got {
-		errorf(t, want, got)
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			r := httptest.NewRequest("", "/", nil)
+			if !tc.headerless {
+				r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tc.jot))
+			}
+			_, err := FromRequest(r)
+			if want, got := tc.err, err; want != got {
+				t.Errorf("want %v, got %v", want, got)
+			}
+		})
 	}
-
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", mock))
-
-	_, err = FromRequest(r)
-
-	if want, got := (error)(nil), err; want != got {
-		errorf(t, want, got)
-	}
-}
-
-func errorf(t *testing.T, want, got interface{}) {
-	t.Errorf("want %v, got %v\n", want, got)
 }
