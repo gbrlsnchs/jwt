@@ -39,10 +39,10 @@ opt := &jwt.Options{
 }
 
 // Define a signer.
-sig := jwt.HS256("my_53cr37")
+s := jwt.HS256("my_53cr37")
 
 // Issue a new token.
-token, err := jwt.Sign(sig, opt)
+token, err := jwt.Sign(s, opt)
 if err != nil {
 	// ...
 }
@@ -52,8 +52,8 @@ log.Print(token)
 ### Verify a JWT
 ```go
 now := time.Now()
-sig := jwt.HS256("my_53cr37")
-jot, err := jwt.Verify(sig)
+s := jwt.HS256("my_53cr37")
+jot, err := jwt.Verify(s)
 if err != nil {
 	// token is invalid
 }
