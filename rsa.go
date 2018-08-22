@@ -41,17 +41,14 @@ func (r *rsasha) Sign(msg []byte) ([]byte, error) {
 
 	hh := r.hash.New()
 	var err error
-
 	if _, err = hh.Write(msg); err != nil {
 		return nil, err
 	}
 
 	sig, err := rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, hh.Sum(nil))
-
 	if err != nil {
 		return nil, err
 	}
-
 	return sig, nil
 }
 
@@ -66,10 +63,8 @@ func (r *rsasha) Verify(msg, sig []byte) error {
 
 	hh := r.hash.New()
 	var err error
-
 	if _, err = hh.Write(msg); err != nil {
 		return err
 	}
-
 	return rsa.VerifyPKCS1v15(r.pub, r.hash, hh.Sum(nil), sig)
 }

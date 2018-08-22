@@ -43,17 +43,14 @@ func FromContext(ctx context.Context, key interface{}) (*JWT, error) {
 	}
 
 	v := ctx.Value(key)
-
 	if token, ok := v.(string); ok {
 		return FromString(token)
 	}
 
 	jot, ok := v.(*JWT)
-
 	if !ok {
 		return nil, ErrCtxAssertion
 	}
-
 	return jot, nil
 }
 
@@ -67,11 +64,9 @@ func FromCookie(c *http.Cookie) (*JWT, error) {
 func FromRequest(r *http.Request) (*JWT, error) {
 	auth := r.Header.Get("Authorization")
 	i := strings.IndexByte(auth, ' ')
-
 	if i < 0 {
 		return nil, ErrEmptyAuthorization
 	}
-
 	return FromString(auth[i+1:])
 }
 
@@ -79,24 +74,18 @@ func FromRequest(r *http.Request) (*JWT, error) {
 // of a JSON Web Token.
 func FromString(s string) (*JWT, error) {
 	sep1 := strings.IndexByte(s, '.')
-
 	if sep1 < 0 {
 		return nil, ErrMalformedToken
 	}
-
 	sep2 := strings.IndexByte(s[sep1+1:], '.')
-
 	if sep2 < 0 {
 		return nil, ErrMalformedToken
 	}
-
 	sep2 += sep1 + 1
 	jot := &JWT{raw: s, sep: sep2}
-
 	if err := jot.build(); err != nil {
 		return nil, err
 	}
-
 	return jot, nil
 }
 
@@ -176,7 +165,6 @@ func (j *JWT) Validate(vfuncs ...ValidatorFunc) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -186,11 +174,9 @@ func (j *JWT) Verify(s Signer) error {
 		sig []byte
 		err error
 	)
-
 	if sig, err = decode(j.raw[j.sep+1:]); err != nil {
 		return err
 	}
-
 	return s.Verify([]byte(j.raw[:j.sep]), sig)
 }
 
@@ -200,28 +186,22 @@ func (j *JWT) build() error {
 		dec    []byte
 		err    error
 	)
-
 	if dec, err = decode(p1); err != nil {
 		return err
 	}
-
 	if err = json.Unmarshal(dec, &j.header); err != nil {
 		return err
 	}
-
 	if dec, err = decode(p2); err != nil {
 		return err
 	}
-
 	if err = json.Unmarshal(dec, &j.claims); err != nil {
 		return err
 	}
-
 	return nil
 }
 
 func (j *JWT) parts() (string, string) {
 	sep := strings.IndexByte(j.raw[:j.sep], '.')
-
 	return j.raw[:sep], j.raw[sep+1 : j.sep]
 }

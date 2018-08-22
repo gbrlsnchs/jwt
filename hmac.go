@@ -40,11 +40,9 @@ func (h *hmacsha) Sign(msg []byte) ([]byte, error) {
 	}
 
 	hh := hmac.New(h.hash, h.key)
-
 	if _, err := hh.Write(msg); err != nil {
 		return nil, err
 	}
-
 	return hh.Sum(nil), nil
 }
 
@@ -54,7 +52,6 @@ func (h *hmacsha) String() string {
 
 func (h *hmacsha) Verify(msg, sig []byte) error {
 	sig2, err := h.Sign(msg)
-
 	if err != nil {
 		return err
 	}
@@ -62,6 +59,5 @@ func (h *hmacsha) Verify(msg, sig []byte) error {
 	if !hmac.Equal(sig, sig2) {
 		return ErrHMACInvalid
 	}
-
 	return nil
 }

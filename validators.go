@@ -22,7 +22,6 @@ func AlgorithmValidator(alg string) ValidatorFunc {
 		if alg != jot.Algorithm() {
 			return ErrAlgorithmMismatch
 		}
-
 		return nil
 	}
 }
@@ -33,7 +32,6 @@ func AudienceValidator(aud string) ValidatorFunc {
 		if jot.Audience() != aud {
 			return ErrAudienceMismatch
 		}
-
 		return nil
 	}
 }
@@ -44,7 +42,6 @@ func ExpirationTimeValidator(now time.Time) ValidatorFunc {
 		if exp := jot.ExpirationTime(); !exp.IsZero() && now.After(exp) {
 			return ErrTokenExpired
 		}
-
 		return nil
 	}
 }
@@ -55,7 +52,6 @@ func IssuedAtValidator(now time.Time) ValidatorFunc {
 		if now.Before(jot.IssuedAt()) {
 			return ErrTokenFromFuture
 		}
-
 		return nil
 	}
 }
@@ -66,7 +62,6 @@ func IssuerValidator(iss string) ValidatorFunc {
 		if jot.Issuer() != iss {
 			return ErrIssuerMismatch
 		}
-
 		return nil
 	}
 }
@@ -77,7 +72,6 @@ func IDValidator(jti string) ValidatorFunc {
 		if jot.ID() != jti {
 			return ErrJWTIDMismatch
 		}
-
 		return nil
 	}
 }
@@ -88,7 +82,6 @@ func NotBeforeValidator(now time.Time) ValidatorFunc {
 		if now.Before(jot.NotBefore()) {
 			return ErrTokenTooYoung
 		}
-
 		return nil
 	}
 }
@@ -99,7 +92,6 @@ func SubjectValidator(sub string) ValidatorFunc {
 		if jot.Subject() != sub {
 			return ErrSubjectMismatch
 		}
-
 		return nil
 	}
 }
