@@ -97,3 +97,23 @@ func TestFromRequest(t *testing.T) {
 		})
 	}
 }
+
+func TestFromString(t *testing.T) {
+	testCases := []struct {
+		jot string
+		err error
+	}{
+		{err: ErrMalformedToken},
+		{jot: mock},
+		{jot: mockNone},
+		{jot: mockMalformed, err: ErrMalformedToken},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			_, err := FromString(tc.jot)
+			if want, got := tc.err, err; want != got {
+				t.Errorf("want %v, got %v", want, got)
+			}
+		})
+	}
+}
