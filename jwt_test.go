@@ -117,3 +117,26 @@ func TestFromString(t *testing.T) {
 		})
 	}
 }
+
+func run(t *testing.T, s, v Signer, errOnSign, errOnVerify bool) {
+	token, err := Sign(s, nil)
+	if want, got := errOnSign, err != nil; want != got {
+		t.Fatalf("want %v, got %v", want, got)
+	}
+	if err != nil {
+		return
+	}
+
+	if v == nil {
+		v = s
+	}
+	jot, err := FromString(token)
+	if want, got := (error)(nil), err; want != got {
+		t.Logf("%s: %s", s.String(), token)
+		t.Fatalf("want %v, got %v", want, got)
+	}
+	if want, got := errOnVerify, jot.Verify(v) != nil; want != got {
+		t.Fatalf("want %t, got %t\n", want, got)
+	}
+	t.Logf("%s: %s", s.String(), jot.String())
+}
