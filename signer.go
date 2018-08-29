@@ -1,7 +1,7 @@
 package jwt
 
 type Signer interface {
-	Sign(msg []byte) ([]byte, error)
+	Sign(Marshaler) ([]byte, error)
+	Verify([]byte, Marshaler) error
 	String() string
-	Verify(msg, sig []byte) error
 }
