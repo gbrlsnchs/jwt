@@ -1,212 +1,117 @@
 package jwt
 
 import (
-	"context"
+	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"net/http"
-	"strings"
 	"time"
 )
 
-// ValidatorFunc is a function for running extra
-// validators when parsing a JWT string.
-type ValidatorFunc func(jot *JWT) error
+var enc = base64.RawURLEncoding
+
+type JWT struct {
+	*Header
+	*Claims
+	nested bool // avoids nested JWT infinite loop
+}
 
 var (
-	// ErrEmptyAuthorization indicates that the "Authorization" header
-	// doesn't have a token and, thus, extracting a token is impossible.
-	ErrEmptyAuthorization = errors.New("jwt: no token could be extracted from header")
 	// ErrMalformedToken indicates a token doesn't have
 	// a valid format, as per the RFC 7519, section 7.2.
 	ErrMalformedToken = errors.New("jwt: malformed token")
-	// ErrNilCtxKey indicates that no context key is set for retrieving
-	// JWTs from context objects. This error is resolved if a key is set.
-	ErrNilCtxKey = errors.New("jwt: JWT context key is a nil value")
-	// ErrNilCtxValue indicates the context value is nil.
-	// This mitigates possible nil pointer reference problems
-	// and avoids tiring and unnecessary JWT pointer checking.
-	ErrNilCtxValue = errors.New("jwt: context value is nil")
-	// ErrCtxAssertion indicates a JWT could not be extracted from a context object
-	// because the value it holds can not be asserted to a JWT pointer.
-	ErrCtxAssertion = errors.New("jwt: unable to assert context value into JWT pointer")
+	ErrNilHeader      = errors.New("jwt: nil header")
+	ErrBigNest        = errors.New("jwt: more than one nested JWT")
 )
 
-// JWT is a JSON Web Token.
-type JWT struct {
-	header *header
-	claims *claims
-	raw    string
-	sep    int
-}
-
-// FromContext extracts a JWT object from a given context.
-func FromContext(ctx context.Context, key interface{}) (*JWT, error) {
-	if key == nil {
-		return nil, ErrNilCtxKey
+// MarshalJWT implements JWT marshaling.
+func (jot *JWT) MarshalJWT() (payload []byte, err error) {
+	if jot.Header == nil {
+		return nil, ErrNilHeader
 	}
-	v := ctx.Value(key)
-	if v == nil {
-		return nil, ErrNilCtxValue
-	}
-	if token, ok := v.(string); ok {
-		return FromString(token)
-	}
-	jot, ok := v.(*JWT)
-	if !ok {
-		return nil, ErrCtxAssertion
-	}
-	return jot, nil
-}
-
-// FromCookie extracts a JWT object from a given cookie.
-func FromCookie(c *http.Cookie) (*JWT, error) {
-	return FromString(c.Value)
-}
-
-// FromRequest builds a JWT from the token contained
-// in the "Authorization" header.
-func FromRequest(r *http.Request) (*JWT, error) {
-	auth := r.Header.Get("Authorization")
-	i := strings.IndexByte(auth, ' ')
-	if i < 0 {
-		return nil, ErrEmptyAuthorization
-	}
-	return FromString(auth[i+1:])
-}
-
-// FromString builds a JWT from a string representation
-// of a JSON Web Token.
-func FromString(s string) (*JWT, error) {
-	sep1 := strings.IndexByte(s, '.')
-	if sep1 < 0 {
-		return nil, ErrMalformedToken
-	}
-	sep2 := strings.IndexByte(s[sep1+1:], '.')
-	if sep2 < 0 {
-		return nil, ErrMalformedToken
-	}
-	sep2 += sep1 + 1
-	jot := &JWT{raw: s, sep: sep2}
-	if err := jot.build(); err != nil {
+	jot.header = &header{"JWT"}
+	hdr, err := json.Marshal(jot.Header)
+	if err != nil {
 		return nil, err
 	}
-	return jot, nil
-}
+	hdrSize := enc.EncodedLen(len(hdr))
 
-// Algorithm returns the "alg" claim
-// from the JWT's header.
-func (j *JWT) Algorithm() string {
-	return j.header.Algorithm
-}
-
-// Audience returns the "aud" claim
-// from the JWT's payload.
-func (j *JWT) Audience() string {
-	return j.claims.aud
-}
-
-// Bytes returns a representation of the JWT
-// as an array of bytes.
-func (j *JWT) Bytes() []byte {
-	return []byte(j.raw)
-}
-
-// ExpirationTime returns the "exp" claim
-// from the JWT's payload.
-func (j *JWT) ExpirationTime() time.Time {
-	return j.claims.exp
-}
-
-// IssuedAt returns the "iat" claim
-// from the JWT's payload.
-func (j *JWT) IssuedAt() time.Time {
-	return j.claims.iat
-}
-
-// Issuer returns the "iss" claim
-// from the JWT's payload.
-func (j *JWT) Issuer() string {
-	return j.claims.iss
-}
-
-// ID returns the "jti" claim
-// from the JWT's payload.
-func (j *JWT) ID() string {
-	return j.claims.jti
-}
-
-// KeyID returns the "kid" claim
-// from the JWT's header.
-func (j *JWT) KeyID() string {
-	return j.header.KeyID
-}
-
-// NotBefore returns the "nbf" claim
-// from the JWT's payload.
-func (j *JWT) NotBefore() time.Time {
-	return j.claims.nbf
-}
-
-// Public returns all public claims set.
-func (j *JWT) Public() map[string]interface{} {
-	return j.claims.pub
-}
-
-// Subject returns the "sub" claim
-// from the JWT's payload.
-func (j *JWT) Subject() string {
-	return j.claims.sub
-}
-
-func (j *JWT) String() string {
-	return j.raw
-}
-
-// Validate iterates over custom validator functions to validate the JWT.
-func (j *JWT) Validate(vfuncs ...ValidatorFunc) error {
-	for _, vfunc := range vfuncs {
-		if err := vfunc(j); err != nil {
-			return err
+	if jot.Claims != nil {
+		jot.claims = &claims{}
+		if t := jot.IssuedAt; !t.IsZero() {
+			jot.Iat = t.Unix()
+		}
+		if t := jot.Expiration; !t.IsZero() {
+			jot.Exp = t.Unix()
+		}
+		if t := jot.NotBefore; !t.IsZero() {
+			jot.Nbf = t.Unix()
 		}
 	}
+	cls, err := json.Marshal(jot.Claims)
+	if err != nil {
+		return nil, err
+	}
+	clsSize := enc.EncodedLen(len(cls))
+
+	payload = make([]byte, hdrSize+1+clsSize)
+	enc.Encode(payload, hdr)
+	payload[hdrSize] = '.'
+	enc.Encode(payload[hdrSize+1:], cls)
+	return payload, nil
+}
+
+// UnmarshalJWT implements JWT unmarshaling.
+func (jot *JWT) UnmarshalJWT(b []byte) error {
+	if jot == nil {
+		jot = &JWT{}
+	}
+	sep := bytes.IndexByte(b, '.')
+	if sep < 0 { // RFC 7519, section 7.2.1
+		return ErrMalformedToken
+	}
+	var err error
+
+	encHdr := b[:sep] // RFC 7519, section 7.2.2
+	hdrSize := enc.DecodedLen(len(encHdr))
+	decHdr := make([]byte, hdrSize)
+	if _, err = enc.Decode(decHdr, encHdr); err != nil { // RFC 7519, section 7.2.3
+		return err
+	}
+	var hdr Header
+	hdr.header = &header{}
+	if err = json.Unmarshal(decHdr, &hdr); err != nil { // RFC 7519, sections 7.2.{4,5,6,7,8}
+		return err
+	}
+
+	encCls := b[sep+1:]
+	if hdr.ContentType == "JWT" {
+		if jot.nested {
+			return ErrBigNest
+		}
+		jot.nested = true
+		return jot.UnmarshalJWT(encCls)
+	}
+	clsSize := enc.DecodedLen(len(encCls))
+	decCls := make([]byte, clsSize)
+	if _, err = enc.Decode(decCls, encCls); err != nil {
+		return err
+	}
+	var cls Claims
+	cls.claims = &claims{}
+	jot.Claims = &cls
+	if err = json.Unmarshal(decCls, jot); err != nil {
+		return err
+	}
+	if jot.Iat > 0 {
+		jot.IssuedAt = time.Unix(jot.Iat, 0)
+	}
+	if jot.Exp > 0 {
+		jot.Expiration = time.Unix(jot.Exp, 0)
+	}
+	if jot.Nbf > 0 {
+		jot.NotBefore = time.Unix(jot.Nbf, 0)
+	}
+	jot.Header = &hdr
 	return nil
-}
-
-// Verify verifies the Token's signature.
-func (j *JWT) Verify(s Signer) error {
-	var (
-		sig []byte
-		err error
-	)
-	if sig, err = decode(j.raw[j.sep+1:]); err != nil {
-		return err
-	}
-	return s.Verify([]byte(j.raw[:j.sep]), sig)
-}
-
-func (j *JWT) build() error {
-	var (
-		p1, p2 = j.parts()
-		dec    []byte
-		err    error
-	)
-	if dec, err = decode(p1); err != nil {
-		return err
-	}
-	if err = json.Unmarshal(dec, &j.header); err != nil {
-		return err
-	}
-	if dec, err = decode(p2); err != nil {
-		return err
-	}
-	if err = json.Unmarshal(dec, &j.claims); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (j *JWT) parts() (string, string) {
-	sep := strings.IndexByte(j.raw[:j.sep], '.')
-	return j.raw[:sep], j.raw[sep+1 : j.sep]
 }
