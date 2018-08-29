@@ -9,61 +9,113 @@
 ## About
 This package is a JWT signer, verifier and validator for [Go] (or Golang).
 
-When it comes to JWT, there are lots of libraries available for Go.
-Still, I couldn't find one that was simple enough to use, so I decided to create this library in order to help whomever needs an easy solution for JWT.
+There are many JWT packages out there for Go, but many lack signing/verifying methods or validation, and when they don't, they're overkill or overcomplicated. This package tries to mimic the ease of use from [Node's] JWT implementation but written in Go.
 
-The main difference between other libraries is ease of use.
-This library is pretty straightforward and has no external dependencies.
-If one is used to easy-to-use libraries, like [Node's], perhaps it is the ideal library for them to use.
+Version 1 was simple to use but not so fast and memory-efficient, that's why version 2 is a total rework that brings better performance, taking advantage of type embedding and a new `jwt.Marshaler` interface, while following the [Effective Go] guidelines.
 
-Also, it supports header and payload validators and all hashing algorithms (both signing and verifying).
+### Benchmark
+#### `v1` on  `Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz`
+```
+BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
+BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
+```
+
+#### `v2` on  `Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz`
+```
+BenchmarkSign-4     	  300000	      3633 ns/op	    1216 B/op	      12 allocs/op
+BenchmarkVerify-4   	  200000	      8046 ns/op	    1504 B/op	      29 allocs/op
+```
 
 ## Usage
 Full documentation [here].
 
 ## Example
-### Issue a JWT
+### JWT without public claims
 ```go
-// Set the options.
+// Timestamp the beginning.
 now := time.Now()
-opt := &jwt.Options{
-	JWTID:          "unique_id",
-	Timestamp:      true,
-	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour),
-	NotBefore:      now.Add(30 * time.Minute),
-	Subject:        "123",
-	Audience:       "admin",
-	Issuer:         "auth_server",
-	KeyID:          "my_key",
-	Public:         map[string]interface{}{"foo": "bar", "myBool": true},
-}
-
 // Define a signer.
-s := jwt.HS256("my_53cr37")
-
-// Issue a new token.
-token, err := jwt.Sign(s, opt)
-if err != nil {
-	// ...
+hs256 := jwt.HS256("my_53cr37")
+auth := &jwt.JWT{
+	Header: &jwt.Header{
+		Algorithm: hs256.String(),
+		KeyID:     "my_key",
+	},
+	Claims: &jwt.Claims{
+		ID:         "unique_id",
+		IssuedAt:   now,
+		Expiration: now.Add(24 * 30 * 12 * time.Hour),
+		NotBefore:  now.Add(30 * time.Minute),
+		Subject:    "123",
+		Audience:   "admin",
+		Issuer:     "auth_server",
+	},
 }
-log.Print(token)
+token, err := hs256.Sign(auth)
+if err != nil {
+	// handle error
+}
+log.Print("token = %s", jot)
 ```
 
-### Verify a JWT
+### JWT with public claims
 ```go
+type Token struct {
+	*jwt.JWT
+	Foo  string `json:"foo,omitempty"`
+	Bool bool   `json:"bool"`
+}
+
+// Timestamp the beginning.
 now := time.Now()
-s := jwt.HS256("my_53cr37")
-jot, err := jwt.FromRequest(r)
+// Define a signer.
+hs256 := jwt.HS256("my_53cr37")
+jot := &Token{
+	JWT: &jwt.JWT{
+		Header: &jwt.Header{
+			Algorithm: hs256.String(),
+			KeyID:     "my_key",
+		},
+		Claims: &jwt.Claims{
+			ID:         "unique_id",
+			IssuedAt:   now,
+			Expiration: now.Add(24 * 30 * 12 * time.Hour),
+			NotBefore:  now.Add(30 * time.Minute),
+			Subject:    "123",
+			Audience:   "admin",
+			Issuer:     "auth_server",
+		},
+	},
+	Foo: "bar",
+	Bool: true,
+}
+token, err := hs256.Sign(jot)
 if err != nil {
-	// handle malformed or inexistent token
+	// handle error
 }
-if err := jot.Verify(s); err != nil {
-	// token is invalid
-}
+log.Print("token = %s", token)
 ```
 
-### Validate a JWT
+### Verify and validating a JWT
 ```go
+type Token struct {
+	*jwt.JWT
+	Foo  string `json:"foo,omitempty"`
+	Bool bool   `json:"bool"`
+}
+
+// Timestamp the beginning.
+now := time.Now()
+hs256 := jwt.HS256("my_53cr37")
+token := `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q`
+var jot Token
+
+if err := hs256.Verify(string(token), &auth); err != nil {
+	// handle error
+}
+
 algValidator := jwt.AlgorithmValidator(jwt.MethodHS256)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
@@ -79,13 +131,6 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 }
 ```
 
-## Benchmark
-### `v1` on `Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz`
-```
-BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
-BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
-```
-
 ## Contribution
 ### How to help:
 - Pull Requests
@@ -94,4 +139,5 @@ BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
 
 [Go]: https://golang.org
 [Node's]: https://github.com/auth0/node-jsonwebtoken
+[Effective Go]: https://golang.org/doc/effective_go.html
 [here]: https://godoc.org/github.com/gbrlsnchs/jwt
