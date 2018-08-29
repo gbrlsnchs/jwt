@@ -79,6 +79,13 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 }
 ```
 
+## Benchmark
+### `v1` on `Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz`
+```
+BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
+BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
+```
+
 ## Contribution
 ### How to help:
 - Pull Requests
