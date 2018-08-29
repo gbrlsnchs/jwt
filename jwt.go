@@ -115,3 +115,12 @@ func (jot *JWT) UnmarshalJWT(b []byte) error {
 	jot.Header = &hdr
 	return nil
 }
+
+func (jot *JWT) Validate(validators ...ValidatorFunc) error {
+	for _, fn := range validators {
+		if err := fn(jot); err != nil {
+			return err
+		}
+	}
+	return nil
+}
