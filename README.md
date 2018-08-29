@@ -53,8 +53,11 @@ log.Print(token)
 ```go
 now := time.Now()
 s := jwt.HS256("my_53cr37")
-jot, err := jwt.Verify(s)
+jot, err := jwt.FromRequest(r)
 if err != nil {
+	// handle malformed or inexistent token
+}
+if err := jot.Verify(s); err != nil {
 	// token is invalid
 }
 ```
