@@ -16,10 +16,14 @@ var (
 	ErrSubjectMismatch   = errors.New("jwt: Subject mismatch")
 )
 
+// ValidatorFunc is a function for running extra
+// validators when parsing a JWT string.
+type ValidatorFunc func(jot *JWT) error
+
 // AlgorithmValidator validates the "alg" claim.
 func AlgorithmValidator(alg string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if alg != jot.Algorithm() {
+		if alg != jot.Algorithm {
 			return ErrAlgorithmMismatch
 		}
 		return nil
@@ -29,7 +33,7 @@ func AlgorithmValidator(alg string) ValidatorFunc {
 // AudienceValidator validates the "aud" claim.
 func AudienceValidator(aud string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if jot.Audience() != aud {
+		if jot.Audience != aud {
 			return ErrAudienceMismatch
 		}
 		return nil
@@ -39,7 +43,7 @@ func AudienceValidator(aud string) ValidatorFunc {
 // ExpirationTimeValidator validates the "exp" claim.
 func ExpirationTimeValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if exp := jot.ExpirationTime(); !exp.IsZero() && now.After(exp) {
+		if exp := jot.Expiration; !exp.IsZero() && now.After(exp) {
 			return ErrTokenExpired
 		}
 		return nil
@@ -49,7 +53,7 @@ func ExpirationTimeValidator(now time.Time) ValidatorFunc {
 // IssuedAtValidator validates the "iat" claim.
 func IssuedAtValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if now.Before(jot.IssuedAt()) {
+		if now.Before(jot.IssuedAt) {
 			return ErrTokenFromFuture
 		}
 		return nil
@@ -59,7 +63,7 @@ func IssuedAtValidator(now time.Time) ValidatorFunc {
 // IssuerValidator validates the "iss" claim.
 func IssuerValidator(iss string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if jot.Issuer() != iss {
+		if jot.Issuer != iss {
 			return ErrIssuerMismatch
 		}
 		return nil
@@ -69,7 +73,7 @@ func IssuerValidator(iss string) ValidatorFunc {
 // IDValidator validates the "jti" claim.
 func IDValidator(jti string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if jot.ID() != jti {
+		if jot.ID != jti {
 			return ErrJWTIDMismatch
 		}
 		return nil
@@ -79,7 +83,7 @@ func IDValidator(jti string) ValidatorFunc {
 // NotBeforeValidator validates the "nbf" claim.
 func NotBeforeValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if now.Before(jot.NotBefore()) {
+		if now.Before(jot.NotBefore) {
 			return ErrTokenTooYoung
 		}
 		return nil
@@ -89,7 +93,7 @@ func NotBeforeValidator(now time.Time) ValidatorFunc {
 // SubjectValidator validates the "sub" claim.
 func SubjectValidator(sub string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if jot.Subject() != sub {
+		if jot.Subject != sub {
 			return ErrSubjectMismatch
 		}
 		return nil
