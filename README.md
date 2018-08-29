@@ -9,21 +9,21 @@
 ## About
 This package is a JWT signer, verifier and validator for [Go] (or Golang).
 
-There are many JWT packages out there for Go, but many lack signing/verifying methods or validation, and when they don't, they're overkill or overcomplicated. This package tries to mimic the ease of use from [Node's] JWT implementation but written in Go.
+There are many JWT packages out there for Go, but many lack signing/verifying methods or validation, and when they don't, they're overkill or overcomplicated. This package tries to mimic the ease of use from [Node's] JWT implementation but, of course, written in Go.
 
 Version 1 was simple to use but not so fast and memory-efficient, that's why version 2 is a total rework that brings better performance, taking advantage of type embedding and a new `jwt.Marshaler` interface, while following the [Effective Go] guidelines.
 
 ### Benchmark
-#### `v1` on  `Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz`
-```
-BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
-BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
-```
-
-#### `v2` on  `Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz`
+#### `v2` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
 BenchmarkSign-4     	  300000	      3633 ns/op	    1216 B/op	      12 allocs/op
 BenchmarkVerify-4   	  200000	      8046 ns/op	    1504 B/op	      29 allocs/op
+```
+
+#### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
+```
+BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
+BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
 ```
 
 ## Usage
