@@ -34,11 +34,44 @@ func HS512(key string) Signer {
 	return &hmacsha{key: []byte(key), hash: sha512.New, alg: MethodHS512}
 }
 
-func (h *hmacsha) Sign(msg []byte) ([]byte, error) {
-	if len(h.key) == 0 {
+func (h *hmacsha) Sign(jot Marshaler) ([]byte, error) {
+	if string(h.key) == "" {
 		return nil, ErrNoHMACKey
 	}
+	payload, err := jot.MarshalJWT()
+	if err != nil {
+		return nil, err
+	}
+	sig, err := h.sign(payload)
+	if err != nil {
+		return nil, err
+	}
+	return build(payload, sig, h), nil
+}
 
+func (h *hmacsha) Verify(token []byte, jot Marshaler) error {
+	if string(h.key) == "" {
+		return ErrNoHMACKey
+	}
+	payload, sig, err := parseBytes(token)
+	if err != nil {
+		return err
+	}
+	decSig := make([]byte, enc.DecodedLen(len(sig)))
+	if _, err = enc.Decode(decSig, sig); err != nil {
+		return err
+	}
+	if err = jot.UnmarshalJWT(payload); err != nil {
+		return err
+	}
+	return h.verify(payload, decSig)
+}
+
+func (h *hmacsha) String() string {
+	return h.alg
+}
+
+func (h *hmacsha) sign(msg []byte) ([]byte, error) {
 	hh := hmac.New(h.hash, h.key)
 	if _, err := hh.Write(msg); err != nil {
 		return nil, err
@@ -46,12 +79,8 @@ func (h *hmacsha) Sign(msg []byte) ([]byte, error) {
 	return hh.Sum(nil), nil
 }
 
-func (h *hmacsha) String() string {
-	return h.alg
-}
-
-func (h *hmacsha) Verify(msg, sig []byte) error {
-	sig2, err := h.Sign(msg)
+func (h *hmacsha) verify(msg, sig []byte) error {
+	sig2, err := h.sign(msg)
 	if err != nil {
 		return err
 	}
