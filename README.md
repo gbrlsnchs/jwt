@@ -13,6 +13,12 @@ There are many JWT packages out there for Go, but many lack signing/verifying me
 
 Version 1 was simple to use but not so fast and memory-efficient, that's why version 2 is a total rework that brings better performance, taking advantage of type embedding and a new `jwt.Marshaler` interface, while following the [Effective Go] guidelines.
 
+#### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
+```
+BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
+BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
+```
+
 ### Benchmark
 #### `v2` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
@@ -20,23 +26,17 @@ BenchmarkSign-4     	  300000	      3633 ns/op	    1216 B/op	      12 allocs/op
 BenchmarkVerify-4   	  200000	      8046 ns/op	    1504 B/op	      29 allocs/op
 ```
 
-#### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
-```
-BenchmarkSign-4     	  200000	      9978 ns/op	    4483 B/op	      55 allocs/op
-BenchmarkVerify-4   	  100000	     12848 ns/op	    3777 B/op	      80 allocs/op
-```
-
 ## Usage
 Full documentation [here].
 
 ## Example
-### JWT without public claims
+### Sign a JWT without public claims
 ```go
 // Timestamp the beginning.
 now := time.Now()
 // Define a signer.
 hs256 := jwt.HS256("my_53cr37")
-auth := &jwt.JWT{
+jot := &jwt.JWT{
 	Header: &jwt.Header{
 		Algorithm: hs256.String(),
 		KeyID:     "my_key",
@@ -51,14 +51,14 @@ auth := &jwt.JWT{
 		Issuer:     "auth_server",
 	},
 }
-token, err := hs256.Sign(auth)
+token, err := hs256.Sign(jot)
 if err != nil {
 	// handle error
 }
-log.Print("token = %s", jot)
+log.Print("token = %s", token)
 ```
 
-### JWT with public claims
+### Sign a JWT with public claims
 ```go
 type Token struct {
 	*jwt.JWT
@@ -96,7 +96,7 @@ if err != nil {
 log.Print("token = %s", token)
 ```
 
-### Verify and validating a JWT
+### Verifying and validating a JWT
 ```go
 type Token struct {
 	*jwt.JWT
@@ -112,7 +112,7 @@ eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
 lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q`
 var jot Token
 
-if err := hs256.Verify(string(token), &auth); err != nil {
+if err := hs256.Verify(string(token), &jot); err != nil {
 	// handle error
 }
 
@@ -125,9 +125,9 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 		// handle "alg" mismatch
 	case jwt.ErrTokenExpired:
 		// handle "exp" being expired
-	}
 	case jwt.ErrAudienceMismatch:
 		// handle "aud" mismatch
+	}
 }
 ```
 
