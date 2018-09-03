@@ -17,7 +17,6 @@ Although there are many JWT packages out there for Go, many lack support for som
 Also, branch `master` contains bleeding edge code, therefore it sometimes may introduce breaking changes.
 
 ### `v1` vs. `v2`
-### Benchmark
 #### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
 BenchmarkSign-4     	  200000	      7962 ns/op	    3457 B/op	      50 allocs/op
