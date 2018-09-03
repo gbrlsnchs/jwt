@@ -15,6 +15,8 @@ Although there are many JWT packages out there for Go, many lack support for som
 `master` branch contains bleeding edge code, therefore it sometimes introduces breaking changes.  
 Using a tagged version along with a proper dependency manager is the preferred way to use this library.
 
+From `v2` on, this library is guaranteed to work on Go1.11 or later, although Go1.10 may be compatible using `vgo`.
+
 ### `v1` vs. `v2`
 `v2` is a total rework of the library's API. While `v1` was simple to use, it was neither fast nor memory-efficient. That's why `v2` came on the scene: it's got better performance, takes advantage of type embedding and uses a bit of reflection in order to allow a custom struct to be used as a JWT.
 
@@ -36,7 +38,10 @@ BenchmarkVerify-4   	  200000	      8363 ns/op	    1808 B/op	      32 allocs/op
 ## Usage
 Full documentation [here].
 
-### To import using `vgo` or `go mod`
+### Downloading
+`go get -u github.com/gbrlsnchs/jwt/v2`
+
+### Importing
 ```go
 import (
 	// ...
