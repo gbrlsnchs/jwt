@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `JWT` properties.
 - `Header` and `Claims` now are part of `JWT`.
 - README texts, examples and usage.
+- Rename `const.go` to `methods.go`.
 
 ### Removed
 - `Sign` and `Verify` functions.

@@ -11,14 +11,4 @@ const (
 	MethodES384 = "ES384" // Method name for ECDSA and SHA-384.
 	MethodES512 = "ES512" // Method name for ECDSA and SHA-512.
 	MethodNone  = "none"  // Method name for "none".
-	algKey      = "alg"
-	audKey      = "aud"
-	expKey      = "exp"
-	iatKey      = "iat"
-	issKey      = "iss"
-	jtiKey      = "jti"
-	kidKey      = "kid"
-	nbfKey      = "nbf"
-	subKey      = "sub"
-	typKey      = "typ"
 )
