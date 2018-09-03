@@ -108,7 +108,7 @@ func (e *ecdsasha) verify(msg, sig []byte) error {
 	}
 
 	if !ecdsa.Verify(e.pub, hh.Sum(nil), r, s) {
-		return ErrECSDAInvalid
+		return ErrECDSAInvalid
 	}
 	return nil
 }
