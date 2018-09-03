@@ -20,16 +20,6 @@ var (
 // validators when parsing a JWT string.
 type ValidatorFunc func(jot *JWT) error
 
-// AlgorithmValidator validates the "alg" claim.
-func AlgorithmValidator(alg string) ValidatorFunc {
-	return func(jot *JWT) error {
-		if alg != jot.Header.Algorithm {
-			return ErrAlgorithmMismatch
-		}
-		return nil
-	}
-}
-
 // AudienceValidator validates the "aud" claim.
 func AudienceValidator(aud string) ValidatorFunc {
 	return func(jot *JWT) error {
