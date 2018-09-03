@@ -1,5 +1,6 @@
 package jwt
 
+// Claims is a JWT claims set, as per the RFC 7519.
 type Claims struct {
 	IssuedAt   int64  `json:"iat,omitempty"`
 	Expiration int64  `json:"exp,omitempty"`
