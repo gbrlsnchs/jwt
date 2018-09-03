@@ -1,26 +1,25 @@
 package jwt
 
 import (
-	"errors"
 	"reflect"
 )
 
-func extractJWT(v interface{}, headless bool) (*JWT, error) {
+func extractJWT(v interface{}) *JWT {
 	if v == nil {
-		return nil, errors.New("jwt: marshal/unmarshal nil interface")
+		return nil
 	}
 	switch jot := v.(type) {
 	case JWT:
-		return &jot, nil
+		return &jot
 	case *JWT:
-		return jot, nil
+		return jot
 	}
 	val := reflect.ValueOf(v)
 	if val.Kind() == reflect.Ptr {
 		val = val.Elem()
 	}
 	if val.Kind() != reflect.Struct {
-		return nil, errors.New("jwt: marshal/unmarshal a value that is not a struct or pointer to a struct")
+		return nil
 	}
 
 	var jot *JWT
@@ -35,23 +34,5 @@ func extractJWT(v interface{}, headless bool) (*JWT, error) {
 			break
 		}
 	}
-	if jot == nil {
-		if !headless {
-			return nil, ErrNilHeader
-		}
-		jot = &JWT{
-			Header: &Header{
-				header: &header{},
-			},
-		}
-	}
-	if jot.Header == nil {
-		if !headless {
-			return nil, ErrNilHeader
-		}
-		jot.Header = &Header{
-			header: &header{},
-		}
-	}
-	return jot, nil
+	return jot
 }

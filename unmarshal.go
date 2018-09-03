@@ -9,7 +9,7 @@ import (
 func Unmarshal(b []byte, v interface{}) error {
 	sep := bytes.IndexByte(b, '.')
 	if sep < 0 { // RFC 7519, section 7.2.1
-		return ErrMalformedToken
+		return ErrMalformed
 	}
 
 	encHdr := b[:sep] // RFC 7519, section 7.2.2
@@ -19,7 +19,6 @@ func Unmarshal(b []byte, v interface{}) error {
 		return err
 	}
 	var hdr Header
-	hdr.header = &header{}
 	if err := json.Unmarshal(decHdr, &hdr); err != nil { // RFC 7519, sections 7.2.{4,5,6,7,8}
 		return err
 	}
@@ -36,10 +35,8 @@ func Unmarshal(b []byte, v interface{}) error {
 
 	// Extract the JWT from the interface to
 	// be able to set a header to it.
-	jot, err := extractJWT(v, true)
-	if err != nil {
-		return err
+	if jot := extractJWT(v); jot != nil {
+		jot.Header = &hdr
 	}
-	jot.Header = &hdr
 	return nil
 }

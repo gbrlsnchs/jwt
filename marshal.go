@@ -4,12 +4,11 @@ import "encoding/json"
 
 // Marshal marshals a struct or a pointer to it and returns a JWT payload.
 func Marshal(v interface{}) ([]byte, error) {
-	jot, err := extractJWT(v, false)
-	if err != nil {
-		return nil, err
+	var header Header
+	if jot := extractJWT(v); jot != nil {
+		header = *jot.Header
 	}
-	jot.Header.header = &header{"JWT"}
-	hdr, err := json.Marshal(jot.Header)
+	hdr, err := json.Marshal(header)
 	if err != nil {
 		return nil, err
 	}
