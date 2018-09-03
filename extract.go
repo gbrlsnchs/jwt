@@ -1,8 +1,6 @@
 package jwt
 
-import (
-	"reflect"
-)
+import "reflect"
 
 func extractJWT(v interface{}) *JWT {
 	if v == nil {
