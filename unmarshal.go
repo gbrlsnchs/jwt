@@ -8,18 +8,18 @@ import (
 // Unmarshal unmarshals a token and assign a JWT to an interface.
 func Unmarshal(b []byte, v interface{}) error {
 	sep := bytes.IndexByte(b, '.')
-	if sep < 0 { // RFC 7519, section 7.2.1
+	if sep < 0 {
 		return ErrMalformed
 	}
 
-	encHdr := b[:sep] // RFC 7519, section 7.2.2
+	encHdr := b[:sep]
 	hdrSize := enc.DecodedLen(len(encHdr))
 	decHdr := make([]byte, hdrSize)
-	if _, err := enc.Decode(decHdr, encHdr); err != nil { // RFC 7519, section 7.2.3
+	if _, err := enc.Decode(decHdr, encHdr); err != nil {
 		return err
 	}
 	var hdr Header
-	if err := json.Unmarshal(decHdr, &hdr); err != nil { // RFC 7519, sections 7.2.{4,5,6,7,8}
+	if err := json.Unmarshal(decHdr, &hdr); err != nil {
 		return err
 	}
 

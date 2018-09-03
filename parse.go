@@ -10,7 +10,7 @@ func Parse(token string) ([]byte, []byte, error) {
 // ParseBytes does the same parsing as Parse but accepts a byte slice instead.
 func ParseBytes(token []byte) ([]byte, []byte, error) {
 	sep1 := bytes.IndexByte(token, '.')
-	if sep1 < 0 { // RFC 7519, section 7.2.1
+	if sep1 < 0 {
 		return nil, nil, ErrMalformed
 	}
 
