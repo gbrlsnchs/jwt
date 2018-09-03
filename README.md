@@ -22,6 +22,8 @@ From `v2` on, this library is guaranteed to work on Go1.11 or later, although Go
 
 As of [version 1.1.0], the library is pretty stable, but if a better performance is desired, it is recommended to migrate from `v1` to `v2`.
 
+A branch named `v1` is used to fix possible imminent bugs in `v1` and will be supported until `v3` is released.
+
 ### Benchmark
 #### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
