@@ -9,6 +9,12 @@ func extractJWT(v interface{}, headless bool) (*JWT, error) {
 	if v == nil {
 		return nil, errors.New("jwt: marshal/unmarshal nil interface")
 	}
+	switch jot := v.(type) {
+	case JWT:
+		return &jot, nil
+	case *JWT:
+		return jot, nil
+	}
 	val := reflect.ValueOf(v)
 	if val.Kind() == reflect.Ptr {
 		val = val.Elem()
