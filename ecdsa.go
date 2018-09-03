@@ -28,18 +28,18 @@ type ecdsasha struct {
 	alg  string
 }
 
-// ES256 creates a signing method using ECDSA and SHA-256.
-func ES256(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
+// NewES256 creates a signing method using ECDSA and SHA-256.
+func NewES256(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
 	return &ecdsasha{priv: priv, pub: pub, hash: sha256.New, alg: MethodES256}
 }
 
-// ES384 creates a signing method using ECDSA and SHA-384.
-func ES384(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
+// NewES384 creates a signing method using ECDSA and SHA-384.
+func NewES384(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
 	return &ecdsasha{priv: priv, pub: pub, hash: sha512.New384, alg: MethodES384}
 }
 
-// ES512 creates a signing method using ECDSA and SHA-512.
-func ES512(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
+// NewES512 creates a signing method using ECDSA and SHA-512.
+func NewES512(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
 	return &ecdsasha{priv: priv, pub: pub, hash: sha512.New, alg: MethodES512}
 }
 

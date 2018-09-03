@@ -58,7 +58,7 @@ import (
 // Timestamp the beginning.
 now := time.Now()
 // Define a signer.
-hs256 := jwt.HS256("secret")
+hs256 := jwt.NewHS256("secret")
 jot := &jwt.JWT{
 	Header: &jwt.Header{
 		Algorithm: hs256.String(),
@@ -100,7 +100,7 @@ type Token struct {
 // Timestamp the beginning.
 now := time.Now()
 // Define a signer.
-hs256 := jwt.HS256("secret")
+hs256 := jwt.NewHS256("secret")
 jot := &Token{
 	JWT: &jwt.JWT{
 		Header: &jwt.Header{
@@ -138,7 +138,7 @@ When signing or verifying, this library **always** base64 encodes the signature.
 // Timestamp the beginning.
 now := time.Now()
 // Define a signer.
-hs256 := jwt.HS256("my_53cr37")
+hs256 := jwt.NewHS256("my_53cr37")
 // This is a mocked token for demonstration purposes only.
 token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
 

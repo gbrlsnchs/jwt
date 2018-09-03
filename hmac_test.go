@@ -8,10 +8,10 @@ import (
 
 func TestHMAC(t *testing.T) {
 	testCases := []testCase{
-		{HS256(""), HS256(""), nil, ErrNoHMACKey, nil, nil, ErrNoHMACKey},
-		{HS256("secret"), HS256("secret"), nil, nil, nil, nil, nil},
-		{HS256("secret"), HS256("not_secret"), nil, nil, nil, nil, ErrHMACInvalid},
-		{HS256("not_secret"), HS256("secret"), nil, nil, nil, nil, ErrHMACInvalid},
+		{NewHS256(""), NewHS256(""), nil, ErrNoHMACKey, nil, nil, ErrNoHMACKey},
+		{NewHS256("secret"), NewHS256("secret"), nil, nil, nil, nil, nil},
+		{NewHS256("secret"), NewHS256("not_secret"), nil, nil, nil, nil, ErrHMACInvalid},
+		{NewHS256("not_secret"), NewHS256("secret"), nil, nil, nil, nil, ErrHMACInvalid},
 	}
 	testJWT(t, testCases)
 }

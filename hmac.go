@@ -21,18 +21,18 @@ type hmacsha struct {
 	alg  string
 }
 
-// HS256 creates a signing method using HMAC and SHA-256.
-func HS256(key string) Signer {
+// NewHS256 creates a signing method using HMAC and SHA-256.
+func NewHS256(key string) Signer {
 	return &hmacsha{key: []byte(key), hash: sha256.New, alg: MethodHS256}
 }
 
-// HS384 creates a signing method using HMAC and SHA-384.
-func HS384(key string) Signer {
+// NewHS384 creates a signing method using HMAC and SHA-384.
+func NewHS384(key string) Signer {
 	return &hmacsha{key: []byte(key), hash: sha512.New384, alg: MethodHS384}
 }
 
-// HS512 creates a signing method using HMAC and SHA-512.
-func HS512(key string) Signer {
+// NewHS512 creates a signing method using HMAC and SHA-512.
+func NewHS512(key string) Signer {
 	return &hmacsha{key: []byte(key), hash: sha512.New, alg: MethodHS512}
 }
 

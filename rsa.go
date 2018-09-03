@@ -21,18 +21,18 @@ type rsasha struct {
 	alg  string
 }
 
-// RS256 creates a signing method using RSA and SHA-256.
-func RS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
+// NewRS256 creates a signing method using RSA and SHA-256.
+func NewRS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
 	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA256, alg: MethodRS256}
 }
 
-// RS384 creates a signing method using RSA and SHA-384.
-func RS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
+// NewRS384 creates a signing method using RSA and SHA-384.
+func NewRS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
 	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA384, alg: MethodRS384}
 }
 
-// RS512 creates a signing method using RSA and SHA-512.
-func RS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
+// NewRS512 creates a signing method using RSA and SHA-512.
+func NewRS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
 	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA512, alg: MethodRS512}
 }
 
