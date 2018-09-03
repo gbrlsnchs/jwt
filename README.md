@@ -20,7 +20,7 @@ From `v2` on, this library is guaranteed to work on Go1.11 or later, although Go
 ### `v1` vs. `v2`
 `v2` is a total rework of the library's API. While `v1` was simple to use, it was neither fast nor memory-efficient. That's why `v2` came on the scene: it's got better performance, takes advantage of type embedding and uses a bit of reflection in order to allow a custom struct to be used as a JWT.
 
-As of [version 1.1.0], the library is pretty stable, but if a better performance is desired, it is recommended to migrate from `v1` to `v2`.
+By now, `v2` is in its `alpha` stage. Until a stable version is released, anything from the API can change. So if stability is desired, it is recommended to use `v1`.
 
 A branch named `v1` is used to fix possible imminent bugs in `v1` and will be supported until `v3` is released.
 
