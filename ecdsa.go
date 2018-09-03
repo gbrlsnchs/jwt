@@ -70,10 +70,10 @@ func (e *ecdsasha) Verify(payload, sig []byte) (err error) {
 	return nil
 }
 
-func (e *ecdsasha) sign(msg []byte) ([]byte, error) {
+func (e *ecdsasha) sign(payload []byte) ([]byte, error) {
 	hh := e.hash()
 	var err error
-	if _, err = hh.Write(msg); err != nil {
+	if _, err = hh.Write(payload); err != nil {
 		return nil, err
 	}
 	r, s, err := ecdsa.Sign(rand.Reader, e.priv, hh.Sum(nil))
@@ -92,7 +92,7 @@ func (e *ecdsasha) sign(msg []byte) ([]byte, error) {
 	return append(rsig, ssig...), nil
 }
 
-func (e *ecdsasha) verify(msg, sig []byte) error {
+func (e *ecdsasha) verify(payload, sig []byte) error {
 	byteSize := e.byteSize(e.pub.Params().BitSize)
 	if len(sig) != byteSize*2 {
 		return ErrECDSAVerification
@@ -101,7 +101,7 @@ func (e *ecdsasha) verify(msg, sig []byte) error {
 	r := big.NewInt(0).SetBytes(sig[:byteSize])
 	s := big.NewInt(0).SetBytes(sig[byteSize:])
 	hh := e.hash()
-	if _, err := hh.Write(msg); err != nil {
+	if _, err := hh.Write(payload); err != nil {
 		return err
 	}
 

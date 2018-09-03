@@ -52,6 +52,9 @@ func (r *rsasha) String() string {
 }
 
 func (r *rsasha) Verify(payload, sig []byte) (err error) {
+	if r.pub == nil {
+		return ErrRSANilPubKey
+	}
 	decSig := make([]byte, enc.DecodedLen(len(sig)))
 	if _, err = enc.Decode(decSig, sig); err != nil {
 		return err
@@ -62,10 +65,10 @@ func (r *rsasha) Verify(payload, sig []byte) (err error) {
 	return nil
 }
 
-func (r *rsasha) sign(msg []byte) ([]byte, error) {
+func (r *rsasha) sign(payload []byte) ([]byte, error) {
 	hh := r.hash.New()
 	var err error
-	if _, err = hh.Write(msg); err != nil {
+	if _, err = hh.Write(payload); err != nil {
 		return nil, err
 	}
 
@@ -76,14 +79,10 @@ func (r *rsasha) sign(msg []byte) ([]byte, error) {
 	return sig, nil
 }
 
-func (r *rsasha) verify(msg, sig []byte) error {
-	if r.pub == nil {
-		return ErrRSANilPubKey
-	}
-
+func (r *rsasha) verify(payload, sig []byte) error {
 	hh := r.hash.New()
 	var err error
-	if _, err = hh.Write(msg); err != nil {
+	if _, err = hh.Write(payload); err != nil {
 		return err
 	}
 	return rsa.VerifyPKCS1v15(r.pub, r.hash, hh.Sum(nil), sig)

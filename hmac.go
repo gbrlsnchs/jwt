@@ -65,20 +65,19 @@ func (h *hmacsha) String() string {
 	return h.alg
 }
 
-func (h *hmacsha) sign(msg []byte) ([]byte, error) {
+func (h *hmacsha) sign(payload []byte) ([]byte, error) {
 	hh := hmac.New(h.hash, h.key)
-	if _, err := hh.Write(msg); err != nil {
+	if _, err := hh.Write(payload); err != nil {
 		return nil, err
 	}
 	return hh.Sum(nil), nil
 }
 
-func (h *hmacsha) verify(msg, sig []byte) error {
-	sig2, err := h.sign(msg)
+func (h *hmacsha) verify(payload, sig []byte) error {
+	sig2, err := h.sign(payload)
 	if err != nil {
 		return err
 	}
-
 	if !hmac.Equal(sig, sig2) {
 		return ErrHMACVerification
 	}
