@@ -32,11 +32,11 @@ func BenchmarkSign(b *testing.B) {
 
 func BenchmarkVerify(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		jot, err := jwt.FromString(benchMock)
+		jot, err := FromString(benchMock)
 		if err != nil {
 			b.Fatal(err)
 		}
-		if err = jot.Verify(benchMock); err != nil {
+		if err = jot.Verify(benchSigner); err != nil {
 			b.Fatal(err)
 		}
 	}
