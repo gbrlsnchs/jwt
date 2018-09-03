@@ -37,16 +37,16 @@ func TestECDSA(t *testing.T) {
 	testCases := []testCase{
 		{NewES256(priv256, nil), NewES256(nil, &priv256.PublicKey), nil, nil, nil, nil, nil},
 		{NewES256(priv256, nil), NewES256(nil, &priv256_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
-		{NewES256(nil, nil), NewES256(nil, nil), nil, ErrNoECDSAPrivKey, nil, nil, nil},
-		{NewES256(priv256, nil), NewES256(nil, nil), nil, nil, nil, nil, ErrNoECDSAPubKey},
+		{NewES256(nil, nil), NewES256(nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
+		{NewES256(priv256, nil), NewES256(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
 		{NewES384(priv384, nil), NewES384(nil, &priv384.PublicKey), nil, nil, nil, nil, nil},
 		{NewES384(priv384, nil), NewES384(nil, &priv384_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
-		{NewES384(nil, nil), NewES384(nil, nil), nil, ErrNoECDSAPrivKey, nil, nil, nil},
-		{NewES384(priv384, nil), NewES384(nil, nil), nil, nil, nil, nil, ErrNoECDSAPubKey},
+		{NewES384(nil, nil), NewES384(nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
+		{NewES384(priv384, nil), NewES384(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
 		{NewES512(priv512, nil), NewES512(nil, &priv512.PublicKey), nil, nil, nil, nil, nil},
 		{NewES512(priv512, nil), NewES512(nil, &priv512_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
-		{NewES512(nil, nil), NewES512(nil, nil), nil, ErrNoECDSAPrivKey, nil, nil, nil},
-		{NewES512(priv512, nil), NewES512(nil, nil), nil, nil, nil, nil, ErrNoECDSAPubKey},
+		{NewES512(nil, nil), NewES512(nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
+		{NewES512(priv512, nil), NewES512(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
 	}
 	testJWT(t, testCases)
 }

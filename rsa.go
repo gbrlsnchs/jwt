@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	// ErrNoRSAPrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrNoRSAPrivKey = errors.New("jwt: RSA private key is nil")
-	// ErrNoRSAPubKey is the error for trying to verify a JWT with a nil public key.
-	ErrNoRSAPubKey = errors.New("jwt: RSA public key is nil")
+	// ErrRSANilPrivKey is the error for trying to sign a JWT with a nil private key.
+	ErrRSANilPrivKey = errors.New("jwt: RSA private key is nil")
+	// ErrRSANilPubKey is the error for trying to verify a JWT with a nil public key.
+	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
 )
 
 type rsasha struct {
@@ -38,7 +38,7 @@ func NewRS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
 
 func (r *rsasha) Sign(payload []byte) ([]byte, error) {
 	if r.priv == nil {
-		return nil, ErrNoRSAPrivKey
+		return nil, ErrRSANilPrivKey
 	}
 	sig, err := r.sign(payload)
 	if err != nil {
@@ -78,7 +78,7 @@ func (r *rsasha) sign(msg []byte) ([]byte, error) {
 
 func (r *rsasha) verify(msg, sig []byte) error {
 	if r.pub == nil {
-		return ErrNoRSAPubKey
+		return ErrRSANilPubKey
 	}
 
 	hh := r.hash.New()

@@ -11,14 +11,12 @@ import (
 )
 
 var (
-	// ErrNoECDSAPrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrNoECDSAPrivKey = errors.New("jwt: ECDSA private key is nil")
-	// ErrNoECDSAPubKey is the error for trying to verify a JWT with a nil public key.
-	ErrNoECDSAPubKey = errors.New("jwt: ECDSA public key is nil")
+	// ErrECDSANilPrivKey is the error for trying to sign a JWT with a nil private key.
+	ErrECDSANilPrivKey = errors.New("jwt: ECDSA private key is nil")
+	// ErrECDSANilPubKey is the error for trying to verify a JWT with a nil public key.
+	ErrECDSANilPubKey = errors.New("jwt: ECDSA public key is nil")
 	// ErrECDSAVerification is the error for an invalid signature.
 	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
-	// ErrECDSASigLen is the error for an invalid signature length.
-	ErrECDSASigLen = errors.New("jwt: ECDSA signature has unexpected size")
 )
 
 type ecdsasha struct {
@@ -45,7 +43,7 @@ func NewES512(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
 
 func (e *ecdsasha) Sign(payload []byte) ([]byte, error) {
 	if e.priv == nil {
-		return nil, ErrNoECDSAPrivKey
+		return nil, ErrECDSANilPrivKey
 	}
 	sig, err := e.sign(payload)
 	if err != nil {
@@ -60,7 +58,7 @@ func (e *ecdsasha) String() string {
 
 func (e *ecdsasha) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
-		return ErrNoECDSAPubKey
+		return ErrECDSANilPubKey
 	}
 	decSig := make([]byte, enc.DecodedLen(len(sig)))
 	if _, err = enc.Decode(decSig, sig); err != nil {
@@ -97,7 +95,7 @@ func (e *ecdsasha) sign(msg []byte) ([]byte, error) {
 func (e *ecdsasha) verify(msg, sig []byte) error {
 	byteSize := e.byteSize(e.pub.Params().BitSize)
 	if len(sig) != byteSize*2 {
-		return ErrECDSASigLen
+		return ErrECDSAVerification
 	}
 
 	r := big.NewInt(0).SetBytes(sig[:byteSize])
