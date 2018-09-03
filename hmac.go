@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	// ErrNoHMACKey is the error for trying to sign or verify with an empty key.
-	ErrNoHMACKey = errors.New("jwt.(Signer).Sign: HMAC key is empty")
-	// ErrHMACInvalid is the error for when an invalid signature is informed.
-	ErrHMACInvalid = errors.New("jwt.(Signer).Verify: HMAC validation failed")
+	// ErrNoHMACKey is the error for trying to sign or verify a JWT with an empty key.
+	ErrNoHMACKey = errors.New("jwt: HMAC key is empty")
+	// ErrHMACInvalid is the error for an invalid signature.
+	ErrHMACInvalid = errors.New("jwt: HMAC validation failed")
 )
 
 type hmacsha struct {
