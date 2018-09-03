@@ -7,23 +7,16 @@
 [![Sourcegraph](https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg)](https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge)
 
 ## About
-This package is a JWT signer, verifier and validator for [Go] (or Golang).
+This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
 
-Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library]'s API while following the [Effective Go] guidelines.
+Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library](https://github.com/auth0/node-jsonwebtoken)'s API while following the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
+
 
 ## Warning
-`master` branch contains bleeding edge code, therefore it sometimes introduces breaking changes.  
-Using a tagged version along with a proper dependency manager is the preferred way to use this library.
-
-From `v2` on, this library is guaranteed to work on Go1.11 or later, although Go1.10 may be compatible using `vgo`.
+`v2` is guaranteed to work with `go1.11` or after. Nevertheless, it might work with `go1.10` by using [vgo](https://github.com/golang/vgo).  
+Also, branch `master` contains bleeding edge code, therefore it sometimes may introduce breaking changes.
 
 ### `v1` vs. `v2`
-`v2` is a total rework of the library's API. While `v1` was simple to use, it was neither fast nor memory-efficient. That's why `v2` came on the scene: it's got better performance, takes advantage of type embedding and uses a bit of reflection in order to allow a custom struct to be used as a JWT.
-
-By now, `v2` is in its `alpha` stage. Until a stable version is released, anything from the API can change. So if stability is desired, it is recommended to use `v1`.
-
-A branch named `v1` is used to fix possible imminent bugs in `v1` and will be supported until `v3` is released.
-
 ### Benchmark
 #### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
@@ -33,14 +26,14 @@ BenchmarkVerify-4   	  100000	     13087 ns/op	    3825 B/op	      80 allocs/op
 
 #### `v2` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
-BenchmarkSign-4     	  300000	      4075 ns/op	    1312 B/op	      11 allocs/op
-BenchmarkVerify-4   	  200000	      8363 ns/op	    1808 B/op	      32 allocs/op
+BenchmarkSign-4     	  300000	      3882 ns/op	    1296 B/op	      11 allocs/op
+BenchmarkVerify-4   	  200000	      8304 ns/op	    1728 B/op	      29 allocs/op
 ```
 
 ## Usage
-Full documentation [here].
+Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
-### Downloading
+### Installing
 `go get -u github.com/gbrlsnchs/jwt/v2`
 
 ### Importing
@@ -53,7 +46,7 @@ import (
 ```
 
 ## Example
-### Sign a JWT without public claims
+### Signing a simple JWT
 ```go
 // Timestamp the beginning.
 now := time.Now()
@@ -85,7 +78,7 @@ if err != nil {
 log.Print("token = %s", token)
 ```
 
-### Sign a JWT with public claims
+### Signing a JWT with public claims
 #### First, create a custom type and embed a JWT pointer in it
 ```go
 type Token struct {
@@ -95,7 +88,7 @@ type Token struct {
 }
 ```
 
-#### Now, initialize, marshal and sign it
+#### Now initialize, marshal and sign it
 ```go
 // Timestamp the beginning.
 now := time.Now()
@@ -133,12 +126,12 @@ log.Print("token = %s", token)
 
 ### Verifying and validating a JWT
 #### Quick note
-When signing or verifying, this library **always** base64 encodes the signature.
+This library **always** encodes the signature to Base64 when signing and **always** decodes it from Base64 when verifying.
 ```go
 // Timestamp the beginning.
 now := time.Now()
 // Define a signer.
-hs256 := jwt.NewHS256("my_53cr37")
+hs256 := jwt.NewHS256("secret")
 // This is a mocked token for demonstration purposes only.
 token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
 
@@ -158,17 +151,17 @@ if err = hs256.Verify(payload, sig); err != nil {
 }
 
 // Validate fields.
-algValidator := jwt.AlgorithmValidator(jwt.MethodHS256)
+iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
 if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 	switch err {
-	case jwt.ErrAlgorithmMismatch:
-		// handle "alg" mismatch
-	case jwt.ErrTokenExpired:
-		// handle "exp" being expired
-	case jwt.ErrAudienceMismatch:
-		// handle "aud" mismatch
+	case jwt.ErrIatValidation:
+		// handle "iat" validation error
+	case jwt.ErrExpValidation:
+		// handle "exp" validation error
+	case jwt.ErrAudValidation:
+		// handle "aud" validation error
 	}
 }
 ```
@@ -178,9 +171,3 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 - Pull Requests
 - Issues
 - Opinions
-
-[Go]: https://golang.org
-[Node JWT library]: https://github.com/auth0/node-jsonwebtoken
-[Effective Go]: https://golang.org/doc/effective_go.html
-[version 1.1.0]: https://github.com/gbrlsnchs/jwt/releases/tag/v1.1.0
-[here]: https://godoc.org/github.com/gbrlsnchs/jwt
