@@ -34,6 +34,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 		t.Run(name, func(t *testing.T) {
 			now := time.Now()
 			kid := fmt.Sprintf("kid %s %d", t.Name(), i)
+			typ := Type
 			iat := now.Unix()
 			exp := now.Add(30 * time.Minute).Unix()
 			nbf := now.Add(1 * time.Second).Unix()
@@ -48,6 +49,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 					Header: &Header{
 						Algorithm: tc.signer.String(),
 						KeyID:     kid,
+						Type:      typ,
 					},
 					Claims: &Claims{
 						IssuedAt:   iat,
@@ -116,6 +118,10 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			if want, got := kid, jot2.Header.KeyID; want != got {
+				t.Errorf("want %s, got %s", want, got)
+			}
+
+			if want, got := typ, jot2.Header.Type; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
