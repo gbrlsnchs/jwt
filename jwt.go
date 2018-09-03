@@ -5,8 +5,12 @@ import (
 	"errors"
 )
 
+// Type is a constant value for header fields "typ" and "cty".
+const Type = "JWT"
+
 var enc = base64.RawURLEncoding
 
+// JWT is a JSON Web Token as per the RFC 7519.
 type JWT struct {
 	Header *Header `json:"-"`
 	*Claims
@@ -14,11 +18,9 @@ type JWT struct {
 }
 
 var (
-	// ErrMalformedToken indicates a token doesn't have
+	// ErrMalformed indicates a token doesn't have
 	// a valid format, as per the RFC 7519, section 7.2.
-	ErrMalformedToken = errors.New("jwt: malformed token")
-	// ErrNilHeader is returned when a struct or pointer to it doesn't contain a JWT header.
-	ErrNilHeader = errors.New("jwt: nil header")
+	ErrMalformed = errors.New("jwt: malformed token")
 )
 
 // Validate validates claims and header fields.
