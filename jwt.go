@@ -17,10 +17,11 @@ var (
 	// ErrMalformedToken indicates a token doesn't have
 	// a valid format, as per the RFC 7519, section 7.2.
 	ErrMalformedToken = errors.New("jwt: malformed token")
-	ErrNilHeader      = errors.New("jwt: nil header")
-	ErrBigNest        = errors.New("jwt: more than one nested JWT")
+	// ErrNilHeader is returned when a struct or pointer to it doesn't contain a JWT header.
+	ErrNilHeader = errors.New("jwt: nil header")
 )
 
+// Validate validates claims and header fields.
 func (jot *JWT) Validate(validators ...ValidatorFunc) error {
 	for _, fn := range validators {
 		if err := fn(jot); err != nil {
