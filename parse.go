@@ -11,13 +11,13 @@ func Parse(token string) ([]byte, []byte, error) {
 func ParseBytes(token []byte) ([]byte, []byte, error) {
 	sep1 := bytes.IndexByte(token, '.')
 	if sep1 < 0 { // RFC 7519, section 7.2.1
-		return nil, nil, ErrMalformedToken
+		return nil, nil, ErrMalformed
 	}
 
 	cls := token[sep1+1:]
 	sep2 := bytes.IndexByte(cls, '.')
 	if sep2 < 0 {
-		return nil, nil, ErrMalformedToken
+		return nil, nil, ErrMalformed
 	}
 	sep2 += sep1 + 1
 	return token[:sep2], token[sep2+1:], nil
