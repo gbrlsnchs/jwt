@@ -34,38 +34,30 @@ func RS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
 	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA512, alg: MethodRS512}
 }
 
-func (r *rsasha) Sign(jot Marshaler) ([]byte, error) {
+func (r *rsasha) Sign(payload []byte) ([]byte, error) {
 	if r.priv == nil {
 		return nil, ErrNoRSAPrivKey
-	}
-	payload, err := jot.MarshalJWT()
-	if err != nil {
-		return nil, err
 	}
 	sig, err := r.sign(payload)
 	if err != nil {
 		return nil, err
 	}
-	return build(payload, sig, r), nil
+	return build(r, payload, sig), nil
 }
 
 func (r *rsasha) String() string {
 	return r.alg
 }
 
-func (r *rsasha) Verify(token []byte, jot Marshaler) error {
-	payload, sig, err := parseBytes(token)
-	if err != nil {
-		return err
-	}
+func (r *rsasha) Verify(payload, sig []byte) (err error) {
 	decSig := make([]byte, enc.DecodedLen(len(sig)))
 	if _, err = enc.Decode(decSig, sig); err != nil {
 		return err
 	}
-	if err = jot.UnmarshalJWT(payload); err != nil {
+	if err = r.verify(payload, decSig); err != nil {
 		return err
 	}
-	return r.verify(payload, decSig)
+	return nil
 }
 
 func (r *rsasha) sign(msg []byte) ([]byte, error) {

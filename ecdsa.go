@@ -39,43 +39,33 @@ func ES512(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Signer {
 	return &ecdsasha{priv: priv, pub: pub, hash: sha512.New, alg: MethodES512}
 }
 
-func (e *ecdsasha) Sign(jot Marshaler) ([]byte, error) {
+func (e *ecdsasha) Sign(payload []byte) ([]byte, error) {
 	if e.priv == nil {
 		return nil, ErrNoECDSAPrivKey
-	}
-
-	payload, err := jot.MarshalJWT()
-	if err != nil {
-		return nil, err
 	}
 	sig, err := e.sign(payload)
 	if err != nil {
 		return nil, err
 	}
-	return build(payload, sig, e), nil
+	return build(e, payload, sig), nil
 }
 
 func (e *ecdsasha) String() string {
 	return e.alg
 }
 
-func (e *ecdsasha) Verify(token []byte, jot Marshaler) error {
+func (e *ecdsasha) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrNoECDSAPubKey
-	}
-
-	payload, sig, err := parseBytes(token)
-	if err != nil {
-		return err
 	}
 	decSig := make([]byte, enc.DecodedLen(len(sig)))
 	if _, err = enc.Decode(decSig, sig); err != nil {
 		return err
 	}
-	if err = jot.UnmarshalJWT(payload); err != nil {
+	if err = e.verify(payload, decSig); err != nil {
 		return err
 	}
-	return e.verify(payload, decSig)
+	return nil
 }
 
 func (e *ecdsasha) sign(msg []byte) ([]byte, error) {

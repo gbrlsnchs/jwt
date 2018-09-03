@@ -9,18 +9,14 @@ func None() Signer {
 	return &none{}
 }
 
-func (n *none) Sign(jot Marshaler) ([]byte, error) {
-	payload, err := jot.MarshalJWT()
-	if err != nil {
-		return nil, err
-	}
-	return build(payload, nil, n), nil
+func (n *none) Sign(payload []byte) ([]byte, error) {
+	return build(n, payload, nil), nil
 }
 
 func (n *none) String() string {
 	return MethodNone
 }
 
-func (n *none) Verify(token []byte, jot Marshaler) error {
-	return jot.UnmarshalJWT(token)
+func (n *none) Verify(_, _ []byte) error {
+	return nil
 }
