@@ -23,7 +23,7 @@ type ValidatorFunc func(jot *JWT) error
 // AlgorithmValidator validates the "alg" claim.
 func AlgorithmValidator(alg string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if alg != jot.Algorithm {
+		if alg != jot.Header.Algorithm {
 			return ErrAlgorithmMismatch
 		}
 		return nil
@@ -43,7 +43,7 @@ func AudienceValidator(aud string) ValidatorFunc {
 // ExpirationTimeValidator validates the "exp" claim.
 func ExpirationTimeValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if exp := jot.Expiration; !exp.IsZero() && now.After(exp) {
+		if exp := time.Unix(jot.Expiration, 0); !exp.IsZero() && now.After(exp) {
 			return ErrTokenExpired
 		}
 		return nil
@@ -53,7 +53,7 @@ func ExpirationTimeValidator(now time.Time) ValidatorFunc {
 // IssuedAtValidator validates the "iat" claim.
 func IssuedAtValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if now.Before(jot.IssuedAt) {
+		if iat := time.Unix(jot.IssuedAt, 0); now.Before(iat) {
 			return ErrTokenFromFuture
 		}
 		return nil
@@ -83,7 +83,7 @@ func IDValidator(jti string) ValidatorFunc {
 // NotBeforeValidator validates the "nbf" claim.
 func NotBeforeValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if now.Before(jot.NotBefore) {
+		if nbf := time.Unix(jot.NotBefore, 0); now.Before(nbf) {
 			return ErrTokenTooYoung
 		}
 		return nil
