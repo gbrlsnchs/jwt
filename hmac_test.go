@@ -12,6 +12,14 @@ func TestHMAC(t *testing.T) {
 		{NewHS256("secret"), NewHS256("secret"), nil, nil, nil, nil, nil},
 		{NewHS256("secret"), NewHS256("not_secret"), nil, nil, nil, nil, ErrHMACInvalid},
 		{NewHS256("not_secret"), NewHS256("secret"), nil, nil, nil, nil, ErrHMACInvalid},
+		{NewHS384(""), NewHS384(""), nil, ErrNoHMACKey, nil, nil, ErrNoHMACKey},
+		{NewHS384("secret"), NewHS384("secret"), nil, nil, nil, nil, nil},
+		{NewHS384("secret"), NewHS384("not_secret"), nil, nil, nil, nil, ErrHMACInvalid},
+		{NewHS384("not_secret"), NewHS384("secret"), nil, nil, nil, nil, ErrHMACInvalid},
+		{NewHS512(""), NewHS512(""), nil, ErrNoHMACKey, nil, nil, ErrNoHMACKey},
+		{NewHS512("secret"), NewHS512("secret"), nil, nil, nil, nil, nil},
+		{NewHS512("secret"), NewHS512("not_secret"), nil, nil, nil, nil, ErrHMACInvalid},
+		{NewHS512("not_secret"), NewHS512("secret"), nil, nil, nil, nil, ErrHMACInvalid},
 	}
 	testJWT(t, testCases)
 }
