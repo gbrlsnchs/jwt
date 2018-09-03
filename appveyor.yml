@@ -1,4 +1,4 @@
-version: "{build}"
+version: "{build}.{branch}"
 clone_folder: c:\gopath\src\github.com\gbrlsnchs\jwt
 environment:
   GOPATH: c:\gopath
