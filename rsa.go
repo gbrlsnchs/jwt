@@ -8,8 +8,10 @@ import (
 )
 
 var (
-	ErrNoRSAPrivKey = errors.New("jwt.(Signer).Sign: RSA private key is nil")
-	ErrNoRSAPubKey  = errors.New("jwt.(Signer).Verify: RSA public key is nil")
+	// ErrNoRSAPrivKey is the error for trying to sign a JWT with a nil private key.
+	ErrNoRSAPrivKey = errors.New("jwt: RSA private key is nil")
+	// ErrNoRSAPubKey is the error for trying to verify a JWT with a nil public key.
+	ErrNoRSAPubKey = errors.New("jwt: RSA public key is nil")
 )
 
 type rsasha struct {
