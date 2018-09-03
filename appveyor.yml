@@ -1,5 +1,5 @@
 version: "{build}.{branch}"
-clone_folder: c:\gopath\src\github.com\gbrlsnchs\jwt
+clone_folder: c:\test
 environment:
   GOPATH: c:\gopath
   GO111MODULE: on
