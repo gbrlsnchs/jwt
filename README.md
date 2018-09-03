@@ -9,61 +9,148 @@
 ## About
 This package is a JWT signer, verifier and validator for [Go] (or Golang).
 
-When it comes to JWT, there are lots of libraries available for Go.
-Still, I couldn't find one that was simple enough to use, so I decided to create this library in order to help whomever needs an easy solution for JWT.
+Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library]'s API while following the [Effective Go] guidelines.
 
-The main difference between other libraries is ease of use.
-This library is pretty straightforward and has no external dependencies.
-If one is used to easy-to-use libraries, like [Node's], perhaps it is the ideal library for them to use.
+## Warning
+`master` branch contains bleeding edge code, therefore it sometimes introduces breaking changes.  
+Using a tagged version along with a proper dependency manager is the preferred way to use this library.
 
-Also, it supports header and payload validators and all hashing algorithms (both signing and verifying).
+### `v1` vs. `v2`
+`v2` is a total rework of the library's API. While `v1` was simple to use, it was neither fast nor memory-efficient. That's why `v2` came on the scene: it's got better performance, takes advantage of type embedding and uses a bit of reflection in order to allow a custom struct to be used as a JWT.
+
+As of [version 1.1.0], the library is pretty stable, but if a better performance is desired, it is recommended to migrate from `v1` to `v2`.
+
+### Benchmark
+#### `v1` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
+```
+BenchmarkSign-4     	  200000	      7962 ns/op	    3457 B/op	      50 allocs/op
+BenchmarkVerify-4   	  100000	     13087 ns/op	    3825 B/op	      80 allocs/op
+```
+
+#### `v2` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
+```
+BenchmarkSign-4     	  300000	      4075 ns/op	    1312 B/op	      11 allocs/op
+BenchmarkVerify-4   	  200000	      8363 ns/op	    1808 B/op	      32 allocs/op
+```
 
 ## Usage
 Full documentation [here].
 
-## Example
-### Issue a JWT
+### To import using `vgo` or `go mod`
 ```go
-// Set the options.
-now := time.Now()
-opt := &jwt.Options{
-	JWTID:          "unique_id",
-	Timestamp:      true,
-	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour),
-	NotBefore:      now.Add(30 * time.Minute),
-	Subject:        "123",
-	Audience:       "admin",
-	Issuer:         "auth_server",
-	KeyID:          "my_key",
-	Public:         map[string]interface{}{"foo": "bar", "myBool": true},
-}
-
-// Define a signer.
-s := jwt.HS256("my_53cr37")
-
-// Issue a new token.
-token, err := jwt.Sign(s, opt)
-if err != nil {
+import (
 	// ...
-}
-log.Print(token)
+
+	github.com/gbrlsnchs/jwt/v2
+)
 ```
 
-### Verify a JWT
+## Example
+### Sign a JWT without public claims
 ```go
+// Timestamp the beginning.
 now := time.Now()
-s := jwt.HS256("my_53cr37")
-jot, err := jwt.FromRequest(r)
-if err != nil {
-	// handle malformed or inexistent token
+// Define a signer.
+hs256 := jwt.HS256("secret")
+jot := &jwt.JWT{
+	Header: &jwt.Header{
+		Algorithm: hs256.String(),
+		KeyID:     "kid",
+	},
+	Claims: &jwt.Claims{
+		ID:         "foobar",
+		IssuedAt:   now.Unix(),
+		Expiration: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+		NotBefore:  now.Add(30 * time.Minute).Unix(),
+		Subject:    "someone",
+		Audience:   "gophers",
+		Issuer:     "gbrlsnchs",
+	},
 }
-if err := jot.Verify(s); err != nil {
-	// token is invalid
+payload, err := jwt.Marshal(jot)
+if err != nil {
+	// handle error
+}
+token, err := hs256.Sign(payload)
+if err != nil {
+	// handle error
+}
+log.Print("token = %s", token)
+```
+
+### Sign a JWT with public claims
+#### First, create a custom type and embed a JWT pointer in it
+```go
+type Token struct {
+	*jwt.JWT
+	IsLoggedIn  bool   `json:"isLoggedIn"`
+	CustomField string `json:"customField,omitempty"`
 }
 ```
 
-### Validate a JWT
+#### Now, initialize, marshal and sign it
 ```go
+// Timestamp the beginning.
+now := time.Now()
+// Define a signer.
+hs256 := jwt.HS256("secret")
+jot := &Token{
+	JWT: &jwt.JWT{
+		Header: &jwt.Header{
+			Algorithm: hs256.String(),
+			KeyID:     "kid",
+		},
+		Claims: &jwt.Claims{
+			ID:         "foobar",
+			IssuedAt:   now.Unix(),
+			Expiration: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+			NotBefore:  now.Add(30 * time.Minute).Unix(),
+			Subject:    "someone",
+			Audience:   "gophers",
+			Issuer:     "gbrlsnchs",
+		},
+	},
+	IsLoggedIn:  true,
+	CustomField: "myCustomField",
+}
+payload, err := jwt.Marshal(jot)
+if err != nil {
+	// handle error
+}
+token, err := hs256.Sign(payload)
+if err != nil {
+	// handle error
+}
+log.Print("token = %s", token)
+```
+
+### Verifying and validating a JWT
+#### Quick note
+When signing or verifying, this library **always** base64 encodes the signature.
+```go
+// Timestamp the beginning.
+now := time.Now()
+// Define a signer.
+hs256 := jwt.HS256("my_53cr37")
+// This is a mocked token for demonstration purposes only.
+token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
+
+// First, extract the payload and signature.
+// This enables unmarshaling the JWT first and
+// verifying it later or vice versa.
+payload, sig, err := jwt.Parse(token)
+if err != nil {
+	// handle error
+}
+var jot Token
+if err = jwt.Unmarshal(&jot); err != nil {
+	// handle error
+}
+if err = hs256.Verify(payload, sig); err != nil {
+	// handle error
+}
+
+// Validate fields.
 algValidator := jwt.AlgorithmValidator(jwt.MethodHS256)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
@@ -73,9 +160,9 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 		// handle "alg" mismatch
 	case jwt.ErrTokenExpired:
 		// handle "exp" being expired
-	}
 	case jwt.ErrAudienceMismatch:
 		// handle "aud" mismatch
+	}
 }
 ```
 
@@ -86,5 +173,7 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 - Opinions
 
 [Go]: https://golang.org
-[Node's]: https://github.com/auth0/node-jsonwebtoken
+[Node JWT library]: https://github.com/auth0/node-jsonwebtoken
+[Effective Go]: https://golang.org/doc/effective_go.html
+[version 1.1.0]: https://github.com/gbrlsnchs/jwt/releases/tag/v1.1.0
 [here]: https://godoc.org/github.com/gbrlsnchs/jwt

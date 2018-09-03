@@ -1,1 +1,1 @@
-module github.com/gbrlsnchs/jwt
+module github.com/gbrlsnchs/jwt/v2

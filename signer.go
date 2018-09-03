@@ -1,7 +1,9 @@
 package jwt
 
+// Signer is a signing method capable of
+// both signing and verifying a JWT.
 type Signer interface {
-	Sign(msg []byte) ([]byte, error)
-	String() string
-	Verify(msg, sig []byte) error
+	Sign([]byte) ([]byte, error)
+	Verify([]byte, []byte) error
+	String() string // prints a specific text used in the "alg" field
 }

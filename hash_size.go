@@ -1,11 +1,6 @@
 package jwt
 
-import (
-	"encoding/base64"
-)
-
 func hashSize(s Signer) int {
-	enc := base64.RawURLEncoding
 	switch s.String() {
 	case MethodHS256:
 		return enc.EncodedLen(32)

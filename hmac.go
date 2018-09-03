@@ -9,7 +9,9 @@ import (
 )
 
 var (
-	ErrNoHMACKey   = errors.New("jwt.(Signer).Sign: HMAC key is empty")
+	// ErrNoHMACKey is the error for trying to sign or verify with an empty key.
+	ErrNoHMACKey = errors.New("jwt.(Signer).Sign: HMAC key is empty")
+	// ErrHMACInvalid is the error for when an invalid signature is informed.
 	ErrHMACInvalid = errors.New("jwt.(Signer).Verify: HMAC validation failed")
 )
 
@@ -34,11 +36,36 @@ func HS512(key string) Signer {
 	return &hmacsha{key: []byte(key), hash: sha512.New, alg: MethodHS512}
 }
 
-func (h *hmacsha) Sign(msg []byte) ([]byte, error) {
-	if len(h.key) == 0 {
+func (h *hmacsha) Sign(payload []byte) ([]byte, error) {
+	if string(h.key) == "" {
 		return nil, ErrNoHMACKey
 	}
+	sig, err := h.sign(payload)
+	if err != nil {
+		return nil, err
+	}
+	return build(h, payload, sig), nil
+}
 
+func (h *hmacsha) Verify(payload, sig []byte) (err error) {
+	if string(h.key) == "" {
+		return ErrNoHMACKey
+	}
+	decSig := make([]byte, enc.DecodedLen(len(sig)))
+	if _, err = enc.Decode(decSig, sig); err != nil {
+		return err
+	}
+	if err = h.verify(payload, decSig); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *hmacsha) String() string {
+	return h.alg
+}
+
+func (h *hmacsha) sign(msg []byte) ([]byte, error) {
 	hh := hmac.New(h.hash, h.key)
 	if _, err := hh.Write(msg); err != nil {
 		return nil, err
@@ -46,12 +73,8 @@ func (h *hmacsha) Sign(msg []byte) ([]byte, error) {
 	return hh.Sum(nil), nil
 }
 
-func (h *hmacsha) String() string {
-	return h.alg
-}
-
-func (h *hmacsha) Verify(msg, sig []byte) error {
-	sig2, err := h.Sign(msg)
+func (h *hmacsha) verify(msg, sig []byte) error {
+	sig2, err := h.sign(msg)
 	if err != nil {
 		return err
 	}

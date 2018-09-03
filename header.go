@@ -1,7 +1,12 @@
 package jwt
 
-type header struct {
+// Header is a JOSE header scoped to the JWT definition.
+type Header struct {
 	Algorithm string `json:"alg,omitempty"`
 	KeyID     string `json:"kid,omitempty"`
-	Type      string `json:"typ,omitempty"`
+	*header
+}
+
+type header struct {
+	Type string `json:"typ,omitempty"`
 }
