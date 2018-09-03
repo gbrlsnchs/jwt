@@ -14,7 +14,6 @@ var enc = base64.RawURLEncoding
 type JWT struct {
 	Header *Header `json:"-"`
 	*Claims
-	nested bool // avoids nested JWT infinite loop
 }
 
 var (
