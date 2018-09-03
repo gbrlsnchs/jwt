@@ -12,13 +12,13 @@ import (
 
 var (
 	// ErrNoECDSAPrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrNoECDSAPrivKey = errors.New("jwt.(Signer).Sign: ECDSA private key is nil")
+	ErrNoECDSAPrivKey = errors.New("jwt: ECDSA private key is nil")
 	// ErrNoECDSAPubKey is the error for trying to verify a JWT with a nil public key.
-	ErrNoECDSAPubKey = errors.New("jwt.(Signer).Sign: ECDSA public key is nil")
-	// ErrECDSAInvalid is the error for an invalid signature.
-	ErrECDSAInvalid = errors.New("jwt.(Signer).Verify: ECDSA validation failed")
+	ErrNoECDSAPubKey = errors.New("jwt: ECDSA public key is nil")
+	// ErrECDSAVerification is the error for an invalid signature.
+	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
 	// ErrECDSASigLen is the error for an invalid signature length.
-	ErrECDSASigLen = errors.New("jwt.(Signer).Verify: ECDSA signature has unexpected size")
+	ErrECDSASigLen = errors.New("jwt: ECDSA signature has unexpected size")
 )
 
 type ecdsasha struct {
@@ -108,7 +108,7 @@ func (e *ecdsasha) verify(msg, sig []byte) error {
 	}
 
 	if !ecdsa.Verify(e.pub, hh.Sum(nil), r, s) {
-		return ErrECDSAInvalid
+		return ErrECDSAVerification
 	}
 	return nil
 }
