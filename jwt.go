@@ -18,7 +18,7 @@ type JWT struct {
 
 var (
 	// ErrMalformed indicates a token doesn't have
-	// a valid format, as per the RFC 7519, section 7.2.
+	// a valid format, as per the RFC 7519.
 	ErrMalformed = errors.New("jwt: malformed token")
 )
 
