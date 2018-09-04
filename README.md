@@ -12,7 +12,7 @@ This package is a JWT signer, verifier and validator for [Go](https://golang.org
 
 Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library](https://github.com/auth0/node-jsonwebtoken)'s API while following the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
-Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT RFC](https://tools.ietf.org/html/rfc7519).
+Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
 
 
 ## Warning
@@ -73,7 +73,7 @@ token, err := hs256.Sign(payload)
 if err != nil {
 	// handle error
 }
-log.Print("token = %s", token)
+log.Printf("token = %s", token)
 ```
 
 ### Signing a JWT with public claims
@@ -115,7 +115,7 @@ token, err := hs256.Sign(payload)
 if err != nil {
 	// handle error
 }
-log.Print("token = %s", token)
+log.Printf("token = %s", token)
 ```
 
 ### Verifying and validating a JWT
@@ -137,7 +137,7 @@ if err != nil {
 	// handle error
 }
 var jot Token
-if err = jwt.Unmarshal(&jot); err != nil {
+if err = jwt.Unmarshal(payload, &jot); err != nil {
 	// handle error
 }
 if err = hs256.Verify(payload, sig); err != nil {
