@@ -28,8 +28,8 @@ BenchmarkVerify-4   	  100000	     13087 ns/op	    3825 B/op	      80 allocs/op
 
 #### `v2` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
-BenchmarkSign-4     	  300000	      3978 ns/op	    1360 B/op	      11 allocs/op
-BenchmarkVerify-4   	  200000	      7990 ns/op	    1712 B/op	      28 allocs/op
+BenchmarkSign-4     	  300000	      3923 ns/op	    1344 B/op	      11 allocs/op
+BenchmarkVerify-4   	  200000	      8078 ns/op	    1696 B/op	      28 allocs/op
 ```
 
 ## Usage
