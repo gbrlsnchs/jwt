@@ -4,24 +4,27 @@ import "encoding/json"
 
 // Marshal marshals a struct or a pointer to it and returns a JWT payload.
 func Marshal(v interface{}) ([]byte, error) {
-	var header Header
-	if jot := extractJWT(v); jot != nil {
-		header = *jot.Header
+	if m, ok := v.(Marshaler); ok {
+		return m.MarshalJWT()
 	}
-	hdr, err := json.Marshal(header)
+	var hdr header
+	if jot, ok := v.(joser); ok {
+		hdr = *jot.header()
+	}
+	hdrBytes, err := json.Marshal(hdr)
 	if err != nil {
 		return nil, err
 	}
-	hdrSize := enc.EncodedLen(len(hdr))
-	cls, err := json.Marshal(v)
+	hdrSize := enc.EncodedLen(len(hdrBytes))
+	clsBytes, err := json.Marshal(v)
 	if err != nil {
 		return nil, err
 	}
-	clsSize := enc.EncodedLen(len(cls))
+	clsSize := enc.EncodedLen(len(clsBytes))
 
 	payload := make([]byte, hdrSize+1+clsSize)
-	enc.Encode(payload, hdr)
+	enc.Encode(payload, hdrBytes)
 	payload[hdrSize] = '.'
-	enc.Encode(payload[hdrSize+1:], cls)
+	enc.Encode(payload[hdrSize+1:], clsBytes)
 	return payload, nil
 }

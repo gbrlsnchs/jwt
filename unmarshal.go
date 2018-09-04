@@ -7,6 +7,9 @@ import (
 
 // Unmarshal unmarshals a token and assign a JWT to an interface.
 func Unmarshal(b []byte, v interface{}) error {
+	if m, ok := v.(Marshaler); ok {
+		return m.UnmarshalJWT(b)
+	}
 	sep := bytes.IndexByte(b, '.')
 	if sep < 0 {
 		return ErrMalformed
@@ -18,7 +21,7 @@ func Unmarshal(b []byte, v interface{}) error {
 	if _, err := enc.Decode(decHdr, encHdr); err != nil {
 		return err
 	}
-	var hdr Header
+	var hdr header
 	if err := json.Unmarshal(decHdr, &hdr); err != nil {
 		return err
 	}
@@ -32,11 +35,8 @@ func Unmarshal(b []byte, v interface{}) error {
 	if err := json.Unmarshal(decCls, v); err != nil {
 		return err
 	}
-
-	// Extract the JWT from the interface to
-	// be able to set a header to it.
-	if jot := extractJWT(v); jot != nil {
-		jot.Header = &hdr
+	if jot, ok := v.(joser); ok {
+		jot.setHeader(&hdr)
 	}
 	return nil
 }
