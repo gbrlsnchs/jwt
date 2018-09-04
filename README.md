@@ -165,7 +165,7 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 }
 ```
 
-## Contribution
+## Contributing
 ### How to help:
 - Pull Requests
 - Issues
