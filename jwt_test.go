@@ -46,25 +46,20 @@ func testJWT(t *testing.T, testCases []testCase) {
 			randomFloat := rand.Float64() * 100
 			jot := &testToken{
 				JWT: &JWT{
-					Header: &Header{
-						Algorithm: tc.signer.String(),
-						KeyID:     kid,
-						Type:      typ,
-					},
-					Claims: &Claims{
-						IssuedAt:   iat,
-						Expiration: exp,
-						NotBefore:  nbf,
-						Issuer:     iss,
-						Audience:   aud,
-						Subject:    sub,
-						ID:         jti,
-					},
+					Issuer:         iss,
+					Subject:        sub,
+					Audience:       aud,
+					ExpirationTime: exp,
+					NotBefore:      nbf,
+					IssuedAt:       iat,
+					ID:             jti,
 				},
 				Name:      name,
 				RandInt:   randomInt,
 				RandFloat: randomFloat,
 			}
+			jot.SetAlgorithm(tc.signer)
+			jot.SetKeyID(kid)
 
 			// 1 - Marshal.
 			payload, err := Marshal(jot)
@@ -113,15 +108,15 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			// 6 - Check new token.
-			if want, got := tc.signer.String(), jot2.Header.Algorithm; want != got {
+			if want, got := tc.signer.String(), jot2.Algorithm(); want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := kid, jot2.Header.KeyID; want != got {
+			if want, got := kid, jot2.KeyID(); want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := typ, jot2.Header.Type; want != got {
+			if want, got := typ, jot2.Type(); want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
@@ -129,7 +124,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
-			if want, got := exp, jot2.Expiration; want != got {
+			if want, got := exp, jot2.ExpirationTime; want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
@@ -165,11 +160,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
-			if want, got := reflect.ValueOf(jot.Header).Elem().NumField(), reflect.ValueOf(jot2.Header).Elem().NumField(); want != got {
-				t.Errorf("want %d, got %d", want, got)
-			}
-
-			if want, got := reflect.ValueOf(jot.Claims).Elem().NumField(), reflect.ValueOf(jot2.Claims).Elem().NumField(); want != got {
+			if want, got := reflect.ValueOf(jot.JWT).Elem().NumField(), reflect.ValueOf(jot2.JWT).Elem().NumField(); want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 		})

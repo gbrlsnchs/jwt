@@ -21,23 +21,19 @@ func BenchmarkSign(b *testing.B) {
 	now := time.Now()
 	jot := &benchToken{
 		JWT: &JWT{
-			Header: &Header{
-				Algorithm: benchSigner.String(),
-				KeyID:     "kid",
-			},
-			Claims: &Claims{
-				ID:         b.Name(),
-				IssuedAt:   now.Unix(),
-				Expiration: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-				NotBefore:  now.Add(30 * time.Minute).Unix(),
-				Subject:    "me",
-				Audience:   "benchmark",
-				Issuer:     "gbrlsnchs",
-			},
+			Issuer:         "gbrlsnchs",
+			Subject:        "me",
+			Audience:       "benchmark",
+			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+			NotBefore:      now.Add(30 * time.Minute).Unix(),
+			IssuedAt:       now.Unix(),
+			ID:             b.Name(),
 		},
 		Name:    "foobar",
 		IsBench: true,
 	}
+	jot.SetAlgorithm(benchSigner)
+	jot.SetKeyID("kid")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		payload, err := Marshal(jot)

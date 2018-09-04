@@ -26,8 +26,8 @@ BenchmarkVerify-4   	  100000	     13087 ns/op	    3825 B/op	      80 allocs/op
 
 #### `v2` on  Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
 ```
-BenchmarkSign-4     	  300000	      3882 ns/op	    1296 B/op	      11 allocs/op
-BenchmarkVerify-4   	  200000	      8304 ns/op	    1728 B/op	      29 allocs/op
+BenchmarkSign-4     	  300000	      3978 ns/op	    1360 B/op	      11 allocs/op
+BenchmarkVerify-4   	  200000	      7990 ns/op	    1712 B/op	      28 allocs/op
 ```
 
 ## Usage
@@ -53,20 +53,16 @@ now := time.Now()
 // Define a signer.
 hs256 := jwt.NewHS256("secret")
 jot := &jwt.JWT{
-	Header: &jwt.Header{
-		Algorithm: hs256.String(),
-		KeyID:     "kid",
-	},
-	Claims: &jwt.Claims{
-		ID:         "foobar",
-		IssuedAt:   now.Unix(),
-		Expiration: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-		NotBefore:  now.Add(30 * time.Minute).Unix(),
-		Subject:    "someone",
-		Audience:   "gophers",
-		Issuer:     "gbrlsnchs",
-	},
+	Issuer:         "gbrlsnchs",
+	Subject:        "someone",
+	Audience:       "gophers",
+	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+	NotBefore:      now.Add(30 * time.Minute).Unix(),
+	IssuedAt:       now.Unix(),
+	ID:             "foobar",
 }
+jot.SetAlgorithm(hs256)
+jot.SetKeyID("kid")
 payload, err := jwt.Marshal(jot)
 if err != nil {
 	// handle error
@@ -96,23 +92,19 @@ now := time.Now()
 hs256 := jwt.NewHS256("secret")
 jot := &Token{
 	JWT: &jwt.JWT{
-		Header: &jwt.Header{
-			Algorithm: hs256.String(),
-			KeyID:     "kid",
-		},
-		Claims: &jwt.Claims{
-			ID:         "foobar",
-			IssuedAt:   now.Unix(),
-			Expiration: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-			NotBefore:  now.Add(30 * time.Minute).Unix(),
-			Subject:    "someone",
-			Audience:   "gophers",
-			Issuer:     "gbrlsnchs",
-		},
+		Issuer:         "gbrlsnchs",
+		Subject:        "someone",
+		Audience:       "gophers",
+		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+		NotBefore:      now.Add(30 * time.Minute).Unix(),
+		IssuedAt:       now.Unix(),
+		ID:             "foobar",
 	},
 	IsLoggedIn:  true,
 	CustomField: "myCustomField",
 }
+jot.SetAlgorithm(hs256)
+jot.SetKeyID("kid")
 payload, err := jwt.Marshal(jot)
 if err != nil {
 	// handle error

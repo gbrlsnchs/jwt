@@ -13,15 +13,13 @@ import (
 func TestValidators(t *testing.T) {
 	var now time.Time
 	jot := &JWT{
-		Claims: &Claims{
-			IssuedAt:   now.Unix(),
-			Expiration: now.Add(24 * time.Hour).Unix(),
-			NotBefore:  now.Add(15 * time.Second).Unix(),
-			ID:         "jti",
-			Audience:   "aud",
-			Subject:    "sub",
-			Issuer:     "iss",
-		},
+		IssuedAt:       now.Unix(),
+		ExpirationTime: now.Add(24 * time.Hour).Unix(),
+		NotBefore:      now.Add(15 * time.Second).Unix(),
+		ID:             "jti",
+		Audience:       "aud",
+		Subject:        "sub",
+		Issuer:         "iss",
 	}
 	testCases := []struct {
 		validator ValidatorFunc
@@ -30,9 +28,9 @@ func TestValidators(t *testing.T) {
 		{IssuedAtValidator(now), nil},
 		{IssuedAtValidator(time.Unix(now.Unix()+1, 0)), nil},
 		{IssuedAtValidator(time.Unix(now.Unix()-1, 0)), ErrIatValidation},
-		{ExpirationValidator(now), nil},
-		{ExpirationValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0)), nil},
-		{ExpirationValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0)), ErrExpValidation},
+		{ExpirationTimeValidator(now), nil},
+		{ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0)), nil},
+		{ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0)), ErrExpValidation},
 		{NotBeforeValidator(now), ErrNbfValidation},
 		{NotBeforeValidator(time.Unix(now.Unix()+int64(15*time.Second), 0)), nil},
 		{NotBeforeValidator(time.Unix(now.Unix()-int64(15*time.Second), 0)), ErrNbfValidation},
