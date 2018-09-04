@@ -36,10 +36,10 @@ func AudienceValidator(aud string) ValidatorFunc {
 	}
 }
 
-// ExpirationValidator validates the "exp" claim.
-func ExpirationValidator(now time.Time) ValidatorFunc {
+// ExpirationTimeValidator validates the "exp" claim.
+func ExpirationTimeValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
-		if exp := time.Unix(jot.Expiration, 0); now.After(exp) {
+		if exp := time.Unix(jot.ExpirationTime, 0); now.After(exp) {
 			return ErrExpValidation
 		}
 		return nil
