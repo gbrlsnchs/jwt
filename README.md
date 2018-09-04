@@ -12,7 +12,7 @@ This package is a JWT signer, verifier and validator for [Go](https://golang.org
 
 Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library](https://github.com/auth0/node-jsonwebtoken)'s API while following the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
-Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, but narrowed down to the [JWT RFC](https://tools.ietf.org/html/rfc7519).
+Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT RFC](https://tools.ietf.org/html/rfc7519).
 
 
 ## Warning
