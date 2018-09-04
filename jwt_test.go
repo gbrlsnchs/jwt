@@ -34,7 +34,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 		t.Run(name, func(t *testing.T) {
 			now := time.Now()
 			kid := fmt.Sprintf("kid %s %d", t.Name(), i)
-			typ := Type
+			typ := "JWT"
 			iat := now.Unix()
 			exp := now.Add(30 * time.Minute).Unix()
 			nbf := now.Add(1 * time.Second).Unix()
