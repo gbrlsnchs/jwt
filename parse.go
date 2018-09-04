@@ -14,8 +14,8 @@ func ParseBytes(token []byte) ([]byte, []byte, error) {
 		return nil, nil, ErrMalformed
 	}
 
-	cls := token[sep1+1:]
-	sep2 := bytes.IndexByte(cls, '.')
+	clsBytes := token[sep1+1:]
+	sep2 := bytes.IndexByte(clsBytes, '.')
 	if sep2 < 0 {
 		return nil, nil, ErrMalformed
 	}
