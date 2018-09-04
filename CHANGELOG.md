@@ -6,21 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- `Parse` and `ParseBytes` functions.
 - `Marshal` and `Unmarshal` functions.
-- Support for using custom structs embedding a `JWT` object as a JWT.
+- `Marshaler` interface.
 
 ### Changed
-- `Signer` interface signature.
-- `JWT` properties.
-- `Header` and `Claims` now are part of `JWT`.
-- README texts, examples and usage.
+- Modify `Signer` signature.
+- Add claims directly to `JWT` struct.
+- Embed `header` to JWT.
+- Add README texts, examples and usage.
 - Rename `const.go` to `methods.go`.
 - Add prefix `New` to signing methods constructors.
 
 ### Removed
 - `Sign` and `Verify` functions.
-- JWT options object.
 - Base64 encoding and deconding functions.
+- `Options` struct.
+- `Claims` struct.
+- Functions that extract JWT from contexts and requests.
 
 ## [1.1.0] - 2018-08-22
 ### Changed
