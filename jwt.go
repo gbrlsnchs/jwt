@@ -5,14 +5,11 @@ import (
 	"errors"
 )
 
-// Type is a constant value for header fields "typ" and "cty".
-const Type = "JWT"
-
 var enc = base64.RawURLEncoding
 
 // JWT is a JSON Web Token as per the RFC 7519.
 //
-// Fields are ordered according to the RFC 7519.
+// Fields are ordered according to the RFC 7519 order.
 type JWT struct {
 	hdr            *header
 	Issuer         string `json:"iss,omitempty"`
@@ -68,7 +65,7 @@ func (jot *JWT) Validate(validators ...ValidatorFunc) error {
 func (jot *JWT) header() *header {
 	if jot.hdr == nil {
 		jot.hdr = &header{
-			Type: Type,
+			Type: "JWT",
 		}
 	}
 	return jot.hdr
