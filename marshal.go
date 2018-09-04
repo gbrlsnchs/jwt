@@ -16,12 +16,20 @@ func Marshal(v interface{}) ([]byte, error) {
 		return nil, err
 	}
 	hdrSize := enc.EncodedLen(len(hdrBytes))
-	clsBytes, err := json.Marshal(v)
-	if err != nil {
+
+	var clsBytes []byte
+	if jot, ok := v.(nest); ok {
+		if nst := jot.nested(); string(nst) != "" {
+			clsBytes = nst
+			goto encode
+		}
+	}
+	if clsBytes, err = json.Marshal(v); err != nil {
 		return nil, err
 	}
-	clsSize := enc.EncodedLen(len(clsBytes))
 
+encode:
+	clsSize := enc.EncodedLen(len(clsBytes))
 	payload := make([]byte, hdrSize+1+clsSize)
 	enc.Encode(payload, hdrBytes)
 	payload[hdrSize] = '.'
