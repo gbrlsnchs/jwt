@@ -22,7 +22,6 @@ type JWT struct {
 	NotBefore      int64  `json:"nbf,omitempty"`
 	IssuedAt       int64  `json:"iat,omitempty"`
 	ID             string `json:"jti,omitempty"`
-	nst            []byte
 }
 
 var (
@@ -39,13 +38,6 @@ func (jot *JWT) Algorithm() string {
 // KeyID returns the JWT's header's key ID.
 func (jot *JWT) KeyID() string {
 	return jot.header().KeyID
-}
-
-// Nest nests a already marshaled and signed JWT within the
-// JWT object and sets the header parameter "cty" to "JWT".
-func (jot *JWT) Nest(nst []byte) {
-	jot.nst = nst
-	jot.header().ContentType = Type
 }
 
 // SetAlgorithm sets the algorithm a JWT uses based on its signer.
@@ -80,10 +72,6 @@ func (jot *JWT) header() *header {
 		}
 	}
 	return jot.hdr
-}
-
-func (jot *JWT) nested() []byte {
-	return jot.nst
 }
 
 func (jot *JWT) setHeader(hdr *header) {
