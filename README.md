@@ -5,7 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/wqao7uvucce71jja/branch/master?svg=true)](https://ci.appveyor.com/project/gbrlsnchs/jwt/branch/master)
 [![Sourcegraph](https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg)](https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge)
 [![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
-[![Minimal version](https://img.shields.io/badge/minimal%20version-go1.11%2B-5272b4.svg)](https://golang.org/doc/go1.11)
+[![Minimal version](https://img.shields.io/badge/minimal%20version-go1.11%2B-5272b4.svg)](https://golang.org/doc/go1.11) [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
