@@ -8,7 +8,6 @@ go:
   - "1.11"
   - "tip"
 install:
-  - "export TESTSPACE=$HOME/testspace/gbrlsnchs/jwt"
-  - "mkdir -p $TESTSPACE"
-  - "rsync -az ${TRAVIS_BUILD_DIR}/ $TESTSPACE/"
-  - "cd $TESTSPACE"
+  - "mkdir $HOME/test"
+  - "rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/test/"
+  - "cd $HOME/test"
