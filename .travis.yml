@@ -7,4 +7,8 @@ env: "GO111MODULE=on"
 go:
   - "1.11"
   - "tip"
-install: true
+install:
+  - "export TESTSPACE=$HOME/testspace/gbrlsnchs/jwt"
+  - "mkdir -p $TESTSPACE"
+  - "rsync -az ${TRAVIS_BUILD_DIR}/ $TESTSPACE/"
+  - "cd $TESTSPACE"
