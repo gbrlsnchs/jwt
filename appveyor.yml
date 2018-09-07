@@ -6,5 +6,4 @@ environment:
 build: false
 deploy: false
 test_script:
-  - for %%g in (go110 go111) do (set GOROOT=c:\%%g&& c:\%%g\bin\go.exe get -u golang.org/x/vgo & IF ERRORLEVEL == 1 EXIT 1)
-  - for %%g in (go110 go111) do (set GOROOT=c:\%%g&& %GOPATH%\bin\vgo.exe test -v ./... & IF ERRORLEVEL == 1 EXIT 1)
+  - for %%g in (go111) do (set GOROOT=c:\%%g&& c:\%%g\bin\go.exe test -v ./... & IF ERRORLEVEL == 1 EXIT 1)
