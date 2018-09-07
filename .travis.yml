@@ -5,6 +5,8 @@ os:
 sudo: false
 env: "GO111MODULE=on"
 go:
+  - "1.10"
   - "1.11"
   - "tip"
-install: true
+install: go get -u golang.org/x/vgo
+script: vgo test -v ./...
