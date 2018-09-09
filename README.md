@@ -119,8 +119,6 @@ log.Printf("token = %s", token)
 ```
 
 ### Verifying and validating a JWT
-#### Quick note
-This library **always** encodes the signature to Base64 when signing and **always** decodes it from Base64 when verifying.
 ```go
 // Timestamp the beginning.
 now := time.Now()
