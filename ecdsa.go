@@ -60,11 +60,10 @@ func (e *ecdsasha) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrECDSANilPubKey
 	}
-	decSig := make([]byte, enc.DecodedLen(len(sig)))
-	if _, err = enc.Decode(decSig, sig); err != nil {
+	if sig, err = decodeToBytes(sig); err != nil {
 		return err
 	}
-	if err = e.verify(payload, decSig); err != nil {
+	if err = e.verify(payload, sig); err != nil {
 		return err
 	}
 	return nil
@@ -80,8 +79,7 @@ func (e *ecdsasha) sign(payload []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	byteSize := e.byteSize(e.priv.Params().BitSize)
+	byteSize := byteSize(e.priv.Params().BitSize)
 	rbytes := r.Bytes()
 	rsig := make([]byte, byteSize)
 	copy(rsig[byteSize-len(rbytes):], rbytes)
@@ -93,7 +91,7 @@ func (e *ecdsasha) sign(payload []byte) ([]byte, error) {
 }
 
 func (e *ecdsasha) verify(payload, sig []byte) error {
-	byteSize := e.byteSize(e.pub.Params().BitSize)
+	byteSize := byteSize(e.pub.Params().BitSize)
 	if len(sig) != byteSize*2 {
 		return ErrECDSAVerification
 	}
@@ -109,12 +107,4 @@ func (e *ecdsasha) verify(payload, sig []byte) error {
 		return ErrECDSAVerification
 	}
 	return nil
-}
-
-func (e *ecdsasha) byteSize(bitSize int) int {
-	byteSize := bitSize / 8
-	if bitSize%8 > 0 {
-		return byteSize + 1
-	}
-	return byteSize
 }

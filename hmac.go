@@ -37,9 +37,6 @@ func NewHS512(key string) Signer {
 }
 
 func (h *hmacsha) Sign(payload []byte) ([]byte, error) {
-	if string(h.key) == "" {
-		return nil, ErrNoHMACKey
-	}
 	sig, err := h.sign(payload)
 	if err != nil {
 		return nil, err
@@ -48,17 +45,10 @@ func (h *hmacsha) Sign(payload []byte) ([]byte, error) {
 }
 
 func (h *hmacsha) Verify(payload, sig []byte) (err error) {
-	if string(h.key) == "" {
-		return ErrNoHMACKey
-	}
-	decSig := make([]byte, enc.DecodedLen(len(sig)))
-	if _, err = enc.Decode(decSig, sig); err != nil {
+	if sig, err = decodeToBytes(sig); err != nil {
 		return err
 	}
-	if err = h.verify(payload, decSig); err != nil {
-		return err
-	}
-	return nil
+	return h.verify(payload, sig)
 }
 
 func (h *hmacsha) String() string {
@@ -66,6 +56,9 @@ func (h *hmacsha) String() string {
 }
 
 func (h *hmacsha) sign(payload []byte) ([]byte, error) {
+	if string(h.key) == "" {
+		return nil, ErrNoHMACKey
+	}
 	hh := hmac.New(h.hash, h.key)
 	if _, err := hh.Write(payload); err != nil {
 		return nil, err
