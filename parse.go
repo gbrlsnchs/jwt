@@ -2,7 +2,7 @@ package jwt
 
 import "bytes"
 
-// Parse splits a string JWT representation in payload and signature for further inspection.
+// Parse returns both the payload and the signature encoded to Base64 or an error if token is invalid.
 func Parse(token string) ([]byte, []byte, error) {
 	return ParseBytes([]byte(token))
 }
