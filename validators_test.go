@@ -25,23 +25,23 @@ func TestValidators(t *testing.T) {
 		validator ValidatorFunc
 		err       error
 	}{
-		{IssuedAtValidator(now), nil},
-		{IssuedAtValidator(time.Unix(now.Unix()+1, 0)), nil},
-		{IssuedAtValidator(time.Unix(now.Unix()-1, 0)), ErrIatValidation},
+		{IssuerValidator("iss"), nil},
+		{IssuerValidator("not_iss"), ErrIssValidation},
+		{SubjectValidator("sub"), nil},
+		{SubjectValidator("not_sub"), ErrSubValidation},
+		{AudienceValidator("aud"), nil},
+		{AudienceValidator("not_aud"), ErrAudValidation},
 		{ExpirationTimeValidator(now), nil},
 		{ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0)), nil},
 		{ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0)), ErrExpValidation},
 		{NotBeforeValidator(now), ErrNbfValidation},
 		{NotBeforeValidator(time.Unix(now.Unix()+int64(15*time.Second), 0)), nil},
 		{NotBeforeValidator(time.Unix(now.Unix()-int64(15*time.Second), 0)), ErrNbfValidation},
+		{IssuedAtValidator(now), nil},
+		{IssuedAtValidator(time.Unix(now.Unix()+1, 0)), nil},
+		{IssuedAtValidator(time.Unix(now.Unix()-1, 0)), ErrIatValidation},
 		{IDValidator("jti"), nil},
 		{IDValidator("not_jti"), ErrJtiValidation},
-		{AudienceValidator("aud"), nil},
-		{AudienceValidator("not_aud"), ErrAudValidation},
-		{SubjectValidator("sub"), nil},
-		{SubjectValidator("not_sub"), ErrSubValidation},
-		{IssuerValidator("iss"), nil},
-		{IssuerValidator("not_iss"), ErrIssValidation},
 	}
 	for _, tc := range testCases {
 		fn := runtime.FuncForPC(reflect.ValueOf(tc.validator).Pointer())
