@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Parse` and `ParseBytes` functions.
 - `Marshal` and `Unmarshal` functions.
 - `Marshaler` interface.
+- `Unmarshaler` interface.
 
 ### Changed
 - Modify `Signer` signature.
