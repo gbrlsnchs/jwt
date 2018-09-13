@@ -2,7 +2,13 @@ package jwt
 
 import "encoding/json"
 
-// Marshal marshals a struct or a pointer to it and returns a JWT payload.
+// Marshaler is the interface by types that can marshal a JWT description of themselves.
+type Marshaler interface {
+	MarshalJWT() ([]byte, error)
+}
+
+// Marshal marshals a struct or a pointer to a struct
+// according to RFC 7519 and returns a JWT payload encoded to Base64.
 func Marshal(v interface{}) ([]byte, error) {
 	if m, ok := v.(Marshaler); ok {
 		return m.MarshalJWT()

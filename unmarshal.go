@@ -5,9 +5,15 @@ import (
 	"encoding/json"
 )
 
-// Unmarshal unmarshals a token and assign a JWT to an interface.
+// Unmarshaler is the interface inmplemented by types
+// that can unmarshal a JWT description of themselves.
+type Unmarshaler interface {
+	UnmarshalJWT([]byte) error
+}
+
+// Unmarshal unmarshals a token according to RFC 7519 and assigns a JWT to an interface.
 func Unmarshal(b []byte, v interface{}) error {
-	if m, ok := v.(Marshaler); ok {
+	if m, ok := v.(Unmarshaler); ok {
 		return m.UnmarshalJWT(b)
 	}
 	sep := bytes.IndexByte(b, '.')
