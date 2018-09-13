@@ -4,7 +4,8 @@ package jwt
 //
 // Parameters are ordered according to the RFC 7515.
 type header struct {
-	Algorithm string `json:"alg,omitempty"`
-	KeyID     string `json:"kid,omitempty"`
-	Type      string `json:"typ,omitempty"`
+	Algorithm   string `json:"alg,omitempty"`
+	KeyID       string `json:"kid,omitempty"`
+	Type        string `json:"typ,omitempty"`
+	ContentType string `json:"cty,omitempty"`
 }

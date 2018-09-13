@@ -32,14 +32,27 @@ func (jot *JWT) Algorithm() string {
 	return jot.header().Algorithm
 }
 
+// ContentType returns the JWT's header's content type.
+func (jot *JWT) ContentType() string {
+	return jot.header().ContentType
+}
+
 // KeyID returns the JWT's header's key ID.
 func (jot *JWT) KeyID() string {
 	return jot.header().KeyID
 }
 
-// SetAlgorithm sets the algorithm a JWT uses based on its signer.
+// SetAlgorithm sets the algorithm a JWT uses to be signed.
 func (jot *JWT) SetAlgorithm(s Signer) {
 	jot.header().Algorithm = s.String()
+}
+
+// SetContentType sets the JWT's header's content type.
+//
+// This is useful if a type implements the Marshaler and the Unmarshaler
+// types in order to use JWE instead of JWS for signing and verifying.
+func (jot *JWT) SetContentType(cty string) {
+	jot.header().ContentType = cty
 }
 
 // SetKeyID sets the key ID assigned to a JWT.

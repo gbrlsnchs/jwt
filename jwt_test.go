@@ -35,6 +35,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 			now := time.Now()
 			kid := fmt.Sprintf("kid %s %d", t.Name(), i)
 			typ := "JWT"
+			cty := "JWT"
 			iat := now.Unix()
 			exp := now.Add(30 * time.Minute).Unix()
 			nbf := now.Add(1 * time.Second).Unix()
@@ -60,6 +61,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 			jot.SetAlgorithm(tc.signer)
 			jot.SetKeyID(kid)
+			jot.SetContentType(cty)
 
 			// 1 - Marshal.
 			payload, err := Marshal(jot)
@@ -117,6 +119,10 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			if want, got := typ, jot2.Type(); want != got {
+				t.Errorf("want %s, got %s", want, got)
+			}
+
+			if want, got := cty, jot2.ContentType(); want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
