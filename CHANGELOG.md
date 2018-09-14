@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2018-09-14
 ### Added
 - `Parse` and `ParseBytes` functions.
 - `Marshal` and `Unmarshal` functions.
@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add README texts, examples and usage.
 - Rename `const.go` to `methods.go`.
 - Add prefix `New` to signing methods constructors.
+- Run `vgo` for testing (this enables testing the package against Go 1.10);
 
 ### Removed
 - `Sign` and `Verify` functions.
@@ -117,7 +118,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - This package's source code, including examples and tests.
 - Go dep files.
 
-[Unreleased]: https://github.com/gbrlsnchs/jwt/compare/v1.1.0...HEAD
+[2.0.0]: https://github.com/gbrlsnchs/jwt/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/gbrlsnchs/jwt/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/gbrlsnchs/jwt/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/gbrlsnchs/jwt/compare/v1.0.0...v1.0.1
