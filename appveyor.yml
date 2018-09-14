@@ -1,9 +1,20 @@
 version: "{build}.{branch}"
+shallow_clone: true
 clone_folder: c:\test
 environment:
   GOPATH: c:\gopath
-  GO111MODULE: on
 build: false
 deploy: false
 test_script:
-  - for %%g in (go111) do (set GOROOT=c:\%%g&& c:\%%g\bin\go.exe test -v ./... & IF ERRORLEVEL == 1 EXIT 1)
+  # Go 1.10
+  - cd %GOPATH%
+  - set GOROOT=c:\go110
+  - c:\go110\bin\go.exe get -u golang.org/x/vgo
+  - cd c:\test
+  - vgo test -v -race -count=10 ./...
+  # Go 1.11
+  - cd %GOPATH%
+  - set GOROOT=c:\go111
+  - c:\go111\bin\go.exe get -u golang.org/x/vgo
+  - cd c:\test
+  - vgo test -v -race -count=10 ./...
