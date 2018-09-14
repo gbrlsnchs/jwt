@@ -1,23 +1,23 @@
-version: "{build}.{branch}"
+version: '{build}.{branch}'
 shallow_clone: true
-clone_folder: c:\test
+clone_folder: 'c:\test'
 environment:
-  GOPATH: c:\gopath
+  GOPATH: 'c:\gopath'
 build: false
 deploy: false
 test_script:
-  - mkdir %GOPATH%
+  - 'mkdir %GOPATH%'
   # Go 1.10
-  - echo %GOPATH%
-  - cd %GOPATH%
-  - set GOROOT=c:\go110
-  - c:\go110\bin\go.exe get -u golang.org/x/vgo
-  - cd c:\test
-  - %GOPATH%\bin\vgo.exe test -v -race -count=10 ./...
+  - 'echo %GOPATH%'
+  - 'cd %GOPATH%'
+  - 'set GOROOT=c:\go110'
+  - 'c:\go110\bin\go.exe get -u golang.org/x/vgo'
+  - 'cd c:\test'
+  - '%GOPATH%\bin\vgo.exe test -v -race -count=10 ./...'
   # Go 1.11
-  - echo %GOPATH%
-  - cd %GOPATH%
-  - set GOROOT=c:\go111
-  - c:\go111\bin\go.exe get -u golang.org/x/vgo
-  - cd c:\test
-  - %GOPATH%\bin\vgo.exe test -v -race -count=10 ./...
+  - 'echo %GOPATH%'
+  - 'cd %GOPATH%'
+  - 'set GOROOT=c:\go111'
+  - 'c:\go111\bin\go.exe get -u golang.org/x/vgo'
+  - 'cd c:\test'
+  - '%GOPATH%\bin\vgo.exe test -v -race -count=10 ./...'
