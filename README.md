@@ -1,11 +1,12 @@
 # jwt (JSON Web Token for Go)
-[![JWT Compatible](https://jwt.io/img/badge.svg)](https://jwt.io)
+[![JWT compatible](https://jwt.io/img/badge.svg)](https://jwt.io)
 
 [![Build status](https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master)](https://travis-ci.org/gbrlsnchs/jwt)
 [![Build status](https://ci.appveyor.com/api/projects/status/wqao7uvucce71jja/branch/master?svg=true)](https://ci.appveyor.com/project/gbrlsnchs/jwt/branch/master)
 [![Sourcegraph](https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg)](https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge)
 [![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
-[![Minimal version](https://img.shields.io/badge/minimal%20version-go1.10%2B-5272b4.svg)](https://golang.org/doc/go1.10) [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Minimal version](https://img.shields.io/badge/minimal%20version-go1.10%2B-5272b4.svg)](https://golang.org/doc/go1.10)
+[![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
@@ -143,7 +144,6 @@ if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
 ```
 
 ## Contributing
-### How to help:
-- Pull Requests
-- Issues
-- Opinions
+### How to help
+- For bugs and opinions, please [open an issue](https://github.com/gbrlsnchs/jwt/issues/new)
+- For pushing changes, please [open a pull request](https://github.com/gbrlsnchs/jwt/compare)
