@@ -131,7 +131,7 @@ if err = hs256.Verify(payload, sig); err != nil {
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
-if err = jot.Validate(algValidator, expValidator, audValidator); err != nil {
+if err = jot.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error
