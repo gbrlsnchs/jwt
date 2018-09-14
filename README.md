@@ -29,7 +29,7 @@ Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 import (
 	// ...
 
-	github.com/gbrlsnchs/jwt/v2
+	"github.com/gbrlsnchs/jwt/v2"
 )
 ```
 
