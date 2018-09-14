@@ -9,6 +9,7 @@ go:
   - "1.11"
   - "tip"
 install:
+  - "cd ${TRAVIS_HOME}/gopath"
   - "go get -u golang.org/x/vgo"
   - "mkdir $HOME/test"
   - "rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/test/"
