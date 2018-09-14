@@ -10,16 +10,14 @@ test_script:
   - 'gcc --version'
   - 'mkdir %GOPATH%'
   # Go 1.10
-  - 'echo %GOPATH%'
   - 'cd %GOPATH%'
   - 'set GOROOT=c:\go110'
   - 'c:\go110\bin\go.exe get -u golang.org/x/vgo'
   - 'cd c:\test'
-  - '%GOPATH%\bin\vgo.exe test -v -count=10 ./...'
+  - '%GOPATH%\bin\vgo.exe test -ldflags="-linkmode=external" -v -race -count=10 ./...'
   # Go 1.11
-  - 'echo %GOPATH%'
   - 'cd %GOPATH%'
   - 'set GOROOT=c:\go111'
   - 'c:\go111\bin\go.exe get -u golang.org/x/vgo'
   - 'cd c:\test'
-  - '%GOPATH%\bin\vgo.exe test -v -count=10 ./...'
+  - '%GOPATH%\bin\vgo.exe test -ldflags="-linkmode=external" -v -race -count=10 ./...'
