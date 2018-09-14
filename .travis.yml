@@ -5,9 +5,12 @@ os:
 sudo: false
 env: "GO111MODULE=on"
 go:
+  - "1.10"
   - "1.11"
   - "tip"
 install:
+  - "go get -u golang.org/x/vgo"
   - "mkdir $HOME/test"
   - "rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/test/"
   - "cd $HOME/test"
+script: "vgo test -v -count=10 ./..."
