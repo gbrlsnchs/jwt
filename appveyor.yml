@@ -3,6 +3,7 @@ shallow_clone: true
 clone_folder: 'c:\test'
 environment:
   GOPATH: 'c:\gopath'
+  PATH: 'c:\msys64\mingw64\bin\;%PATH%'
 build: false
 deploy: false
 test_script:
