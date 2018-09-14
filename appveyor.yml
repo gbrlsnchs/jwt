@@ -13,11 +13,11 @@ test_script:
   - set GOROOT=c:\go110
   - c:\go110\bin\go.exe get -u golang.org/x/vgo
   - cd c:\test
-  - vgo test -v -race -count=10 ./...
+  - vgo.exe test -v -race -count=10 ./...
   # Go 1.11
   - echo %GOPATH%
   - cd %GOPATH%
   - set GOROOT=c:\go111
   - c:\go111\bin\go.exe get -u golang.org/x/vgo
   - cd c:\test
-  - vgo test -v -race -count=10 ./...
+  - vgo.exe test -v -race -count=10 ./...
