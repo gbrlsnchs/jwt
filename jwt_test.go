@@ -2,6 +2,7 @@ package jwt_test
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"reflect"
 	"strconv"
@@ -43,7 +44,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 			aud := fmt.Sprintf("test %d", i)
 			sub := fmt.Sprintf("sub %d", i)
 			jti := strconv.Itoa(i)
-			randomInt := rand.Intn(int(^uint32(0)))
+			randomInt := rand.Intn(math.MaxUint32)
 			randomFloat := rand.Float64() * 100
 			jot := &testToken{
 				JWT: &JWT{
