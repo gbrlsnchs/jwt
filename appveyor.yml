@@ -6,16 +6,17 @@ environment:
 build: false
 deploy: false
 test_script:
+  - mkdir %GOPATH%
   # Go 1.10
   - echo %GOPATH%
-  - cd c:\gopath
+  - cd %GOPATH%
   - set GOROOT=c:\go110
   - c:\go110\bin\go.exe get -u golang.org/x/vgo
   - cd c:\test
   - vgo test -v -race -count=10 ./...
   # Go 1.11
   - echo %GOPATH%
-  - cd c:\gopath
+  - cd %GOPATH%
   - set GOROOT=c:\go111
   - c:\go111\bin\go.exe get -u golang.org/x/vgo
   - cd c:\test
