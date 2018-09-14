@@ -15,6 +15,9 @@ Although there are many JWT packages out there for Go, many lack support for som
 
 Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
 
+## Usage
+Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
+
 ### Installing
 #### Go 1.10
 `vgo get -u github.com/gbrlsnchs/jwt/v2`
@@ -29,9 +32,6 @@ import (
 	github.com/gbrlsnchs/jwt/v2
 )
 ```
-
-## Usage
-Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Signing a simple JWT
 ```go
