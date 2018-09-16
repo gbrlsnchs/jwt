@@ -121,11 +121,11 @@ payload, sig, err := jwt.Parse(token)
 if err != nil {
 	// handle error
 }
-var jot Token
-if err = jwt.Unmarshal(payload, &jot); err != nil {
+if err = hs256.Verify(payload, sig); err != nil {
 	// handle error
 }
-if err = hs256.Verify(payload, sig); err != nil {
+var jot Token
+if err = jwt.Unmarshal(payload, &jot); err != nil {
 	// handle error
 }
 
