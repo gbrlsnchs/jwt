@@ -110,7 +110,9 @@ now := time.Now()
 // Define a signer.
 hs256 := jwt.NewHS256("secret")
 // This is a mocked token for demonstration purposes only.
-token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
+token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
+	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
+	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
 
 // First, extract the payload and signature.
 // This enables unmarshaling the JWT first and
