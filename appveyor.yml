@@ -18,6 +18,5 @@ test_script:
   # Go 1.11
   - 'cd %GOPATH%'
   - 'set GOROOT=c:\go111'
-  - 'c:\go111\bin\go.exe get -u golang.org/x/vgo'
   - 'cd c:\test'
-  - '%GOPATH%\bin\vgo.exe test -ldflags="-linkmode=external" -v -race -count=10 ./...'
+  - '%GOROOT%\bin\go.exe test -ldflags="-linkmode=external" -v -race -count=10 ./...'
