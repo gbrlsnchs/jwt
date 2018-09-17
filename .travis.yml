@@ -9,7 +9,7 @@ go:
   - 'tip'
 install:
   - 'cd ${TRAVIS_HOME}/gopath'
-  - 'export GOVERSION=$(go version | awk "{print $3}"'
+  - 'export GOVERSION=$(go version | awk "{print $3}")'
   - 'echo $GOVERSION'
   - 'if [ "$GOVERSION" == "go1.10" ]; then go get -u golang.org/x/vgo; fi'
   - 'mkdir $HOME/test'
