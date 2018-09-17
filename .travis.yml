@@ -13,4 +13,5 @@ install:
   - 'mkdir $HOME/test'
   - 'rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/test/'
   - 'cd $HOME/test'
-script: 'if [ $(go version | awk "{print $3}") == go1.10 ]; then vgo test -v -race -count=10; else go test -v -race -count=10; fi'
+  - 'echo go version | awk "{print $3}"'
+script: 'if [ $(go version | awk "{print $3}") == "go1.10" ]; then vgo test -v -race -count=10; else go test -v -race -count=10; fi'
