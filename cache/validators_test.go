@@ -3,7 +3,7 @@ package cache
 import (
 	"testing"
 
-	"github.com/gbrlsnchs/jwt"
+	jwt "github.com/gbrlsnchs/jwt/v2"
 )
 
 func TestValidatorWithNoJTIClaim(t *testing.T) {
