@@ -1,18 +1,22 @@
-sudo: false
 os:
   - 'linux'
   - 'osx'
+sudo: false
+
 language: 'go'
 go:
   - '1.10'
   - '1.11'
   - 'tip'
+
+env:
+  - 'GOBIN=go'
 install:
-  - 'cd ${TRAVIS_HOME}/gopath'
-  - 'export GOVERSION=$(go version | awk ''{print $3}'')'
-  - 'echo $GOVERSION'
-  - 'if [ "$GOVERSION" == "go1.10" ]; then go get -u golang.org/x/vgo; fi'
+  - 'if [ "$(go version | awk ''{print $3}'')" == "go1.10" ]; then go get -u golang.org/x/vgo && GOBIN=vgo; fi'
   - 'mkdir $HOME/test'
-  - 'rsync -az ${TRAVIS_BUILD_DIR}/ $HOME/test/'
+  - 'rsync -az $TRAVIS_BUILD_DIR/ $HOME/test/'
+  # remove the project from GOPATH to mirror real use case
+  - 'rm -rf $TRAVIS_BUILD_DIR'
   - 'cd $HOME/test'
-script: 'if [ "$GOVERSION" == "go1.10" ]; then vgo test -v -race -count=10; else go test -v -race -count=10; fi'
+script:
+  - '$GOBIN test -v -race -count=10'
