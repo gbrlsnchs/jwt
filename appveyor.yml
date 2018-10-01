@@ -1,11 +1,11 @@
 version: '{build}.{branch}'
-shallow_clone: true
-clone_folder: 'c:\test'
+build: false
+deploy: false
 environment:
   GOPATH: 'c:\gopath'
   PATH: 'c:\msys64\mingw64\bin\;%PATH%'
-build: false
-deploy: false
+clone_folder: 'c:\test'
+shallow_clone: true
 test_script:
   - 'gcc --version'
   - 'mkdir %GOPATH%'
