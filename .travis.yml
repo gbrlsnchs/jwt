@@ -12,6 +12,7 @@ go:
 env:
   - 'GOBIN=go'
 install:
+  - 'cd $GOPATH'
   - 'if [ "$(go version | awk ''{print $3}'')" == "go1.10" ]; then go get -u golang.org/x/vgo && GOBIN=vgo; fi'
   - 'mkdir $HOME/test'
   - 'rsync -az $TRAVIS_BUILD_DIR/ $HOME/test/'
