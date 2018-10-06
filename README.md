@@ -133,7 +133,9 @@ if err = jwt.Unmarshal(payload, &jot); err != nil {
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
-if err = jot.Validate(iatValidator, expValidator, audValidator); err != nil {
+jtiUsageValidator := cache.IDValidator(cache.New())
+// Best practice: call cache.IDValidator last to avoid caching invalid tokens.
+if err = jot.Validate(iatValidator, expValidator, audValidator, jtiUsageValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error
@@ -141,6 +143,10 @@ if err = jot.Validate(iatValidator, expValidator, audValidator); err != nil {
 		// handle "exp" validation error
 	case jwt.ErrAudValidation:
 		// handle "aud" validation error
+	case cache.ErrJTIRequiredValidation:
+		// handle "jti" required but not presented validation error
+	case cache.ErrJTIUsageExceededValidation:
+		// handle "jti" usage exceeded error
 	}
 }
 ```
