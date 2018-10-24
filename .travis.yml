@@ -15,10 +15,10 @@ env:
 install:
   - 'cd $GOPATH'
   - 'if [ "$(go version | awk ''{print $3}'')" == "go1.10" ]; then go get -u golang.org/x/vgo && BIN=vgo; fi'
-  - 'mkdir $HOME/test'
-  - 'rsync -az $TRAVIS_BUILD_DIR/ $HOME/test/'
+  - 'mkdir ${TRAVIS_HOME}/test'
+  - 'rsync -az ${TRAVIS_BUILD_DIR}/ ${HOME}/test/'
   # remove the project from GOPATH to mirror real use case
-  - 'rm -rf $TRAVIS_BUILD_DIR'
-  - 'cd $HOME/test'
+  - 'rm -rf ${TRAVIS_BUILD_DIR}'
+  - 'cd ${TRAVIS_HOME}/test'
 script:
   - '$BIN test -v -race -count=10'
