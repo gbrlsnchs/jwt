@@ -9,12 +9,10 @@ go:
   - '1.10'
   - '1.11'
 
-env:
-  - 'BIN=go'
+env: 'BIN=go'
 install:
   - 'cd $GOPATH'
   - 'if [ "$(go version | awk ''{print $3}'')" == "go1.10" ]; then go get -u golang.org/x/vgo && BIN=vgo; fi'
   - 'mv ${TRAVIS_BUILD_DIR} ${TRAVIS_HOME}/test'
   - 'cd ${TRAVIS_HOME}/test'
-script:
-  - '$BIN test -v -race -count=10'
+script: '${BIN} test -v -race -count=10'
