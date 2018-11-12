@@ -23,7 +23,7 @@ func BenchmarkSign(b *testing.B) {
 		JWT: &JWT{
 			Issuer:         "gbrlsnchs",
 			Subject:        "me",
-			Audience:       "benchmark",
+			Audience:       []string{"benchmark"},
 			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 			NotBefore:      now.Add(30 * time.Minute).Unix(),
 			IssuedAt:       now.Unix(),

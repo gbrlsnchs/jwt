@@ -27,13 +27,27 @@ var (
 type ValidatorFunc func(jot *JWT) error
 
 // AudienceValidator validates the "aud" claim.
-func AudienceValidator(aud string) ValidatorFunc {
+func AudienceValidator(aud ...string) ValidatorFunc {
 	return func(jot *JWT) error {
-		if jot.Audience != aud {
-			return ErrAudValidation
+		if len(aud) != 0 {
+			for _, singleAudClaim := range aud {
+				if !contains(jot.Audience, singleAudClaim) {
+					return ErrAudValidation
+				}
+			}
 		}
 		return nil
 	}
+}
+
+// contains reports whether the slice contains the string.
+func contains(slice []string, target string) bool {
+	for _, val := range slice {
+		if target == val {
+			return true
+		}
+	}
+	return false
 }
 
 // ExpirationTimeValidator validates the "exp" claim.

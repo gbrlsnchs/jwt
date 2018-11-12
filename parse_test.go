@@ -1,6 +1,7 @@
 package jwt_test
 
 import (
+	"reflect"
 	"testing"
 
 	. "github.com/gbrlsnchs/jwt/v2"
@@ -16,7 +17,7 @@ func TestParse(t *testing.T) {
 		typ   string
 		iss   string
 		sub   string
-		aud   string
+		aud   []string
 		exp   int64
 		nbf   int64
 		iat   int64
@@ -25,14 +26,14 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
-				"eyJleHAiOjE1MTYyMzkwMzMsInN1YiI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjIsIm5iZiI6MTUxNjIzOTA0NCwiaXNzIjoiand0LmlvIiwiYXVkIjoidGVzdCIsImp0aSI6InUzZzEyM2xrajFoZzRsMWoyZzQxaDJnIn0." +
-				"ckCc4Wa7vSsFCE8smpzFmIh9w_4MmHV1w7HndGbqA-k",
+				"eyJleHAiOjE1MTYyMzkwMzMsInN1YiI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjIsIm5iZiI6MTUxNjIzOTA0NCwiaXNzIjoiand0LmlvIiwiYXVkIjpbInRlc3QiXSwianRpIjoidTNnMTIzbGtqMWhnNGwxajJnNDFoMmcifQ." +
+				"35ptagMNUQ-9GGEibWH5Vu4otcQQ0xDKMh0KyCRBUO0",
 			MethodHS256,
 			"",
 			"JWT",
 			"jwt.io",
 			"1234567890",
-			"test",
+			[]string{"test"},
 			1516239033,
 			1516239044,
 			1516239022,
@@ -48,7 +49,7 @@ func TestParse(t *testing.T) {
 			"JWT",
 			"",
 			"48327482",
-			"",
+			nil,
 			int64(0),
 			int64(0),
 			1516239022,
@@ -84,7 +85,7 @@ func TestParse(t *testing.T) {
 			if want, got := tc.sub, jot.Subject; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
-			if want, got := tc.aud, jot.Audience; want != got {
+			if want, got := tc.aud, jot.Audience; !reflect.DeepEqual(want, got) {
 				t.Errorf("want %s, got %s", want, got)
 			}
 			if want, got := tc.exp, jot.ExpirationTime; want != got {

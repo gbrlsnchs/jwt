@@ -12,13 +12,13 @@ var enc = base64.RawURLEncoding
 // Fields are ordered according to the RFC 7519 order.
 type JWT struct {
 	hdr            *header
-	Issuer         string `json:"iss,omitempty"`
-	Subject        string `json:"sub,omitempty"`
-	Audience       string `json:"aud,omitempty"`
-	ExpirationTime int64  `json:"exp,omitempty"`
-	NotBefore      int64  `json:"nbf,omitempty"`
-	IssuedAt       int64  `json:"iat,omitempty"`
-	ID             string `json:"jti,omitempty"`
+	Issuer         string   `json:"iss,omitempty"`
+	Subject        string   `json:"sub,omitempty"`
+	Audience       []string `json:"aud,omitempty"`
+	ExpirationTime int64    `json:"exp,omitempty"`
+	NotBefore      int64    `json:"nbf,omitempty"`
+	IssuedAt       int64    `json:"iat,omitempty"`
+	ID             string   `json:"jti,omitempty"`
 }
 
 var (
