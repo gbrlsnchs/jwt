@@ -49,4 +49,5 @@ func TestECDSA(t *testing.T) {
 		{NewES512(priv512, nil), NewES512(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
 	}
 	testJWT(t, testCases)
+	testJWTSingleAud(t, testCases)
 }

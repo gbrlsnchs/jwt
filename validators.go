@@ -30,8 +30,9 @@ type ValidatorFunc func(jot *JWT) error
 func AudienceValidator(aud ...string) ValidatorFunc {
 	return func(jot *JWT) error {
 		if len(aud) != 0 {
+			audiences := jot.GetAudience()
 			for _, singleAudClaim := range aud {
-				if !contains(jot.Audience, singleAudClaim) {
+				if !contains(audiences, singleAudClaim) {
 					return ErrAudValidation
 				}
 			}

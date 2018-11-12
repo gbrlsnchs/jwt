@@ -32,4 +32,5 @@ func TestRSA(t *testing.T) {
 		{NewRS512(priv, nil), NewRS512(nil, nil), nil, nil, nil, nil, ErrRSANilPubKey},
 	}
 	testJWT(t, testCases)
+	testJWTSingleAud(t, testCases)
 }

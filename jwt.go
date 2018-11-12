@@ -12,13 +12,13 @@ var enc = base64.RawURLEncoding
 // Fields are ordered according to the RFC 7519 order.
 type JWT struct {
 	hdr            *header
-	Issuer         string   `json:"iss,omitempty"`
-	Subject        string   `json:"sub,omitempty"`
-	Audience       []string `json:"aud,omitempty"`
-	ExpirationTime int64    `json:"exp,omitempty"`
-	NotBefore      int64    `json:"nbf,omitempty"`
-	IssuedAt       int64    `json:"iat,omitempty"`
-	ID             string   `json:"jti,omitempty"`
+	Issuer         string      `json:"iss,omitempty"`
+	Subject        string      `json:"sub,omitempty"`
+	Audience       interface{} `json:"aud,omitempty"`
+	ExpirationTime int64       `json:"exp,omitempty"`
+	NotBefore      int64       `json:"nbf,omitempty"`
+	IssuedAt       int64       `json:"iat,omitempty"`
+	ID             string      `json:"jti,omitempty"`
 }
 
 var (
@@ -63,6 +63,25 @@ func (jot *JWT) SetKeyID(kid string) {
 // Type returns the JWT's header's type.
 func (jot *JWT) Type() string {
 	return jot.header().Type
+}
+
+// GetAudience returns the audience claim as a list of strings.
+func (jot *JWT) GetAudience() []string {
+	switch jot.Audience.(type) {
+	case string:
+		return []string{jot.Audience.(string)}
+	case []string:
+		return jot.Audience.([]string)
+	case []interface{}:
+		auds := make([]string, len(jot.Audience.([]interface{})))
+		for i, value := range jot.Audience.([]interface{}) {
+			str, _ := value.(string)
+			auds[i] = str
+		}
+		return auds
+	default:
+		return []string{}
+	}
 }
 
 // Validate validates claims and header fields.

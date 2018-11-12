@@ -49,7 +49,7 @@ func TestParse(t *testing.T) {
 			"JWT",
 			"",
 			"48327482",
-			nil,
+			[]string{},
 			int64(0),
 			int64(0),
 			1516239022,
@@ -85,7 +85,7 @@ func TestParse(t *testing.T) {
 			if want, got := tc.sub, jot.Subject; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
-			if want, got := tc.aud, jot.Audience; !reflect.DeepEqual(want, got) {
+			if want, got := tc.aud, jot.GetAudience(); !reflect.DeepEqual(want, got) {
 				t.Errorf("want %s, got %s", want, got)
 			}
 			if want, got := tc.exp, jot.ExpirationTime; want != got {

@@ -22,4 +22,5 @@ func TestHMAC(t *testing.T) {
 		{NewHS512("not_secret"), NewHS512("secret"), nil, nil, nil, nil, ErrHMACVerification},
 	}
 	testJWT(t, testCases)
+	testJWTSingleAud(t, testCases)
 }

@@ -13,4 +13,5 @@ func TestNone(t *testing.T) {
 		{NewHS256("secret"), None(), nil, nil, nil, nil, nil},
 	}
 	testJWT(t, testCases)
+	testJWTSingleAud(t, testCases)
 }
