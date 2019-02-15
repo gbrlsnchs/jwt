@@ -19,16 +19,16 @@ Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Installing
 #### Go 1.10
-`vgo get -u github.com/gbrlsnchs/jwt/v2`
+`vgo get -u github.com/gbrlsnchs/jwt/v3`
 #### Go 1.11 or after
-`go get -u github.com/gbrlsnchs/jwt/v2`
+`go get -u github.com/gbrlsnchs/jwt/v3`
 
 ### Importing
 ```go
 import (
 	// ...
 
-	"github.com/gbrlsnchs/jwt/v2"
+	"github.com/gbrlsnchs/jwt/v3"
 )
 ```
 
@@ -39,21 +39,18 @@ now := time.Now()
 // Define a signer.
 hs256 := jwt.NewHS256("secret")
 jot := &jwt.JWT{
-	Issuer:         "gbrlsnchs",
-	Subject:        "someone",
-	Audience:       "gophers",
-	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-	NotBefore:      now.Add(30 * time.Minute).Unix(),
-	IssuedAt:       now.Unix(),
-	ID:             "foobar",
+	Header: jwt.Header{KeyID: "kid"},
+	Claims: &jwt.Claims{
+		Issuer:         "gbrlsnchs",
+		Subject:        "someone",
+		Audience:       "gophers",
+		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+		NotBefore:      now.Add(30 * time.Minute).Unix(),
+		IssuedAt:       now.Unix(),
+		ID:             "foobar",
+	},
 }
-jot.SetAlgorithm(hs256)
-jot.SetKeyID("kid")
-payload, err := jwt.Marshal(jot)
-if err != nil {
-	// handle error
-}
-token, err := hs256.Sign(payload)
+token, err := jwt.Sign(jot, hs256)
 if err != nil {
 	// handle error
 }
@@ -64,7 +61,7 @@ log.Printf("token = %s", token)
 #### First, create a custom type and embed a JWT pointer in it
 ```go
 type Token struct {
-	*jwt.JWT
+	jwt.JWT
 	IsLoggedIn  bool   `json:"isLoggedIn"`
 	CustomField string `json:"customField,omitempty"`
 }
@@ -77,25 +74,22 @@ now := time.Now()
 // Define a signer.
 hs256 := jwt.NewHS256("secret")
 jot := &Token{
-	JWT: &jwt.JWT{
-		Issuer:         "gbrlsnchs",
-		Subject:        "someone",
-		Audience:       "gophers",
-		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-		NotBefore:      now.Add(30 * time.Minute).Unix(),
-		IssuedAt:       now.Unix(),
-		ID:             "foobar",
+	JWT: jwt.JWT{
+		Header: jwt.Header{KeyID: "kid"},
+		Claims: &jwt.Claims{
+			Issuer:         "gbrlsnchs",
+			Subject:        "someone",
+			Audience:       "gophers",
+			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+			NotBefore:      now.Add(30 * time.Minute).Unix(),
+			IssuedAt:       now.Unix(),
+			ID:             "foobar",
+		},
 	},
 	IsLoggedIn:  true,
 	CustomField: "myCustomField",
 }
-jot.SetAlgorithm(hs256)
-jot.SetKeyID("kid")
-payload, err := jwt.Marshal(jot)
-if err != nil {
-	// handle error
-}
-token, err := hs256.Sign(payload)
+token, err := jwt.Sign(jot, hs256)
 if err != nil {
 	// handle error
 }
@@ -109,22 +103,12 @@ now := time.Now()
 // Define a signer.
 hs256 := jwt.NewHS256("secret")
 // This is a mocked token for demonstration purposes only.
-token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
+token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
 	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
-	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
+	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
 
-// First, extract the payload and signature.
-// This enables unmarshaling the JWT first and
-// verifying it later or vice versa.
-payload, sig, err := jwt.Parse(token)
-if err != nil {
-	// handle error
-}
-if err = hs256.Verify(payload, sig); err != nil {
-	// handle error
-}
 var jot Token
-if err = jwt.Unmarshal(payload, &jot); err != nil {
+if err := jwt.Verify(token, &jot, hs256); err != nil {
 	// handle error
 }
 
@@ -132,7 +116,7 @@ if err = jwt.Unmarshal(payload, &jot); err != nil {
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
-if err = jot.Validate(iatValidator, expValidator, audValidator); err != nil {
+if err := jot.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error
