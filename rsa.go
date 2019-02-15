@@ -14,7 +14,7 @@ var (
 	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
 )
 
-type rsasha struct {
+type RSASHA struct {
 	priv *rsa.PrivateKey
 	pub  *rsa.PublicKey
 	hash crypto.Hash
@@ -22,36 +22,32 @@ type rsasha struct {
 }
 
 // NewRS256 creates a signing method using RSA and SHA-256.
-func NewRS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
-	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA256, alg: MethodRS256}
+func NewRS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSASHA {
+	return &RSASHA{priv: priv, pub: pub, hash: crypto.SHA256, alg: MethodRS256}
 }
 
 // NewRS384 creates a signing method using RSA and SHA-384.
-func NewRS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
-	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA384, alg: MethodRS384}
+func NewRS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSASHA {
+	return &RSASHA{priv: priv, pub: pub, hash: crypto.SHA384, alg: MethodRS384}
 }
 
 // NewRS512 creates a signing method using RSA and SHA-512.
-func NewRS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Signer {
-	return &rsasha{priv: priv, pub: pub, hash: crypto.SHA512, alg: MethodRS512}
+func NewRS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSASHA {
+	return &RSASHA{priv: priv, pub: pub, hash: crypto.SHA512, alg: MethodRS512}
 }
 
-func (r *rsasha) Sign(payload []byte) ([]byte, error) {
+func (r *RSASHA) Sign(payload []byte) ([]byte, error) {
 	if r.priv == nil {
 		return nil, ErrRSANilPrivKey
 	}
-	sig, err := r.sign(payload)
-	if err != nil {
-		return nil, err
-	}
-	return build(r, payload, sig), nil
+	return r.sign(payload)
 }
 
-func (r *rsasha) String() string {
+func (r *RSASHA) String() string {
 	return r.alg
 }
 
-func (r *rsasha) Verify(payload, sig []byte) (err error) {
+func (r *RSASHA) Verify(payload, sig []byte) (err error) {
 	if r.pub == nil {
 		return ErrRSANilPubKey
 	}
@@ -64,7 +60,7 @@ func (r *rsasha) Verify(payload, sig []byte) (err error) {
 	return nil
 }
 
-func (r *rsasha) sign(payload []byte) ([]byte, error) {
+func (r *RSASHA) sign(payload []byte) ([]byte, error) {
 	hh := r.hash.New()
 	var err error
 	if _, err = hh.Write(payload); err != nil {
@@ -78,7 +74,7 @@ func (r *rsasha) sign(payload []byte) ([]byte, error) {
 	return sig, nil
 }
 
-func (r *rsasha) verify(payload, sig []byte) error {
+func (r *RSASHA) verify(payload, sig []byte) error {
 	hh := r.hash.New()
 	if _, err := hh.Write(payload); err != nil {
 		return err

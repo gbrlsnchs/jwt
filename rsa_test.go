@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"testing"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestRSA(t *testing.T) {

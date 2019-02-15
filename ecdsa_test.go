@@ -6,7 +6,7 @@ import (
 	"crypto/rand"
 	"testing"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestECDSA(t *testing.T) {

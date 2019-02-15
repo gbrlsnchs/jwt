@@ -3,7 +3,7 @@ package jwt_test
 import (
 	"testing"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestHMAC(t *testing.T) {

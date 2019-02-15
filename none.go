@@ -1,22 +1,22 @@
 package jwt
 
-type none struct{}
+type None struct{}
 
 // None returns a Signer that
 // bypasses signing and validating,
 // thus implementing the "none" method.
-func None() Signer {
-	return &none{}
+func NewNone() *None {
+	return &None{}
 }
 
-func (n *none) Sign(payload []byte) ([]byte, error) {
-	return build(n, payload, nil), nil
+func (n *None) Sign(_ []byte) ([]byte, error) {
+	return nil, nil
 }
 
-func (n *none) String() string {
+func (n *None) String() string {
 	return MethodNone
 }
 
-func (n *none) Verify(_, _ []byte) error {
+func (n *None) Verify(_, _ []byte) error {
 	return nil
 }
