@@ -7,19 +7,21 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestValidators(t *testing.T) {
 	var now time.Time
 	jot := &JWT{
-		IssuedAt:       now.Unix(),
-		ExpirationTime: now.Add(24 * time.Hour).Unix(),
-		NotBefore:      now.Add(15 * time.Second).Unix(),
-		ID:             "jti",
-		Audience:       "aud",
-		Subject:        "sub",
-		Issuer:         "iss",
+		Claims: &Claims{
+			IssuedAt:       now.Unix(),
+			ExpirationTime: now.Add(24 * time.Hour).Unix(),
+			NotBefore:      now.Add(15 * time.Second).Unix(),
+			ID:             "jti",
+			Audience:       "aud",
+			Subject:        "sub",
+			Issuer:         "iss",
+		},
 	}
 	testCases := []struct {
 		validator ValidatorFunc

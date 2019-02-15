@@ -1,9 +1,12 @@
 package jwt
 
-func decodeToBytes(sig []byte) ([]byte, error) {
-	decSig := make([]byte, enc.DecodedLen(len(sig)))
-	if _, err := enc.Decode(decSig, sig); err != nil {
+import "encoding/base64"
+
+func decodeToBytes(enc []byte) ([]byte, error) {
+	encoding := base64.RawURLEncoding
+	dec := make([]byte, encoding.DecodedLen(len(enc)))
+	if _, err := encoding.Decode(dec, enc); err != nil {
 		return nil, err
 	}
-	return decSig, nil
+	return dec, nil
 }

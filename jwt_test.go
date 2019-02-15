@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 type testCase struct {
 	signer        Signer
-	verifier      Signer
+	verifier      Verifier
 	marshalingErr error
 	signingErr    error
 	parsingErr    error
@@ -23,7 +23,7 @@ type testCase struct {
 }
 
 type testToken struct {
-	*JWT
+	JWT
 	Name      string  `json:"name,omitempty"`
 	RandInt   int     `json:"randomInt,omitempty"`
 	RandFloat float64 `json:"randomFloat,omitempty"`
@@ -47,83 +47,59 @@ func testJWT(t *testing.T, testCases []testCase) {
 			randomInt := rand.Intn(math.MaxUint32)
 			randomFloat := rand.Float64() * 100
 			jot := &testToken{
-				JWT: &JWT{
-					Issuer:         iss,
-					Subject:        sub,
-					Audience:       aud,
-					ExpirationTime: exp,
-					NotBefore:      nbf,
-					IssuedAt:       iat,
-					ID:             jti,
+				JWT: JWT{
+					Header: Header{
+						KeyID:       kid,
+						ContentType: cty,
+					},
+					Claims: &Claims{
+						Issuer:         iss,
+						Subject:        sub,
+						Audience:       aud,
+						ExpirationTime: exp,
+						NotBefore:      nbf,
+						IssuedAt:       iat,
+						ID:             jti,
+					},
 				},
 				Name:      name,
 				RandInt:   randomInt,
 				RandFloat: randomFloat,
 			}
-			jot.SetAlgorithm(tc.signer)
-			jot.SetKeyID(kid)
-			jot.SetContentType(cty)
 
-			// 1 - Marshal.
-			payload, err := Marshal(jot)
-			if want, got := tc.marshalingErr, err; want != got {
-				t.Errorf("want %v, got %v", want, got)
-			}
-			if err != nil {
-				t.SkipNow()
-			}
-
-			// 2 - Sign.
-			token, err := tc.signer.Sign(payload)
+			// 1 - Sign.
+			token, err := Sign(jot, tc.signer)
 			if want, got := tc.signingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}
 			if err != nil {
-				t.SkipNow()
+				return
 			}
 
-			// 3 - Parse.
-			payload, sig, err := ParseBytes(token)
-			if want, got := tc.parsingErr, err; want != got {
-				t.Errorf("want %v, got %v", want, got)
-			}
-			if err != nil {
-				t.SkipNow()
-			}
-
-			// 4 - Unmarshal.
+			// 2 - Verify.
 			var jot2 testToken
-			err = Unmarshal(payload, &jot2)
-			if want, got := tc.unmarshalErr, err; want != got {
-				t.Errorf("want %v, got %v", want, got)
-			}
-			if err != nil {
-				t.SkipNow()
-			}
-
-			// 5 - Verify.
-			err = tc.verifier.Verify(payload, sig)
+			err = Verify(token, &jot2, tc.verifier)
 			if want, got := tc.verifyingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}
 			if err != nil {
-				t.SkipNow()
+				return
 			}
 
-			// 6 - Check new token.
-			if want, got := tc.signer.String(), jot2.Algorithm(); want != got {
+			// 3 - Check new token.
+			if want, got := tc.signer.String(), jot2.Algorithm; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := kid, jot2.KeyID(); want != got {
+			if want, got := kid, jot2.KeyID; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := typ, jot2.Type(); want != got {
+			if want, got := typ, jot2.Type; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := cty, jot2.ContentType(); want != got {
+			if want, got := cty, jot2.ContentType; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
@@ -164,10 +140,6 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			if want, got := reflect.ValueOf(jot).Elem().NumField(), reflect.ValueOf(&jot2).Elem().NumField(); want != got {
-				t.Errorf("want %d, got %d", want, got)
-			}
-
-			if want, got := reflect.ValueOf(jot.JWT).Elem().NumField(), reflect.ValueOf(jot2.JWT).Elem().NumField(); want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 		})
