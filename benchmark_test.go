@@ -11,7 +11,7 @@ var benchMock = []byte("eyJhbGciOiJIUzI1NiIsImtpZCI6ImtpZCIsInR5cCI6IkpXVCJ9." +
 	"eyJpYXQiOjE1MzU5NDE1NjcsImV4cCI6MTU2NzA0NTU2NywibmJmIjoxNTM1OTQzMzY3LCJqdGkiOiJCZW5jaG1hcmtTaWduIiwiYXVkIjoiYmVuY2htYXJrIiwic3ViIjoibWUiLCJpc3MiOiJnYnJsc25jaHMiLCJuYW1lIjoiZm9vYmFyIiwiaXNCZW5jaCI6dHJ1ZX0." +
 	"bJSm0om7-BRCuLbICllYEAH7YsAT1cW2fdSfKcMnhOg")
 
-var hs256 = NewHS256("benchmark")
+var hs256 = NewHMAC(SHA256, []byte("benchmark"))
 
 type benchToken struct {
 	JWT
