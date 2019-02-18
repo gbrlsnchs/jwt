@@ -52,8 +52,12 @@ func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	return r.sign(payload)
 }
 
-func (r *RSASHA) String() string {
-	return r.alg
+func (r *RSA) Size() int {
+	pub := r.pub
+	if pub == nil {
+		pub = r.priv.Public().(*rsa.PublicKey)
+	}
+	return pub.Size()
 }
 
 func (r *RSA) String() string {

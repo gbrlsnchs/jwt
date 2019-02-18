@@ -19,6 +19,14 @@ var (
 	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
 )
 
+func byteSize(bitSize int) int {
+	byteSize := bitSize / 8
+	if bitSize%8 > 0 {
+		return byteSize + 1
+	}
+	return byteSize
+}
+
 type ECDSASHA struct {
 	priv *ecdsa.PrivateKey
 	pub  *ecdsa.PublicKey
@@ -48,6 +56,14 @@ func (e *ECDSASHA) Sign(payload []byte) ([]byte, error) {
 	return e.sign(payload)
 }
 
+func (e *ECDSASHA) Size() int {
+	pub := e.pub
+	if pub == nil {
+		pub = e.priv.Public().(*ecdsa.PublicKey)
+	}
+	return byteSize(pub.Params().BitSize) * 2
+}
+
 func (e *ECDSASHA) String() string {
 	return e.alg
 }
@@ -63,14 +79,6 @@ func (e *ECDSASHA) Verify(payload, sig []byte) (err error) {
 		return err
 	}
 	return nil
-}
-
-func byteSize(bitSize int) int {
-	byteSize := bitSize / 8
-	if bitSize%8 > 0 {
-		return byteSize + 1
-	}
-	return byteSize
 }
 
 func (e *ECDSASHA) sign(payload []byte) ([]byte, error) {

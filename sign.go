@@ -46,21 +46,6 @@ func Sign(t Token, s Signer) ([]byte, error) {
 // method is used. This prevents unnecessary memory allocation
 // by allocating the exact amount needed for the whole payload.
 func hashSize(s Signer) int {
-	encoding := base64.RawURLEncoding
-	switch s.String() {
-	case MethodHS256:
-		return encoding.EncodedLen(32)
-	case MethodHS384:
-		return encoding.EncodedLen(48)
-	case MethodHS512, MethodES256:
-		return encoding.EncodedLen(64)
-	case MethodES384:
-		return encoding.EncodedLen(96)
-	case MethodES512:
-		return encoding.EncodedLen(132)
-	case MethodRS256, MethodRS384, MethodRS512:
-		return encoding.EncodedLen(256)
-	default:
-		return 0
-	}
+	return base64.RawURLEncoding.
+		EncodedLen(s.Size())
 }

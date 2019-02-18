@@ -17,38 +17,49 @@ var (
 
 type HMAC struct {
 	key []byte
-	alg string
+	sha SHA
 
 	pool *pool
 }
 
 func NewHMAC(sha SHA, key []byte) *HMAC {
-	var (
-		hh  func() hash.Hash
-		alg string
-	)
+	var hh func() hash.Hash
 	switch sha {
 	case SHA256:
 		fallthrough
 	default:
 		hh = sha256.New
-		alg = MethodHS256
 	case SHA384:
 		hh = sha512.New384
-		alg = MethodHS384
 	case SHA512:
 		hh = sha512.New
-		alg = MethodHS512
 	}
 	return &HMAC{
-		alg:  alg,
 		key:  key,
+		sha:  sha,
 		pool: newPool(func() hash.Hash { return hmac.New(hh, key) }),
 	}
 }
 
 func (h *HMAC) Sign(payload []byte) ([]byte, error) {
 	return h.sign(payload)
+}
+
+func (h *HMAC) Size() int {
+	return int(h.sha)
+}
+
+func (h *HMAC) String() string {
+	switch h.sha {
+	case SHA256:
+		return MethodHS256
+	case SHA384:
+		return MethodHS384
+	case SHA512:
+		return MethodHS512
+	default:
+		return ""
+	}
 }
 
 func (h *HMAC) Verify(payload, sig []byte) (err error) {
@@ -63,10 +74,6 @@ func (h *HMAC) Verify(payload, sig []byte) (err error) {
 		return ErrHMACVerification
 	}
 	return nil
-}
-
-func (h *HMAC) String() string {
-	return h.alg
 }
 
 func (h *HMAC) sign(payload []byte) ([]byte, error) {

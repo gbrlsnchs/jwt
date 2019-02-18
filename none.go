@@ -13,6 +13,10 @@ func (n *None) Sign(_ []byte) ([]byte, error) {
 	return nil, nil
 }
 
+func (n *None) Size() int {
+	return 0
+}
+
 func (n *None) String() string {
 	return MethodNone
 }
