@@ -35,18 +35,18 @@ func TestECDSA(t *testing.T) {
 		t.Fatal(err)
 	}
 	testCases := []testCase{
-		{NewES256(priv256, nil), NewES256(nil, &priv256.PublicKey), nil, nil, nil, nil, nil},
-		{NewES256(priv256, nil), NewES256(nil, &priv256_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
-		{NewES256(nil, nil), NewES256(nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
-		{NewES256(priv256, nil), NewES256(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
-		{NewES384(priv384, nil), NewES384(nil, &priv384.PublicKey), nil, nil, nil, nil, nil},
-		{NewES384(priv384, nil), NewES384(nil, &priv384_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
-		{NewES384(nil, nil), NewES384(nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
-		{NewES384(priv384, nil), NewES384(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
-		{NewES512(priv512, nil), NewES512(nil, &priv512.PublicKey), nil, nil, nil, nil, nil},
-		{NewES512(priv512, nil), NewES512(nil, &priv512_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
-		{NewES512(nil, nil), NewES512(nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
-		{NewES512(priv512, nil), NewES512(nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
+		{NewECDSA(SHA256, priv256, nil), NewECDSA(SHA256, nil, &priv256.PublicKey), nil, nil, nil, nil, nil},
+		{NewECDSA(SHA256, priv256, nil), NewECDSA(SHA256, nil, &priv256_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
+		{NewECDSA(SHA256, nil, nil), NewECDSA(SHA256, nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
+		{NewECDSA(SHA256, priv256, nil), NewECDSA(SHA256, nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
+		{NewECDSA(SHA384, priv384, nil), NewECDSA(SHA384, nil, &priv384.PublicKey), nil, nil, nil, nil, nil},
+		{NewECDSA(SHA384, priv384, nil), NewECDSA(SHA384, nil, &priv384_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
+		{NewECDSA(SHA384, nil, nil), NewECDSA(SHA384, nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
+		{NewECDSA(SHA384, priv384, nil), NewECDSA(SHA384, nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
+		{NewECDSA(SHA512, priv512, nil), NewECDSA(SHA512, nil, &priv512.PublicKey), nil, nil, nil, nil, nil},
+		{NewECDSA(SHA512, priv512, nil), NewECDSA(SHA512, nil, &priv512_2.PublicKey), nil, nil, nil, nil, ErrECDSAVerification},
+		{NewECDSA(SHA512, nil, nil), NewECDSA(SHA512, nil, nil), nil, ErrECDSANilPrivKey, nil, nil, nil},
+		{NewECDSA(SHA512, priv512, nil), NewECDSA(SHA512, nil, nil), nil, nil, nil, nil, ErrECDSANilPubKey},
 	}
 	testJWT(t, testCases)
 }

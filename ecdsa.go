@@ -27,36 +27,42 @@ func byteSize(bitSize int) int {
 	return byteSize
 }
 
-type ECDSASHA struct {
+type ECDSA struct {
 	priv *ecdsa.PrivateKey
 	pub  *ecdsa.PublicKey
-	hash func() hash.Hash
-	alg  string
+	sha  SHA
+
+	pool *pool
 }
 
-// NewES256 creates a signing method using ECDSA and SHA-256.
-func NewES256(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSASHA {
-	return &ECDSASHA{priv: priv, pub: pub, hash: sha256.New, alg: MethodES256}
+func NewECDSA(sha SHA, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSA {
+	var hh func() hash.Hash
+	switch sha {
+	case SHA256:
+		fallthrough
+	default:
+		hh = sha256.New
+	case SHA384:
+		hh = sha512.New384
+	case SHA512:
+		hh = sha512.New
+	}
+	return &ECDSA{
+		priv: priv,
+		pub:  pub,
+		sha:  sha,
+		pool: newPool(hh),
+	}
 }
 
-// NewES384 creates a signing method using ECDSA and SHA-384.
-func NewES384(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSASHA {
-	return &ECDSASHA{priv: priv, pub: pub, hash: sha512.New384, alg: MethodES384}
-}
-
-// NewES512 creates a signing method using ECDSA and SHA-512.
-func NewES512(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSASHA {
-	return &ECDSASHA{priv: priv, pub: pub, hash: sha512.New, alg: MethodES512}
-}
-
-func (e *ECDSASHA) Sign(payload []byte) ([]byte, error) {
+func (e *ECDSA) Sign(payload []byte) ([]byte, error) {
 	if e.priv == nil {
 		return nil, ErrECDSANilPrivKey
 	}
 	return e.sign(payload)
 }
 
-func (e *ECDSASHA) Size() int {
+func (e *ECDSA) Size() int {
 	pub := e.pub
 	if pub == nil {
 		pub = e.priv.Public().(*ecdsa.PublicKey)
@@ -64,11 +70,20 @@ func (e *ECDSASHA) Size() int {
 	return byteSize(pub.Params().BitSize) * 2
 }
 
-func (e *ECDSASHA) String() string {
-	return e.alg
+func (e *ECDSA) String() string {
+	switch e.sha {
+	case SHA256:
+		return MethodES256
+	case SHA384:
+		return MethodES384
+	case SHA512:
+		return MethodES512
+	default:
+		return ""
+	}
 }
 
-func (e *ECDSASHA) Verify(payload, sig []byte) (err error) {
+func (e *ECDSA) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrECDSANilPubKey
 	}
@@ -81,13 +96,12 @@ func (e *ECDSASHA) Verify(payload, sig []byte) (err error) {
 	return nil
 }
 
-func (e *ECDSASHA) sign(payload []byte) ([]byte, error) {
-	hh := e.hash()
-	var err error
-	if _, err = hh.Write(payload); err != nil {
+func (e *ECDSA) sign(payload []byte) ([]byte, error) {
+	sum, err := e.pool.sign(payload)
+	if err != nil {
 		return nil, err
 	}
-	r, s, err := ecdsa.Sign(rand.Reader, e.priv, hh.Sum(nil))
+	r, s, err := ecdsa.Sign(rand.Reader, e.priv, sum)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +116,7 @@ func (e *ECDSASHA) sign(payload []byte) ([]byte, error) {
 	return append(rsig, ssig...), nil
 }
 
-func (e *ECDSASHA) verify(payload, sig []byte) error {
+func (e *ECDSA) verify(payload, sig []byte) error {
 	byteSize := byteSize(e.pub.Params().BitSize)
 	if len(sig) != byteSize*2 {
 		return ErrECDSAVerification
@@ -110,12 +124,11 @@ func (e *ECDSASHA) verify(payload, sig []byte) error {
 
 	r := big.NewInt(0).SetBytes(sig[:byteSize])
 	s := big.NewInt(0).SetBytes(sig[byteSize:])
-	hh := e.hash()
-	if _, err := hh.Write(payload); err != nil {
+	sum, err := e.pool.sign(payload)
+	if err != nil {
 		return err
 	}
-
-	if !ecdsa.Verify(e.pub, hh.Sum(nil), r, s) {
+	if !ecdsa.Verify(e.pub, sum, r, s) {
 		return ErrECDSAVerification
 	}
 	return nil
