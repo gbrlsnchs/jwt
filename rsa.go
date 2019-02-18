@@ -14,29 +14,38 @@ var (
 	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
 )
 
-type RSASHA struct {
+type RSA struct {
 	priv *rsa.PrivateKey
 	pub  *rsa.PublicKey
-	hash crypto.Hash
-	alg  string
+	sha  SHA
+
+	ch   crypto.Hash
+	opts *rsa.PSSOptions
+	pool *pool
 }
 
-// NewRS256 creates a signing method using RSA and SHA-256.
-func NewRS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSASHA {
-	return &RSASHA{priv: priv, pub: pub, hash: crypto.SHA256, alg: MethodRS256}
+func NewRSA(sha SHA, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
+	var ch crypto.Hash
+	switch sha {
+	case SHA256:
+		fallthrough
+	default:
+		ch = crypto.SHA256
+	case SHA384:
+		ch = crypto.SHA384
+	case SHA512:
+		ch = crypto.SHA512
+	}
+	return &RSA{
+		priv: priv,
+		pub:  pub,
+		sha:  sha,
+		ch:   ch,
+		pool: newPool(ch.New),
+	}
 }
 
-// NewRS384 creates a signing method using RSA and SHA-384.
-func NewRS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSASHA {
-	return &RSASHA{priv: priv, pub: pub, hash: crypto.SHA384, alg: MethodRS384}
-}
-
-// NewRS512 creates a signing method using RSA and SHA-512.
-func NewRS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSASHA {
-	return &RSASHA{priv: priv, pub: pub, hash: crypto.SHA512, alg: MethodRS512}
-}
-
-func (r *RSASHA) Sign(payload []byte) ([]byte, error) {
+func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	if r.priv == nil {
 		return nil, ErrRSANilPrivKey
 	}
@@ -47,7 +56,32 @@ func (r *RSASHA) String() string {
 	return r.alg
 }
 
-func (r *RSASHA) Verify(payload, sig []byte) (err error) {
+func (r *RSA) String() string {
+	if r.opts != nil {
+		switch r.sha {
+		case SHA256:
+			return MethodPS256
+		case SHA384:
+			return MethodPS384
+		case SHA512:
+			return MethodPS512
+		default:
+			return ""
+		}
+	}
+	switch r.sha {
+	case SHA256:
+		return MethodRS256
+	case SHA384:
+		return MethodRS384
+	case SHA512:
+		return MethodRS512
+	default:
+		return ""
+	}
+}
+
+func (r *RSA) Verify(payload, sig []byte) (err error) {
 	if r.pub == nil {
 		return ErrRSANilPubKey
 	}
@@ -60,24 +94,32 @@ func (r *RSASHA) Verify(payload, sig []byte) (err error) {
 	return nil
 }
 
-func (r *RSASHA) sign(payload []byte) ([]byte, error) {
-	hh := r.hash.New()
-	var err error
-	if _, err = hh.Write(payload); err != nil {
-		return nil, err
+func (r *RSA) WithPSS() *RSA {
+	r.opts = &rsa.PSSOptions{
+		SaltLength: rsa.PSSSaltLengthAuto,
+		Hash:       r.ch,
 	}
+	return r
+}
 
-	sig, err := rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, hh.Sum(nil))
+func (r *RSA) sign(payload []byte) ([]byte, error) {
+	sum, err := r.pool.sign(payload)
 	if err != nil {
 		return nil, err
 	}
-	return sig, nil
+	if r.opts != nil {
+		return rsa.SignPSS(rand.Reader, r.priv, r.ch, sum, r.opts)
+	}
+	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.ch, sum)
 }
 
-func (r *RSASHA) verify(payload, sig []byte) error {
-	hh := r.hash.New()
-	if _, err := hh.Write(payload); err != nil {
+func (r *RSA) verify(payload, sig []byte) error {
+	sum, err := r.pool.sign(payload)
+	if err != nil {
 		return err
 	}
-	return rsa.VerifyPKCS1v15(r.pub, r.hash, hh.Sum(nil), sig)
+	if r.opts != nil {
+		return rsa.VerifyPSS(r.pub, r.ch, sum, sig, r.opts)
+	}
+	return rsa.VerifyPKCS1v15(r.pub, r.ch, sum, sig)
 }
