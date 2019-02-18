@@ -17,6 +17,7 @@ var (
 
 type HMAC struct {
 	alg  string
+	key  []byte
 	pool *pool
 }
 
@@ -39,13 +40,9 @@ func NewHMAC(sha SHA, key []byte) *HMAC {
 		alg = MethodHS512
 	}
 	return &HMAC{
-		alg: alg,
-		pool: newPool(func() (hash.Hash, error) {
-			if string(key) == "" {
-				return nil, ErrNoHMACKey
-			}
-			return hmac.New(hh, key), nil
-		}),
+		alg:  alg,
+		key:  key,
+		pool: newPool(func() hash.Hash { return hmac.New(hh, key) }),
 	}
 }
 
@@ -72,5 +69,8 @@ func (h *HMAC) String() string {
 }
 
 func (h *HMAC) sign(payload []byte) ([]byte, error) {
-	return h.pool.sign(payload)
+	if string(h.key) == "" {
+		return nil, ErrNoHMACKey
+	}
+	return h.pool.get().sign(payload)
 }
