@@ -41,7 +41,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 			exp := now.Add(30 * time.Minute).Unix()
 			nbf := now.Add(1 * time.Second).Unix()
 			iss := fmt.Sprintf("%s %d", t.Name(), i)
-			aud := fmt.Sprintf("test %d", i)
+			aud := Audience{fmt.Sprintf("test %d", i)}
 			sub := fmt.Sprintf("sub %d", i)
 			jti := strconv.Itoa(i)
 			randomInt := rand.Intn(math.MaxUint32)
@@ -126,7 +126,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := aud, jot2.Audience; want != got {
+			if want, got := aud, jot2.Audience; !reflect.DeepEqual(want, got) {
 				t.Errorf("want %s, got %s", want, got)
 			}
 

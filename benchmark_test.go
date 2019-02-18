@@ -27,7 +27,7 @@ func BenchmarkSign(b *testing.B) {
 			Claims: &Claims{
 				Issuer:         "gbrlsnchs",
 				Subject:        "me",
-				Audience:       "benchmark",
+				Audience:       Audience{"benchmark"},
 				ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 				NotBefore:      now.Add(30 * time.Minute).Unix(),
 				IssuedAt:       now.Unix(),
