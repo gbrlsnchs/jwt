@@ -42,7 +42,10 @@ func NewHMAC(sha SHA, key []byte) *HMAC {
 }
 
 func (h *HMAC) Sign(payload []byte) ([]byte, error) {
-	return h.sign(payload)
+	if string(h.key) == "" {
+		return nil, ErrNoHMACKey
+	}
+	return h.pool.sign(payload)
 }
 
 func (h *HMAC) Size() int {
@@ -66,7 +69,7 @@ func (h *HMAC) Verify(payload, sig []byte) (err error) {
 	if sig, err = decodeToBytes(sig); err != nil {
 		return err
 	}
-	sig2, err := h.sign(payload)
+	sig2, err := h.Sign(payload)
 	if err != nil {
 		return err
 	}
@@ -74,11 +77,4 @@ func (h *HMAC) Verify(payload, sig []byte) (err error) {
 		return ErrHMACVerification
 	}
 	return nil
-}
-
-func (h *HMAC) sign(payload []byte) ([]byte, error) {
-	if string(h.key) == "" {
-		return nil, ErrNoHMACKey
-	}
-	return h.pool.sign(payload)
 }
