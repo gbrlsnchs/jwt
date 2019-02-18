@@ -16,8 +16,9 @@ var (
 )
 
 type HMAC struct {
-	alg  string
-	key  []byte
+	key []byte
+	alg string
+
 	pool *pool
 }
 
@@ -72,5 +73,5 @@ func (h *HMAC) sign(payload []byte) ([]byte, error) {
 	if string(h.key) == "" {
 		return nil, ErrNoHMACKey
 	}
-	return h.pool.get().sign(payload)
+	return h.pool.sign(payload)
 }
