@@ -10,8 +10,7 @@ const (
 
 const (
 	// MethodHS256 is the method name for HMAC and SHA-256.
-	MethodHS256 = "HS256"
-	// MethodHS384 is the method name for HMAC and SHA-384.
+	MethodHS256 = "HS256" // MethodHS384 is the method name for HMAC and SHA-384.
 	MethodHS384 = "HS384"
 	// MethodHS512 is the method name for HMAC and SHA-512.
 	MethodHS512 = "HS512"
@@ -33,6 +32,8 @@ const (
 	MethodPS384 = "PS384"
 	// MethodPS512 is the method name for RSA-PSS and SHA-512.
 	MethodPS512 = "PS512"
+	// MethodEd25519 is the method name for EdDSA using Ed25519 and SHA-512.
+	MethodEd25519 = "Ed25519"
 	// MethodNone is the method name for an unsecured JWT.
 	MethodNone = "none"
 )
