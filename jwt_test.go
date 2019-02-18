@@ -67,7 +67,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 				RandFloat: randomFloat,
 			}
 
-			// 1 - Sign.
+			// Sign.
 			token, err := Sign(jot, tc.signer)
 			if want, got := tc.signingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
@@ -76,9 +76,9 @@ func testJWT(t *testing.T, testCases []testCase) {
 				return
 			}
 
-			// 2 - Verify.
-			var jot2 testToken
-			err = Verify(token, &jot2, tc.verifier)
+			// Verify.
+			var raw RawToken
+			raw, err = Verify(token, tc.verifier)
 			if want, got := tc.verifyingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}
@@ -86,7 +86,14 @@ func testJWT(t *testing.T, testCases []testCase) {
 				return
 			}
 
-			// 3 - Check new token.
+			// Decode token.
+			var jot2 testToken
+			err = raw.Decode(&jot2)
+			if want, got := tc.unmarshalErr, err; want != got {
+				t.Errorf("want %v, got %v", want, got)
+			}
+
+			// Check new token.
 			if want, got := tc.signer.String(), jot2.Algorithm; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}

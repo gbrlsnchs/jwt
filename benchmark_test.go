@@ -47,8 +47,12 @@ func BenchmarkSign(b *testing.B) {
 
 func BenchmarkVerify(b *testing.B) {
 	for i := 0; i < b.N; i++ {
+		raw, err := Verify(benchMock, hs256)
+		if err != nil {
+			b.Fatal(err)
+		}
 		var jot benchToken
-		if err := Verify(benchMock, &jot, hs256); err != nil {
+		if err = raw.Decode(&jot); err != nil {
 			b.Fatal(err)
 		}
 	}

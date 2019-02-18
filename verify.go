@@ -2,53 +2,26 @@ package jwt
 
 import (
 	"bytes"
-	"encoding/base64"
-	"encoding/json"
 	"errors"
 )
 
 // ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
 var ErrMalformed = errors.New("jwt: malformed token")
 
-func Verify(token []byte, t Token, vr Verifier) error {
+func Verify(token []byte, vr Verifier) (r RawToken, err error) {
 	// Firstly, parse and verify.
-	r, err := parse(token)
-	if err != nil {
-		return err
+	if r, err = parse(token); err != nil {
+		return
 	}
 	if err = vr.Verify(r.payload(), r.sig()); err != nil {
-		return err
+		return
 	}
+	return
 
-	// Next, unmarshal the token accordingly.
-	var (
-		enc []byte // encoded header/claims
-		dec []byte // decoded header/claims
-	)
-	// Header.
-	encoding := base64.RawURLEncoding
-	enc = r.header()
-	dec = make([]byte, encoding.DecodedLen(len(enc)))
-	if _, err = encoding.Decode(dec, enc); err != nil {
-		return err
-	}
-	if err = json.Unmarshal(dec, t.HeaderAddr()); err != nil {
-		return err
-	}
-	// Claims.
-	enc = r.claims()
-	dec = make([]byte, encoding.DecodedLen(len(enc)))
-	if _, err = encoding.Decode(dec, enc); err != nil {
-		return err
-	}
-	if err = json.Unmarshal(dec, &t); err != nil {
-		return err
-	}
-	return nil
 }
 
-func parse(token []byte) (raw, error) {
-	var t raw
+func parse(token []byte) (RawToken, error) {
+	var t RawToken
 
 	sep1 := bytes.IndexByte(token, '.')
 	if sep1 < 0 {
