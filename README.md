@@ -47,7 +47,7 @@ jot := &jwt.JWT{
 	Claims: &jwt.Claims{
 		Issuer:         "gbrlsnchs",
 		Subject:        "someone",
-		Audience:       Audience{"gophers"},
+		Audience:       jwt.Audience{"gophers"},
 		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 		NotBefore:      now.Add(30 * time.Minute).Unix(),
 		IssuedAt:       now.Unix(),
@@ -81,7 +81,7 @@ jot := &Token{
 		Claims: &jwt.Claims{
 			Issuer:         "gbrlsnchs",
 			Subject:        "someone",
-			Audience:       Audience{"gophers"},
+			Audience:       jwt.Audience{"gophers"},
 			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 			NotBefore:      now.Add(30 * time.Minute).Unix(),
 			IssuedAt:       now.Unix(),
