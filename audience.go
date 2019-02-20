@@ -10,7 +10,7 @@ type Audience []string
 func (a Audience) MarshalJSON() ([]byte, error) {
 	switch len(a) {
 	case 0:
-		return nil, nil
+		return json.Marshal("") // nil or empty slice returns an empty string
 	case 1:
 		return json.Marshal(a[0])
 	default:
