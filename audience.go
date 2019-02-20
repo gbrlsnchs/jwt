@@ -7,7 +7,6 @@ import "encoding/json"
 type Audience []string
 
 // MarshalJSON implements a marshaling function for "aud" claim.
-// TODO(gbrlsnchs): create tests for this method.
 func (a Audience) MarshalJSON() ([]byte, error) {
 	switch len(a) {
 	case 0:
