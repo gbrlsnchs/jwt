@@ -2,8 +2,12 @@ package jwt
 
 import "encoding/json"
 
+// Audience is a special claim that may either be
+// a single string or an array of strings, as per the RFC 7519.
 type Audience []string
 
+// MarshalJSON implements a marshaling function for "aud" claim.
+// TODO(gbrlsnchs): create tests for this method.
 func (a Audience) MarshalJSON() ([]byte, error) {
 	switch len(a) {
 	case 0:
@@ -15,6 +19,8 @@ func (a Audience) MarshalJSON() ([]byte, error) {
 	}
 }
 
+// UnmarshalJSON implements an unmarshaling function for "aud" claim.
+// TODO(gbrlsnchs): create tests for this method.
 func (a *Audience) UnmarshalJSON(b []byte) error {
 	var (
 		v   interface{}
