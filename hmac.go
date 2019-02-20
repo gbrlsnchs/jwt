@@ -1,9 +1,8 @@
 package jwt
 
 import (
+	"crypto"
 	"crypto/hmac"
-	"crypto/sha256"
-	"crypto/sha512"
 	"errors"
 	"hash"
 )
@@ -16,28 +15,17 @@ var (
 )
 
 type HMAC struct {
-	key []byte
-	sha SHA
-
+	key  []byte
+	hash crypto.Hash
 	pool *pool
 }
 
-func NewHMAC(sha SHA, key []byte) *HMAC {
-	var hh func() hash.Hash
-	switch sha {
-	case SHA256:
-		fallthrough
-	default:
-		hh = sha256.New
-	case SHA384:
-		hh = sha512.New384
-	case SHA512:
-		hh = sha512.New
-	}
+func NewHMAC(sha Hash, key []byte) *HMAC {
+	hh := sha.hash()
 	return &HMAC{
 		key:  key,
-		sha:  sha,
-		pool: newPool(func() hash.Hash { return hmac.New(hh, key) }),
+		hash: hh,
+		pool: newPool(func() hash.Hash { return hmac.New(hh.New, key) }),
 	}
 }
 
@@ -49,16 +37,16 @@ func (h *HMAC) Sign(payload []byte) ([]byte, error) {
 }
 
 func (h *HMAC) Size() int {
-	return int(h.sha)
+	return h.hash.Size()
 }
 
 func (h *HMAC) String() string {
-	switch h.sha {
-	case SHA256:
+	switch h.hash {
+	case crypto.SHA256:
 		return MethodHS256
-	case SHA384:
+	case crypto.SHA384:
 		return MethodHS384
-	case SHA512:
+	case crypto.SHA512:
 		return MethodHS512
 	default:
 		return ""

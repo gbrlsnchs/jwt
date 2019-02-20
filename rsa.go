@@ -17,31 +17,19 @@ var (
 type RSA struct {
 	priv *rsa.PrivateKey
 	pub  *rsa.PublicKey
-	sha  SHA
 
-	ch   crypto.Hash
+	hash crypto.Hash
 	opts *rsa.PSSOptions
 	pool *pool
 }
 
-func NewRSA(sha SHA, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
-	var ch crypto.Hash
-	switch sha {
-	case SHA256:
-		fallthrough
-	default:
-		ch = crypto.SHA256
-	case SHA384:
-		ch = crypto.SHA384
-	case SHA512:
-		ch = crypto.SHA512
-	}
+func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
+	hh := sha.hash()
 	return &RSA{
 		priv: priv,
 		pub:  pub,
-		sha:  sha,
-		ch:   ch,
-		pool: newPool(ch.New),
+		hash: hh,
+		pool: newPool(hh.New),
 	}
 }
 
@@ -62,23 +50,23 @@ func (r *RSA) Size() int {
 
 func (r *RSA) String() string {
 	if r.opts != nil {
-		switch r.sha {
-		case SHA256:
+		switch r.hash {
+		case crypto.SHA256:
 			return MethodPS256
-		case SHA384:
+		case crypto.SHA384:
 			return MethodPS384
-		case SHA512:
+		case crypto.SHA512:
 			return MethodPS512
 		default:
 			return ""
 		}
 	}
-	switch r.sha {
-	case SHA256:
+	switch r.hash {
+	case crypto.SHA256:
 		return MethodRS256
-	case SHA384:
+	case crypto.SHA384:
 		return MethodRS384
-	case SHA512:
+	case crypto.SHA512:
 		return MethodRS512
 	default:
 		return ""
@@ -101,7 +89,7 @@ func (r *RSA) Verify(payload, sig []byte) (err error) {
 func (r *RSA) WithPSS() *RSA {
 	r.opts = &rsa.PSSOptions{
 		SaltLength: rsa.PSSSaltLengthAuto,
-		Hash:       r.ch,
+		Hash:       r.hash,
 	}
 	return r
 }
@@ -112,9 +100,9 @@ func (r *RSA) sign(payload []byte) ([]byte, error) {
 		return nil, err
 	}
 	if r.opts != nil {
-		return rsa.SignPSS(rand.Reader, r.priv, r.ch, sum, r.opts)
+		return rsa.SignPSS(rand.Reader, r.priv, r.hash, sum, r.opts)
 	}
-	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.ch, sum)
+	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, sum)
 }
 
 func (r *RSA) verify(payload, sig []byte) error {
@@ -123,7 +111,7 @@ func (r *RSA) verify(payload, sig []byte) error {
 		return err
 	}
 	if r.opts != nil {
-		return rsa.VerifyPSS(r.pub, r.ch, sum, sig, r.opts)
+		return rsa.VerifyPSS(r.pub, r.hash, sum, sig, r.opts)
 	}
-	return rsa.VerifyPKCS1v15(r.pub, r.ch, sum, sig)
+	return rsa.VerifyPKCS1v15(r.pub, r.hash, sum, sig)
 }

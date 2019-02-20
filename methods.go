@@ -1,16 +1,9 @@
 package jwt
 
-type SHA int
-
-const (
-	SHA256 SHA = 256 / 8
-	SHA384     = 384 / 8
-	SHA512     = 512 / 8
-)
-
 const (
 	// MethodHS256 is the method name for HMAC and SHA-256.
-	MethodHS256 = "HS256" // MethodHS384 is the method name for HMAC and SHA-384.
+	MethodHS256 = "HS256"
+	// MethodHS384 is the method name for HMAC and SHA-384.
 	MethodHS384 = "HS384"
 	// MethodHS512 is the method name for HMAC and SHA-512.
 	MethodHS512 = "HS512"

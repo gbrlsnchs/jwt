@@ -1,12 +1,10 @@
 package jwt
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/rand"
-	"crypto/sha256"
-	"crypto/sha512"
 	"errors"
-	"hash"
 	"math/big"
 )
 
@@ -30,28 +28,18 @@ func byteSize(bitSize int) int {
 type ECDSA struct {
 	priv *ecdsa.PrivateKey
 	pub  *ecdsa.PublicKey
-	sha  SHA
+	hash crypto.Hash
 
 	pool *pool
 }
 
-func NewECDSA(sha SHA, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSA {
-	var hh func() hash.Hash
-	switch sha {
-	case SHA256:
-		fallthrough
-	default:
-		hh = sha256.New
-	case SHA384:
-		hh = sha512.New384
-	case SHA512:
-		hh = sha512.New
-	}
+func NewECDSA(sha Hash, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSA {
+	hh := sha.hash()
 	return &ECDSA{
 		priv: priv,
 		pub:  pub,
-		sha:  sha,
-		pool: newPool(hh),
+		hash: hh,
+		pool: newPool(hh.New),
 	}
 }
 
@@ -71,12 +59,12 @@ func (e *ECDSA) Size() int {
 }
 
 func (e *ECDSA) String() string {
-	switch e.sha {
-	case SHA256:
+	switch e.hash {
+	case crypto.SHA256:
 		return MethodES256
-	case SHA384:
+	case crypto.SHA384:
 		return MethodES384
-	case SHA512:
+	case crypto.SHA512:
 		return MethodES512
 	default:
 		return ""
