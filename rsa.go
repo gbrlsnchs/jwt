@@ -14,6 +14,8 @@ var (
 	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
 )
 
+// RSA is a signing method that uses the RSA cryptosystem
+// with either PKCS1v15 or PSS to sign and verify SHA signatures.
 type RSA struct {
 	priv *rsa.PrivateKey
 	pub  *rsa.PublicKey
@@ -23,6 +25,9 @@ type RSA struct {
 	pool *pool
 }
 
+// NewRSA creates a new RSA signing method with one of the available SHA functions.
+// The RSA pointer returned can be reused both to sign and verify, as it maintains
+// a pool of hashing functions to reduce garbage collection cleanups.
 func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
 	hh := sha.hash()
 	return &RSA{
@@ -33,6 +38,7 @@ func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
 	}
 }
 
+// Sign signs a payload and returns the signature.
 func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	if r.priv == nil {
 		return nil, ErrRSANilPrivKey
@@ -40,6 +46,7 @@ func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	return r.sign(payload)
 }
 
+// Size returns the signature byte size.
 func (r *RSA) Size() int {
 	pub := r.pub
 	if pub == nil {
@@ -48,6 +55,7 @@ func (r *RSA) Size() int {
 	return pub.Size()
 }
 
+// String returns the signing method name.
 func (r *RSA) String() string {
 	if r.opts != nil {
 		switch r.hash {
@@ -73,6 +81,7 @@ func (r *RSA) String() string {
 	}
 }
 
+// Verify verifies a payload and a signature.
 func (r *RSA) Verify(payload, sig []byte) (err error) {
 	if r.pub == nil {
 		return ErrRSANilPubKey
@@ -86,6 +95,7 @@ func (r *RSA) Verify(payload, sig []byte) (err error) {
 	return nil
 }
 
+// WithPSS returns an RSA-PSS signing method.
 func (r *RSA) WithPSS() *RSA {
 	r.opts = &rsa.PSSOptions{
 		SaltLength: rsa.PSSSaltLengthAuto,

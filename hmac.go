@@ -14,12 +14,17 @@ var (
 	ErrHMACVerification = errors.New("jwt: HMAC verification failed")
 )
 
+// HMAC is a signing method that uses an HMAC
+// of SHA hashes to both sign and verify tokens.
 type HMAC struct {
 	key  []byte
 	hash crypto.Hash
 	pool *pool
 }
 
+// NewHMAC creates a new HMAC signing method with one of the available SHA functions.
+// The HMAC pointer returned can be reused both to sign and verify, as it maintains
+// a pool of hashing functions to reduce garbage collection cleanups.
 func NewHMAC(sha Hash, key []byte) *HMAC {
 	hh := sha.hash()
 	return &HMAC{
@@ -29,6 +34,7 @@ func NewHMAC(sha Hash, key []byte) *HMAC {
 	}
 }
 
+// Sign signs a payload and returns the signature.
 func (h *HMAC) Sign(payload []byte) ([]byte, error) {
 	if string(h.key) == "" {
 		return nil, ErrNoHMACKey
@@ -36,10 +42,12 @@ func (h *HMAC) Sign(payload []byte) ([]byte, error) {
 	return h.pool.sign(payload)
 }
 
+// Size returns the signature byte size.
 func (h *HMAC) Size() int {
 	return h.hash.Size()
 }
 
+// String returns the signing method name.
 func (h *HMAC) String() string {
 	switch h.hash {
 	case crypto.SHA256:
@@ -53,6 +61,7 @@ func (h *HMAC) String() string {
 	}
 }
 
+// Verify verifies a payload and a signature.
 func (h *HMAC) Verify(payload, sig []byte) (err error) {
 	if sig, err = decodeToBytes(sig); err != nil {
 		return err

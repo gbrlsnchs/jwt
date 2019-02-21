@@ -5,16 +5,14 @@ import (
 	"encoding/json"
 )
 
+// RawToken is a representation
+// of a parsed JWT string.
 type RawToken struct {
 	token      []byte
 	sep1, sep2 int
 }
 
-func (r RawToken) claims() []byte  { return r.token[r.sep1+1 : r.sep2] }
-func (r RawToken) header() []byte  { return r.token[:r.sep1] }
-func (r RawToken) payload() []byte { return r.token[:r.sep2] }
-func (r RawToken) sig() []byte     { return r.token[r.sep2+1:] }
-
+// Decode decodes a raw JWT into a struct that implements the Token interface.
 func (r RawToken) Decode(t Token) error {
 	// Next, unmarshal the token accordingly.
 	var (
@@ -43,3 +41,8 @@ func (r RawToken) Decode(t Token) error {
 	}
 	return nil
 }
+
+func (r RawToken) claims() []byte  { return r.token[r.sep1+1 : r.sep2] }
+func (r RawToken) header() []byte  { return r.token[:r.sep1] }
+func (r RawToken) payload() []byte { return r.token[:r.sep2] }
+func (r RawToken) sig() []byte     { return r.token[r.sep2+1:] }

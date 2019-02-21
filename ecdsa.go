@@ -25,6 +25,8 @@ func byteSize(bitSize int) int {
 	return byteSize
 }
 
+// ECDSA is a signing method that uses
+// elliptic curve cryptography to sign SHA hashes.
 type ECDSA struct {
 	priv *ecdsa.PrivateKey
 	pub  *ecdsa.PublicKey
@@ -33,6 +35,9 @@ type ECDSA struct {
 	pool *pool
 }
 
+// NewECDSA creates a new ECDSA signing method with one of the available SHA functions.
+// The ECDSA pointer returned can be reused both to sign and verify, as it maintains
+// a pool of hashing functions to reduce garbage collection cleanups.
 func NewECDSA(sha Hash, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSA {
 	hh := sha.hash()
 	return &ECDSA{
@@ -43,6 +48,7 @@ func NewECDSA(sha Hash, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSA {
 	}
 }
 
+// Sign signs a payload and returns the signature.
 func (e *ECDSA) Sign(payload []byte) ([]byte, error) {
 	if e.priv == nil {
 		return nil, ErrECDSANilPrivKey
@@ -50,6 +56,7 @@ func (e *ECDSA) Sign(payload []byte) ([]byte, error) {
 	return e.sign(payload)
 }
 
+// Size returns the signature byte size.
 func (e *ECDSA) Size() int {
 	pub := e.pub
 	if pub == nil {
@@ -58,6 +65,7 @@ func (e *ECDSA) Size() int {
 	return byteSize(pub.Params().BitSize) * 2
 }
 
+// String returns the signing method name.
 func (e *ECDSA) String() string {
 	switch e.hash {
 	case crypto.SHA256:
@@ -71,6 +79,7 @@ func (e *ECDSA) String() string {
 	}
 }
 
+// Verify verifies a payload and a signature.
 func (e *ECDSA) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrECDSANilPubKey

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 )
 
+// Sign signs a struct that implements the Token interface by
+// using a signing method that implements the Signer interface.
 func Sign(t Token, s Signer) ([]byte, error) {
 	// Override some values or set them if empty.
 	h := t.HeaderAddr()
@@ -15,13 +17,11 @@ func Sign(t Token, s Signer) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	// Marshal the claims part of the JWT.
 	cbytes, err := json.Marshal(t)
 	if err != nil {
 		return nil, err
 	}
-
 	// Put both fields together.
 	encoding := base64.RawURLEncoding
 	hsize := encoding.EncodedLen(len(hbytes))

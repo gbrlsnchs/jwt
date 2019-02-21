@@ -8,14 +8,16 @@ import (
 // ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
 var ErrMalformed = errors.New("jwt: malformed token")
 
+// Verify verifies a JWT signature with a verifying method that
+// implements the Verifier interface and returns a RawToken, which can
+// be used to be decoded to a JWT struct. If a verification error occurs,
+// the parsed RawToken is also returned, for debugging purposes.
 func Verify(token []byte, vr Verifier) (r RawToken, err error) {
 	// Firstly, parse and verify.
 	if r, err = parse(token); err != nil {
 		return
 	}
-	if err = vr.Verify(r.payload(), r.sig()); err != nil {
-		return
-	}
+	err = vr.Verify(r.payload(), r.sig())
 	return
 
 }
