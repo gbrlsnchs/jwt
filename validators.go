@@ -27,12 +27,18 @@ var (
 type ValidatorFunc func(jot *JWT) error
 
 // AudienceValidator validates the "aud" claim.
-func AudienceValidator(aud string) ValidatorFunc {
+// It checks if at least one of the audiences within
+// the JWT is listed in the server's audience whitelist.
+func AudienceValidator(aud Audience) ValidatorFunc {
 	return func(jot *JWT) error {
-		if jot.Audience != aud {
-			return ErrAudValidation
+		for _, serverAud := range aud {
+			for _, clientAud := range jot.Audience {
+				if clientAud == serverAud {
+					return nil
+				}
+			}
 		}
-		return nil
+		return ErrAudValidation
 	}
 }
 

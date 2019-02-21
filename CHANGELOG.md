@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Signing and verifying using [RSA-PSS](https://en.wikipedia.org/wiki/Probabilistic_signature_scheme).
+- Signing and verifying using [Ed25519](https://ed25519.cr.yp.to/).
+- `Audience` type for handling the `aud` claim [according to the RFC](https://tools.ietf.org/html/rfc7519#section-4.1.3).
+- `Size` method to `Signer` interface.
+- `Verifier` interface.
+- `RawToken` type.
+- SHA constants.
+
+### Changed
+- Improve performance by storing SHA hash functions in `sync.Pool`.
+- Restructure `JWT` type by putting claims fields in a new struct.
+- Change signing/verifying methods constructors' names.
+- Unify signign/verifying methods constructors.
+- Change `Signer` interface.
+- Sign tokens with global function `Sign`.
+- Verify tokens with global function `Verify`.
+
+### Removed
+- Support for `go1.10`.
+- `Marshal` and `Unmarshal` functions.
+- `Marshaler` and `Unmarshaler` interfaces.
+
 ## [2.0.0] - 2018-09-14
 ### Added
 - `Parse` and `ParseBytes` functions.
@@ -118,6 +142,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - This package's source code, including examples and tests.
 - Go dep files.
 
+[Unreleased]: https://github.com/gbrlsnchs/jwt/compare/v2.0.0...HEAD
 [2.0.0]: https://github.com/gbrlsnchs/jwt/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/gbrlsnchs/jwt/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/gbrlsnchs/jwt/compare/v1.0.1...v1.0.2

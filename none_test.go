@@ -3,14 +3,14 @@ package jwt_test
 import (
 	"testing"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestNone(t *testing.T) {
 	testCases := []testCase{
-		{None(), None(), nil, nil, nil, nil, nil},
-		{None(), NewHS256("secret"), nil, nil, nil, nil, ErrHMACVerification},
-		{NewHS256("secret"), None(), nil, nil, nil, nil, nil},
+		{NewNone(), NewNone(), nil, nil, nil, nil, nil},
+		{NewNone(), NewHMAC(SHA256, []byte("secret")), nil, nil, nil, nil, ErrHMACVerification},
+		{NewHMAC(SHA256, []byte("secret")), NewNone(), nil, nil, nil, nil, nil},
 	}
 	testJWT(t, testCases)
 }

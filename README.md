@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master)](https://travis-ci.org/gbrlsnchs/jwt)
 [![Sourcegraph](https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg)](https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge)
 [![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
-[![Minimal Version](https://img.shields.io/badge/minimal%20version-go1.10%2B-5272b4.svg)](https://golang.org/doc/go1.10)
+[![Minimal Version](https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg)](https://golang.org/doc/go1.11)
 [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## About
@@ -14,46 +14,47 @@ Although there are many JWT packages out there for Go, many lack support for som
 
 Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
 
+### Supported signing methods
+|         | SHA-256            | SHA-384            | SHA-512            |
+|:-------:|:------------------:|:------------------:|:------------------:|
+| HMAC    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| RSA     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| RSA-PSS | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| ECDSA   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| EdDSA   | :heavy_minus_sign: | :heavy_minus_sign: | :heavy_check_mark: |
+
 ## Usage
 Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Installing
-#### Go 1.10
-`vgo get -u github.com/gbrlsnchs/jwt/v2`
-#### Go 1.11 or after
-`go get -u github.com/gbrlsnchs/jwt/v2`
+`go get -u github.com/gbrlsnchs/jwt/v3`
 
 ### Importing
 ```go
 import (
 	// ...
 
-	"github.com/gbrlsnchs/jwt/v2"
+	"github.com/gbrlsnchs/jwt/v3"
 )
 ```
 
 ### Signing a simple JWT
 ```go
-// Timestamp the beginning.
 now := time.Now()
-// Define a signer.
-hs256 := jwt.NewHS256("secret")
+hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
 jot := &jwt.JWT{
-	Issuer:         "gbrlsnchs",
-	Subject:        "someone",
-	Audience:       "gophers",
-	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-	NotBefore:      now.Add(30 * time.Minute).Unix(),
-	IssuedAt:       now.Unix(),
-	ID:             "foobar",
+	Header: jwt.Header{KeyID: "kid"},
+	Claims: &jwt.Claims{
+		Issuer:         "gbrlsnchs",
+		Subject:        "someone",
+		Audience:       jwt.Audience{"gophers"},
+		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+		NotBefore:      now.Add(30 * time.Minute).Unix(),
+		IssuedAt:       now.Unix(),
+		ID:             "foobar",
+	},
 }
-jot.SetAlgorithm(hs256)
-jot.SetKeyID("kid")
-payload, err := jwt.Marshal(jot)
-if err != nil {
-	// handle error
-}
-token, err := hs256.Sign(payload)
+token, err := jwt.Sign(jot, hs256)
 if err != nil {
 	// handle error
 }
@@ -64,7 +65,7 @@ log.Printf("token = %s", token)
 #### First, create a custom type and embed a JWT pointer in it
 ```go
 type Token struct {
-	*jwt.JWT
+	jwt.JWT
 	IsLoggedIn  bool   `json:"isLoggedIn"`
 	CustomField string `json:"customField,omitempty"`
 }
@@ -72,30 +73,25 @@ type Token struct {
 
 #### Now initialize, marshal and sign it
 ```go
-// Timestamp the beginning.
 now := time.Now()
-// Define a signer.
-hs256 := jwt.NewHS256("secret")
+hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
 jot := &Token{
-	JWT: &jwt.JWT{
-		Issuer:         "gbrlsnchs",
-		Subject:        "someone",
-		Audience:       "gophers",
-		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-		NotBefore:      now.Add(30 * time.Minute).Unix(),
-		IssuedAt:       now.Unix(),
-		ID:             "foobar",
+	JWT: jwt.JWT{
+		Header: jwt.Header{KeyID: "kid"},
+		Claims: &jwt.Claims{
+			Issuer:         "gbrlsnchs",
+			Subject:        "someone",
+			Audience:       jwt.Audience{"gophers"},
+			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+			NotBefore:      now.Add(30 * time.Minute).Unix(),
+			IssuedAt:       now.Unix(),
+			ID:             "foobar",
+		},
 	},
 	IsLoggedIn:  true,
 	CustomField: "myCustomField",
 }
-jot.SetAlgorithm(hs256)
-jot.SetKeyID("kid")
-payload, err := jwt.Marshal(jot)
-if err != nil {
-	// handle error
-}
-token, err := hs256.Sign(payload)
+token, err := jwt.Sign(jot, hs256)
 if err != nil {
 	// handle error
 }
@@ -104,35 +100,25 @@ log.Printf("token = %s", token)
 
 ### Verifying and validating a JWT
 ```go
-// Timestamp the beginning.
 now := time.Now()
-// Define a signer.
-hs256 := jwt.NewHS256("secret")
-// This is a mocked token for demonstration purposes only.
-token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
+hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
+token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
 	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
-	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q"
+	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
 
-// First, extract the payload and signature.
-// This enables unmarshaling the JWT first and
-// verifying it later or vice versa.
-payload, sig, err := jwt.Parse(token)
+raw, err := jwt.Verify(token, hs256) 
 if err != nil {
 	// handle error
 }
-if err = hs256.Verify(payload, sig); err != nil {
-	// handle error
-}
 var jot Token
-if err = jwt.Unmarshal(payload, &jot); err != nil {
+if err = raw.Decode(&jot); err != nil {
 	// handle error
 }
 
-// Validate fields.
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now)
 audValidator := jwt.AudienceValidator("admin")
-if err = jot.Validate(iatValidator, expValidator, audValidator); err != nil {
+if err := jot.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error

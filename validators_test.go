@@ -7,19 +7,21 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/gbrlsnchs/jwt/v2"
+	. "github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestValidators(t *testing.T) {
 	var now time.Time
 	jot := &JWT{
-		IssuedAt:       now.Unix(),
-		ExpirationTime: now.Add(24 * time.Hour).Unix(),
-		NotBefore:      now.Add(15 * time.Second).Unix(),
-		ID:             "jti",
-		Audience:       "aud",
-		Subject:        "sub",
-		Issuer:         "iss",
+		Claims: &Claims{
+			IssuedAt:       now.Unix(),
+			ExpirationTime: now.Add(24 * time.Hour).Unix(),
+			NotBefore:      now.Add(15 * time.Second).Unix(),
+			ID:             "jti",
+			Audience:       Audience{"aud", "aud1", "aud2", "aud3"},
+			Subject:        "sub",
+			Issuer:         "iss",
+		},
 	}
 	testCases := []struct {
 		validator ValidatorFunc
@@ -29,8 +31,12 @@ func TestValidators(t *testing.T) {
 		{IssuerValidator("not_iss"), ErrIssValidation},
 		{SubjectValidator("sub"), nil},
 		{SubjectValidator("not_sub"), ErrSubValidation},
-		{AudienceValidator("aud"), nil},
-		{AudienceValidator("not_aud"), ErrAudValidation},
+		{AudienceValidator(Audience{"aud"}), nil},
+		{AudienceValidator(Audience{"foo", "aud1"}), nil},
+		{AudienceValidator(Audience{"bar", "aud2"}), nil},
+		{AudienceValidator(Audience{"baz", "aud3"}), nil},
+		{AudienceValidator(Audience{"qux", "aud4"}), ErrAudValidation},
+		{AudienceValidator(Audience{"not_aud"}), ErrAudValidation},
 		{ExpirationTimeValidator(now), nil},
 		{ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0)), nil},
 		{ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0)), ErrExpValidation},
