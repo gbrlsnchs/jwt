@@ -35,17 +35,9 @@ func Sign(t Token, s Signer) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	token := make([]byte, len(payload)+1+hashSize(s))
+	token := make([]byte, len(payload)+1+encoding.EncodedLen(s.Size()))
 	n := copy(token, payload)
 	token[n] = '.'
 	encoding.Encode(token[n+1:], sig)
 	return token, nil
-}
-
-// hashSize returns the size of a signature based on what signing
-// method is used. This prevents unnecessary memory allocation
-// by allocating the exact amount needed for the whole payload.
-func hashSize(s Signer) int {
-	return base64.RawURLEncoding.
-		EncodedLen(s.Size())
 }
