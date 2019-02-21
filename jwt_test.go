@@ -31,8 +31,7 @@ type testToken struct {
 
 func testJWT(t *testing.T, testCases []testCase) {
 	for i, tc := range testCases {
-		name := fmt.Sprintf("%s %s", tc.signer.String(), tc.verifier.String())
-		t.Run(name, func(t *testing.T) {
+		t.Run(tc.signer.String(), func(t *testing.T) {
 			now := time.Now()
 			kid := fmt.Sprintf("kid %s %d", t.Name(), i)
 			typ := "JWT"
@@ -62,7 +61,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 						ID:             jti,
 					},
 				},
-				Name:      name,
+				Name:      t.Name(),
 				RandInt:   randomInt,
 				RandFloat: randomFloat,
 			}
@@ -135,6 +134,10 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			if want, got := jti, jot2.ID; want != got {
+				t.Errorf("want %s, got %s", want, got)
+			}
+
+			if want, got := t.Name(), jot2.Name; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
