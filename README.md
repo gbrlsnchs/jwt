@@ -117,7 +117,7 @@ if err = raw.Decode(&jot); err != nil {
 
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now)
-audValidator := jwt.AudienceValidator("admin")
+audValidator := jwt.AudienceValidator(jwt.Audience{"admin", "sudo"})
 if err := jot.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
