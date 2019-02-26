@@ -43,9 +43,13 @@ func AudienceValidator(aud Audience) ValidatorFunc {
 }
 
 // ExpirationTimeValidator validates the "exp" claim.
-func ExpirationTimeValidator(now time.Time) ValidatorFunc {
+func ExpirationTimeValidator(now time.Time, validateZero bool) ValidatorFunc {
 	return func(jot *JWT) error {
-		if exp := time.Unix(jot.ExpirationTime, 0); now.After(exp) {
+		expint := jot.ExpirationTime
+		if !validateZero && expint == 0 {
+			return nil
+		}
+		if exp := time.Unix(expint, 0); now.After(exp) {
 			return ErrExpValidation
 		}
 		return nil
@@ -85,6 +89,7 @@ func IDValidator(jti string) ValidatorFunc {
 // NotBeforeValidator validates the "nbf" claim.
 func NotBeforeValidator(now time.Time) ValidatorFunc {
 	return func(jot *JWT) error {
+
 		if nbf := time.Unix(jot.NotBefore, 0); now.Before(nbf) {
 			return ErrNbfValidation
 		}
