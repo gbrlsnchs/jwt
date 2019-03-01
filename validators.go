@@ -76,8 +76,8 @@ func IssuerValidator(iss string) ValidatorFunc {
 	}
 }
 
-// JWTIDValidator validates the "jti" claim.
-func JWTIDValidator(jti string) ValidatorFunc {
+// IDValidator validates the "jti" claim.
+func IDValidator(jti string) ValidatorFunc {
 	return func(p *Payload) error {
 		if p.JWTID != jti {
 			return ErrJtiValidation
@@ -89,7 +89,6 @@ func JWTIDValidator(jti string) ValidatorFunc {
 // NotBeforeValidator validates the "nbf" claim.
 func NotBeforeValidator(now time.Time) ValidatorFunc {
 	return func(p *Payload) error {
-
 		if nbf := time.Unix(p.NotBefore, 0); now.Before(nbf) {
 			return ErrNbfValidation
 		}

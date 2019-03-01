@@ -50,8 +50,8 @@ func TestValidators(t *testing.T) {
 		{Payload{IssuedAt: iat}, IssuedAtValidator(time.Unix(now.Unix()+1, 0)), nil},
 		{Payload{IssuedAt: iat}, IssuedAtValidator(time.Unix(now.Unix()-1, 0)), ErrIatValidation},
 		{Payload{}, IssuedAtValidator(time.Now()), nil},
-		{Payload{JWTID: jti}, JWTIDValidator("jti"), nil},
-		{Payload{JWTID: jti}, JWTIDValidator("not_jti"), ErrJtiValidation},
+		{Payload{JWTID: jti}, IDValidator("jti"), nil},
+		{Payload{JWTID: jti}, IDValidator("not_jti"), ErrJtiValidation},
 	}
 	for _, tc := range testCases {
 		fn := runtime.FuncForPC(reflect.ValueOf(tc.vl).Pointer())
