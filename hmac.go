@@ -42,8 +42,8 @@ func (h *HMAC) Sign(hp []byte) ([]byte, error) {
 	return h.pool.sign(hp)
 }
 
-// Size returns the signature byte size.
-func (h *HMAC) Size() (int, error) {
+// SizeUp returns the signature byte size.
+func (h *HMAC) SizeUp() (int, error) {
 	return h.hash.Size(), nil
 }
 

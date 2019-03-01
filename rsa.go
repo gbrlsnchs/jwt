@@ -46,8 +46,8 @@ func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	return r.sign(payload)
 }
 
-// Size returns the signature byte size.
-func (r *RSA) Size() (int, error) {
+// SizeUp returns the signature byte size.
+func (r *RSA) SizeUp() (int, error) {
 	pub := r.pub
 	if pub == nil {
 		priv := r.priv

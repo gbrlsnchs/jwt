@@ -13,7 +13,7 @@ func (n *None) Sign(_ []byte) ([]byte, error) {
 	return nil, nil
 }
 
-func (n *None) Size() (int, error) {
+func (n *None) SizeUp() (int, error) {
 	return 0, nil
 }
 

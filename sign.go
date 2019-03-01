@@ -21,7 +21,7 @@ func Sign(h Header, payload interface{}, s Signer) ([]byte, error) {
 		return nil, err
 	}
 
-	sigSize, err := s.Size()
+	sigSize, err := s.SizeUp()
 	if err != nil {
 		return nil, err
 	}

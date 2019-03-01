@@ -56,8 +56,8 @@ func (e *ECDSA) Sign(payload []byte) ([]byte, error) {
 	return e.sign(payload)
 }
 
-// Size returns the signature byte size.
-func (e *ECDSA) Size() (int, error) {
+// SizeUp returns the signature byte size.
+func (e *ECDSA) SizeUp() (int, error) {
 	pub := e.pub
 	if pub == nil {
 		priv := e.priv
