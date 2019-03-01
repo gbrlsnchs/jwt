@@ -7,6 +7,10 @@
 [![Minimal Version](https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg)](https://golang.org/doc/go1.11)
 [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Important
+Branch `master` is unstable, **always** use tagged versions. That way it is possible to differentiate pre-release tags from production ones.
+In other words, API changes all the time in `master`. It's a place for public experiment. Thus, make use of the latest stable version via Go modules.
+
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
 
