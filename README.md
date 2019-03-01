@@ -46,21 +46,19 @@ import (
 ```go
 now := time.Now()
 hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-jot := &jwt.JWT{
-	Header: jwt.Header{KeyID: "kid"},
-	Claims: &jwt.Claims{
-		Issuer:         "gbrlsnchs",
-		Subject:        "someone",
-		Audience:       jwt.Audience{"gophers"},
-		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-		NotBefore:      now.Add(30 * time.Minute).Unix(),
-		IssuedAt:       now.Unix(),
-		ID:             "foobar",
-	},
+h := jwt.Header{KeyID: "kid"}
+p := jwt.Payload{
+	Issuer:         "gbrlsnchs",
+	Subject:        "someone",
+	Audience:       jwt.Audience{"gophers"},
+	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+	NotBefore:      now.Add(30 * time.Minute).Unix(),
+	IssuedAt:       now.Unix(),
+	JWTID:          "foobar",
 }
-token, err := jwt.Sign(jot, hs256)
+token, err := jwt.Sign(h, p, hs256)
 if err != nil {
-	// handle error
+	// Handle error.
 }
 log.Printf("token = %s", token)
 ```
@@ -68,8 +66,8 @@ log.Printf("token = %s", token)
 ### Signing a JWT with public claims
 #### First, create a custom type and embed a JWT pointer in it
 ```go
-type Token struct {
-	jwt.JWT
+type CustomPayload struct {
+	jwt.Payload
 	IsLoggedIn  bool   `json:"isLoggedIn"`
 	CustomField string `json:"customField,omitempty"`
 }
@@ -79,25 +77,23 @@ type Token struct {
 ```go
 now := time.Now()
 hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-jot := &Token{
-	JWT: jwt.JWT{
-		Header: jwt.Header{KeyID: "kid"},
-		Claims: &jwt.Claims{
-			Issuer:         "gbrlsnchs",
-			Subject:        "someone",
-			Audience:       jwt.Audience{"gophers"},
-			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-			NotBefore:      now.Add(30 * time.Minute).Unix(),
-			IssuedAt:       now.Unix(),
-			ID:             "foobar",
-		},
+h := jwt.Header{KeyID: "kid"}
+p := CustomPayload{
+	Payload: &jwt.Claims{
+		Issuer:         "gbrlsnchs",
+		Subject:        "someone",
+		Audience:       jwt.Audience{"gophers"},
+		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+		NotBefore:      now.Add(30 * time.Minute).Unix(),
+		IssuedAt:       now.Unix(),
+		JWTID:          "foobar",
 	},
 	IsLoggedIn:  true,
 	CustomField: "myCustomField",
 }
-token, err := jwt.Sign(jot, hs256)
+token, err := jwt.Sign(h, p, hs256)
 if err != nil {
-	// handle error
+	// Handle error.
 }
 log.Printf("token = %s", token)
 ```
@@ -110,19 +106,25 @@ token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
 	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
 	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
 
-raw, err := jwt.Verify(token, hs256) 
+raw, err := jwt.Parse(token) 
 if err != nil {
-	// handle error
+	// Handle error.
 }
-var jot Token
-if err = raw.Decode(&jot); err != nil {
-	// handle error
+if err = raw.Verify(hs256); err != nil {
+	// Handle error.
+}
+var (
+	h jwt.Header
+	p CustomPayload
+)
+if err = raw.Decode(&h, &p); err != nil {
+	// Handle error.
 }
 
 iatValidator := jwt.IssuedAtValidator(now)
-expValidator := jwt.ExpirationTimeValidator(now)
+expValidator := jwt.ExpirationTimeValidator(now, true)
 audValidator := jwt.AudienceValidator(jwt.Audience{"admin", "sudo"})
-if err := jot.Validate(iatValidator, expValidator, audValidator); err != nil {
+if err := p.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error
