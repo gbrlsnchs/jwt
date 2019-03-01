@@ -18,11 +18,11 @@ func TestEd25519(t *testing.T) {
 		t.Fatal(err)
 	}
 	testCases := []testCase{
-		{NewEd25519(priv, nil), NewEd25519(nil, pub), nil, nil, nil, nil, nil},
-		{NewEd25519(priv, nil), NewEd25519(nil, pub2), nil, nil, nil, nil, ErrEd25519Verification},
-		{NewEd25519(priv2, nil), NewEd25519(nil, pub), nil, nil, nil, nil, ErrEd25519Verification},
-		{NewEd25519(nil, nil), NewEd25519(nil, nil), nil, ErrEd25519PrivKey, nil, nil, nil},
-		{NewEd25519(priv, nil), NewEd25519(nil, nil), nil, nil, nil, nil, ErrEd25519PubKey},
+		{NewEd25519(priv, nil), NewEd25519(nil, pub), nil, nil, nil, nil},
+		{NewEd25519(priv, nil), NewEd25519(nil, pub2), nil, nil, nil, ErrEd25519Verification},
+		{NewEd25519(priv2, nil), NewEd25519(nil, pub), nil, nil, nil, ErrEd25519Verification},
+		{NewEd25519(nil, nil), NewEd25519(nil, nil), ErrEd25519PrivKey, nil, nil, nil},
+		{NewEd25519(priv, nil), NewEd25519(nil, nil), nil, nil, nil, ErrEd25519PubKey},
 	}
 	testJWT(t, testCases)
 }

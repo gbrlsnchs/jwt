@@ -13,33 +13,31 @@ var benchMock = []byte("eyJhbGciOiJIUzI1NiIsImtpZCI6ImtpZCIsInR5cCI6IkpXVCJ9." +
 
 var hs256 = NewHMAC(SHA256, []byte("benchmark"))
 
-type benchToken struct {
-	JWT
+type benchPayload struct {
+	Payload
 	Name    string `json:"name,omitempty"`
 	IsBench bool   `json:"isBench"`
 }
 
 func BenchmarkSign(b *testing.B) {
 	now := time.Now()
-	jot := &benchToken{
-		JWT: JWT{
-			Header: Header{KeyID: "kid"},
-			Claims: &Claims{
-				Issuer:         "gbrlsnchs",
-				Subject:        "me",
-				Audience:       Audience{"benchmark"},
-				ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-				NotBefore:      now.Add(30 * time.Minute).Unix(),
-				IssuedAt:       now.Unix(),
-				ID:             b.Name(),
-			},
+	h := Header{KeyID: "kid"}
+	p := &benchPayload{
+		Payload: Payload{
+			Issuer:         "gbrlsnchs",
+			Subject:        "me",
+			Audience:       Audience{"benchmark"},
+			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+			NotBefore:      now.Add(30 * time.Minute).Unix(),
+			IssuedAt:       now.Unix(),
+			JWTID:          b.Name(),
 		},
 		Name:    "foobar",
 		IsBench: true,
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if _, err := Sign(jot, hs256); err != nil {
+		if _, err := Sign(h, p, hs256); err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -47,12 +45,18 @@ func BenchmarkSign(b *testing.B) {
 
 func BenchmarkVerify(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		raw, err := Verify(benchMock, hs256)
+		raw, err := Parse(benchMock)
 		if err != nil {
 			b.Fatal(err)
 		}
-		var jot benchToken
-		if err = raw.Decode(&jot); err != nil {
+		if err = raw.Verify(hs256); err != nil {
+			b.Fatal(err)
+		}
+		var (
+			h Header
+			p benchPayload
+		)
+		if err = raw.Decode(&h, &p); err != nil {
 			b.Fatal(err)
 		}
 	}

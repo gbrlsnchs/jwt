@@ -47,12 +47,16 @@ func (r *RSA) Sign(payload []byte) ([]byte, error) {
 }
 
 // Size returns the signature byte size.
-func (r *RSA) Size() int {
+func (r *RSA) Size() (int, error) {
 	pub := r.pub
 	if pub == nil {
+		priv := r.priv
+		if priv == nil {
+			return 0, ErrRSANilPrivKey
+		}
 		pub = r.priv.Public().(*rsa.PublicKey)
 	}
-	return pub.Size()
+	return pub.Size(), nil
 }
 
 // String returns the signing method name.

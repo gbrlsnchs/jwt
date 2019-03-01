@@ -36,8 +36,8 @@ func (e *Ed25519) Sign(payload []byte) ([]byte, error) {
 }
 
 // Size returns the signature byte size.
-func (e *Ed25519) Size() int {
-	return ed25519.SignatureSize
+func (e *Ed25519) Size() (int, error) {
+	return ed25519.SignatureSize, nil
 }
 
 // String returns the signing method name.

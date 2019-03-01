@@ -57,12 +57,16 @@ func (e *ECDSA) Sign(payload []byte) ([]byte, error) {
 }
 
 // Size returns the signature byte size.
-func (e *ECDSA) Size() int {
+func (e *ECDSA) Size() (int, error) {
 	pub := e.pub
 	if pub == nil {
-		pub = e.priv.Public().(*ecdsa.PublicKey)
+		priv := e.priv
+		if priv == nil {
+			return 0, ErrECDSANilPrivKey
+		}
+		pub = priv.Public().(*ecdsa.PublicKey)
 	}
-	return byteSize(pub.Params().BitSize) * 2
+	return byteSize(pub.Params().BitSize) * 2, nil
 }
 
 // String returns the signing method name.

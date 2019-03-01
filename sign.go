@@ -5,39 +5,40 @@ import (
 	"encoding/json"
 )
 
-// Sign signs a struct that implements the Token interface by
-// using a signing method that implements the Signer interface.
-func Sign(t Token, s Signer) ([]byte, error) {
+// Sign signs a JWT (header and payload) with a signing method that implements the Signer interface.
+func Sign(h Header, payload interface{}, s Signer) ([]byte, error) {
 	// Override some values or set them if empty.
-	h := t.HeaderAddr()
 	h.Algorithm = s.String()
 	h.Type = "JWT"
 	// Marshal the header part of the JWT.
-	hbytes, err := json.Marshal(h)
+	hb, err := json.Marshal(h)
 	if err != nil {
 		return nil, err
 	}
 	// Marshal the claims part of the JWT.
-	cbytes, err := json.Marshal(t)
+	pb, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
-	// Put both fields together.
-	encoding := base64.RawURLEncoding
-	hsize := encoding.EncodedLen(len(hbytes))
-	csize := encoding.EncodedLen(len(cbytes))
-	// Output: Base64(header).Base64(claims).signature
-	payload := make([]byte, hsize+1+csize)
-	encoding.Encode(payload, hbytes)
-	payload[hsize] = '.'
-	encoding.Encode(payload[hsize+1:], cbytes)
-	sig, err := s.Sign(payload)
+
+	sigSize, err := s.Size()
 	if err != nil {
 		return nil, err
 	}
-	token := make([]byte, len(payload)+1+encoding.EncodedLen(s.Size()))
-	n := copy(token, payload)
-	token[n] = '.'
-	encoding.Encode(token[n+1:], sig)
+	enc := base64.RawURLEncoding
+	h64len := enc.EncodedLen(len(hb))
+	p64len := enc.EncodedLen(len(pb))
+	sig64len := enc.EncodedLen(sigSize)
+	token := make([]byte, h64len+1+p64len+1+sig64len)
+
+	enc.Encode(token, hb)
+	token[h64len] = '.'
+	enc.Encode(token[h64len+1:], pb)
+	sig, err := s.Sign(token[:h64len+1+p64len])
+	if err != nil {
+		return nil, err
+	}
+	token[h64len+1+p64len] = '.'
+	enc.Encode(token[h64len+1+p64len+1:], sig)
 	return token, nil
 }

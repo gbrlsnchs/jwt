@@ -13,17 +13,16 @@ import (
 )
 
 type testCase struct {
-	signer        Signer
-	verifier      Verifier
-	marshalingErr error
-	signingErr    error
-	parsingErr    error
-	unmarshalErr  error
-	verifyingErr  error
+	signer       Signer
+	verifier     Verifier
+	signingErr   error
+	parsingErr   error
+	decodingErr  error
+	verifyingErr error
 }
 
-type testToken struct {
-	JWT
+type testPayload struct {
+	Payload
 	Name      string  `json:"name,omitempty"`
 	RandInt   int     `json:"randomInt,omitempty"`
 	RandFloat float64 `json:"randomFloat,omitempty"`
@@ -45,21 +44,19 @@ func testJWT(t *testing.T, testCases []testCase) {
 			jti := strconv.Itoa(i)
 			randomInt := rand.Intn(math.MaxUint32)
 			randomFloat := rand.Float64() * 100
-			jot := &testToken{
-				JWT: JWT{
-					Header: Header{
-						KeyID:       kid,
-						ContentType: cty,
-					},
-					Claims: &Claims{
-						Issuer:         iss,
-						Subject:        sub,
-						Audience:       aud,
-						ExpirationTime: exp,
-						NotBefore:      nbf,
-						IssuedAt:       iat,
-						ID:             jti,
-					},
+			h := Header{
+				KeyID:       kid,
+				ContentType: cty,
+			}
+			tp := &testPayload{
+				Payload: Payload{
+					Issuer:         iss,
+					Subject:        sub,
+					Audience:       aud,
+					ExpirationTime: exp,
+					NotBefore:      nbf,
+					IssuedAt:       iat,
+					JWTID:          jti,
 				},
 				Name:      t.Name(),
 				RandInt:   randomInt,
@@ -67,7 +64,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			// Sign.
-			token, err := Sign(jot, tc.signer)
+			token, err := Sign(h, tp, tc.signer)
 			if want, got := tc.signingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}
@@ -75,9 +72,15 @@ func testJWT(t *testing.T, testCases []testCase) {
 				return
 			}
 
-			// Verify.
+			// Parse.
 			var raw RawToken
-			raw, err = Verify(token, tc.verifier)
+			raw, err = Parse(token)
+			if want, got := tc.parsingErr, err; want != got {
+				t.Errorf("want %v, got %v", want, got)
+			}
+
+			// Verify.
+			err = raw.Verify(tc.verifier)
 			if want, got := tc.verifyingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}
@@ -86,70 +89,76 @@ func testJWT(t *testing.T, testCases []testCase) {
 			}
 
 			// Decode token.
-			var jot2 testToken
-			err = raw.Decode(&jot2)
-			if want, got := tc.unmarshalErr, err; want != got {
+			var (
+				h2  Header
+				tp2 testPayload
+			)
+			err = raw.Decode(&h2, &tp2)
+			if want, got := tc.decodingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}
 
 			// Check new token.
-			if want, got := tc.signer.String(), jot2.Algorithm; want != got {
+			if want, got := tc.signer.String(), h2.Algorithm; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := kid, jot2.KeyID; want != got {
+			if want, got := kid, h2.KeyID; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := typ, jot2.Type; want != got {
+			if want, got := typ, h2.Type; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := cty, jot2.ContentType; want != got {
+			if want, got := cty, h2.ContentType; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := iat, jot2.IssuedAt; want != got {
+			if want, got := iat, tp2.IssuedAt; want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
-			if want, got := exp, jot2.ExpirationTime; want != got {
+			if want, got := exp, tp2.ExpirationTime; want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
-			if want, got := nbf, jot2.NotBefore; want != got {
+			if want, got := nbf, tp2.NotBefore; want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
-			if want, got := iss, jot2.Issuer; want != got {
+			if want, got := iss, tp2.Issuer; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := aud, jot2.Audience; !reflect.DeepEqual(want, got) {
+			if want, got := aud, tp2.Audience; !reflect.DeepEqual(want, got) {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := sub, jot2.Subject; want != got {
+			if want, got := sub, tp2.Subject; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := jti, jot2.ID; want != got {
+			if want, got := jti, tp2.JWTID; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := t.Name(), jot2.Name; want != got {
+			if want, got := t.Name(), tp2.Name; want != got {
 				t.Errorf("want %s, got %s", want, got)
 			}
 
-			if want, got := randomInt, jot2.RandInt; want != got {
+			if want, got := randomInt, tp2.RandInt; want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 
-			if want, got := randomFloat, jot2.RandFloat; want != got {
+			if want, got := randomFloat, tp2.RandFloat; want != got {
 				t.Errorf("want %f, got %f", want, got)
 			}
 
-			if want, got := reflect.ValueOf(jot).Elem().NumField(), reflect.ValueOf(&jot2).Elem().NumField(); want != got {
+			if want, got := reflect.ValueOf(h).NumField(), reflect.ValueOf(h2).NumField(); want != got {
+				t.Errorf("want %d, got %d", want, got)
+			}
+			if want, got := reflect.ValueOf(tp).Elem().NumField(), reflect.ValueOf(&tp2).Elem().NumField(); want != got {
 				t.Errorf("want %d, got %d", want, got)
 			}
 		})
