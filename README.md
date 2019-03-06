@@ -130,9 +130,11 @@ var (
 	h jwt.Header
 	p CustomPayload
 )
-if err = raw.Decode(&h, &p); err != nil {
+if h, err = raw.Decode(&p); err != nil {
 	// Handle error.
 }
+fmt.Println(h.Algorithm)
+fmt.Println(h.KeyID)
 
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now, true)
