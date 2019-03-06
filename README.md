@@ -1,7 +1,7 @@
 # jwt (JSON Web Token for Go)
 
 <p align="center">
-  <tt><b>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q</b></tt>
+  <img src="encoded_jwt.png">
 </p>
 
 <p align="center">
