@@ -1,3 +1,31 @@
+<style>
+.header {
+  width: 100%;
+  height: auto;
+  position: relative;
+}
+
+.header-img {
+  width: 25%;
+  height: 25%;
+}
+
+.header-token {
+  position: absolute;
+  margin-left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  word-break: break-all;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: monospace;
+}
+</style>
+<div class="header">
+  <img class="header-img" src="gopher_head.png">
+  <span class="header-token">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q</span>
+</div>
+
 # jwt (JSON Web Token for Go)
 [![JWT compatible](https://jwt.io/img/badge.svg)](https://jwt.io)
 
