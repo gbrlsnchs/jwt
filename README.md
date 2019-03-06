@@ -1,7 +1,7 @@
 # jwt (JSON Web Token for Go)
 
 <p align="center">
-  <img src="encoded_jwt.png">
+  <img src="encoded_jwt.png" style="margin-bottom: -30px" width="75%" height="75%">
 </p>
 
 <p align="center">
