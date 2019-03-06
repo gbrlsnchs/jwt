@@ -19,7 +19,6 @@ func (a Audience) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements an unmarshaling function for "aud" claim.
-// TODO(gbrlsnchs): create tests for this method.
 func (a *Audience) UnmarshalJSON(b []byte) error {
 	var (
 		v   interface{}
@@ -34,7 +33,7 @@ func (a *Audience) UnmarshalJSON(b []byte) error {
 		aud[0] = vv
 		*a = aud
 	case []interface{}:
-		aud := make(Audience, 0, len(vv))
+		aud := make(Audience, len(vv))
 		for i := range vv {
 			aud[i] = vv[i].(string)
 		}
