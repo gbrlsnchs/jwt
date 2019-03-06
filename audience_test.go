@@ -2,6 +2,7 @@ package jwt_test
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	. "github.com/gbrlsnchs/jwt/v3"
@@ -41,5 +42,27 @@ func TestAudienceOmitempty(t *testing.T) {
 	}
 	if want, got := "{}", b; want != string(got) {
 		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestAudienceUnmarshal(t *testing.T) {
+	testCases := []struct {
+		jstr     []byte
+		expected Audience
+	}{
+		{[]byte(`"foo"`), Audience{"foo"}},
+		{[]byte(`["foo","bar"]`), Audience{"foo", "bar"}},
+		{[]byte("[]"), Audience{}},
+	}
+	for _, tc := range testCases {
+		t.Run(string(tc.jstr), func(t *testing.T) {
+			var aud Audience
+			if err := json.Unmarshal(tc.jstr, &aud); err != nil {
+				t.Fatal(err)
+			}
+			if want, got := tc.expected, aud; !reflect.DeepEqual(want, got) {
+				t.Errorf("want %v, got %v", want, got)
+			}
+		})
 	}
 }
