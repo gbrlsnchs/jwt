@@ -1,11 +1,24 @@
 # jwt (JSON Web Token for Go)
-[![JWT compatible](https://jwt.io/img/badge.svg)](https://jwt.io)
 
-[![Build Status](https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master)](https://travis-ci.org/gbrlsnchs/jwt)
-[![Sourcegraph](https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg)](https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge)
-[![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
-[![Minimal Version](https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg)](https://golang.org/doc/go1.11)
-[![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<p align="center">
+  <tt><b>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q</b></tt>
+</p>
+
+<p align="center">
+  <img src="gopher_head.png" width="25%" height="25%">
+</p>
+
+<p align="center">
+  <a target="_blank" href="https://travis-ci.org/gbrlsnchs/jwt"><img alt="Build Status" src="https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master"></a>
+  <a target="_blank" href="https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge"><img alt="Sourcegraph" src="https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg"></a>
+  <a target="_blank" href="https://godoc.org/github.com/gbrlsnchs/jwt"><img alt="GoDoc" src="https://godoc.org/github.com/gbrlsnchs/jwt?status.svg"></a>
+  <a target="_blank" href="https://golang.org/doc/go1.11"><img alt="Minimal Version" src="https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg"></a>
+  <a target="_blank" href="https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img alt="Join the chat at https://gitter.im/gbrlsnchs/jwt" src="https://badges.gitter.im/gbrlsnchs/jwt.svg"></a>
+</p>
+
+<p align="center">
+  <a target="_blank" href="https://jwt.io"><img alt="JWT compatible" src="https://jwt.io/img/badge.svg"></a>
+</p>
 
 ## Important
 Branch `master` is unstable, **always** use tagged versions. That way it is possible to differentiate pre-release tags from production ones.
