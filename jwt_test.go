@@ -93,7 +93,7 @@ func testJWT(t *testing.T, testCases []testCase) {
 				h2  Header
 				tp2 testPayload
 			)
-			err = raw.Decode(&h2, &tp2)
+			h2, err = raw.Decode(&tp2)
 			if want, got := tc.decodingErr, err; want != got {
 				t.Errorf("want %v, got %v", want, got)
 			}

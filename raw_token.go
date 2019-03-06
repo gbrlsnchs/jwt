@@ -39,33 +39,32 @@ func Parse(token []byte) (RawToken, error) {
 }
 
 // Decode decodes a raw JWT into a header and a payload.
-func (r RawToken) Decode(h *Header, payload interface{}) error {
+func (r RawToken) Decode(payload interface{}) (h Header, err error) {
 	// Next, unmarshal the token accordingly.
 	var (
 		enc      []byte // encoded header/payload
 		dec      []byte // decoded header/payload
 		encoding = base64.RawURLEncoding
-		err      error
 	)
 	// Header.
 	enc = r.header()
 	dec = make([]byte, encoding.DecodedLen(len(enc)))
 	if _, err = encoding.Decode(dec, enc); err != nil {
-		return err
+		return
 	}
-	if err = json.Unmarshal(dec, h); err != nil {
-		return err
+	if err = json.Unmarshal(dec, &h); err != nil {
+		return
 	}
 	// Claims.
 	enc = r.claims()
 	dec = make([]byte, encoding.DecodedLen(len(enc)))
 	if _, err = encoding.Decode(dec, enc); err != nil {
-		return err
+		return
 	}
 	if err = json.Unmarshal(dec, payload); err != nil {
-		return err
+		return
 	}
-	return nil
+	return
 }
 
 // Verify verifies a JWT signature with a verifying method that

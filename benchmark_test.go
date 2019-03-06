@@ -52,11 +52,8 @@ func BenchmarkVerify(b *testing.B) {
 		if err = raw.Verify(hs256); err != nil {
 			b.Fatal(err)
 		}
-		var (
-			h Header
-			p benchPayload
-		)
-		if err = raw.Decode(&h, &p); err != nil {
+		var p benchPayload
+		if _, err = raw.Decode(&p); err != nil {
 			b.Fatal(err)
 		}
 	}
