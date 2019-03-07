@@ -38,7 +38,7 @@ func Parse(token []byte) (RawToken, error) {
 	return t, nil
 }
 
-// Decode decodes a raw JWT into a header and a payload.
+// Decode decodes a raw JWT a payload and returns its header.
 func (r RawToken) Decode(payload interface{}) (h Header, err error) {
 	// Next, unmarshal the token accordingly.
 	var (
@@ -46,15 +46,6 @@ func (r RawToken) Decode(payload interface{}) (h Header, err error) {
 		dec      []byte // decoded header/payload
 		encoding = base64.RawURLEncoding
 	)
-	// Header.
-	enc = r.header()
-	dec = make([]byte, encoding.DecodedLen(len(enc)))
-	if _, err = encoding.Decode(dec, enc); err != nil {
-		return
-	}
-	if err = json.Unmarshal(dec, &h); err != nil {
-		return
-	}
 	// Claims.
 	enc = r.claims()
 	dec = make([]byte, encoding.DecodedLen(len(enc)))
@@ -64,6 +55,13 @@ func (r RawToken) Decode(payload interface{}) (h Header, err error) {
 	if err = json.Unmarshal(dec, payload); err != nil {
 		return
 	}
+	// Header.
+	enc = r.header()
+	dec = make([]byte, encoding.DecodedLen(len(enc)))
+	if _, err = encoding.Decode(dec, enc); err != nil {
+		return
+	}
+	err = json.Unmarshal(dec, &h)
 	return
 }
 
