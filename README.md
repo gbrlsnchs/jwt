@@ -92,7 +92,7 @@ now := time.Now()
 hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
 h := jwt.Header{KeyID: "kid"}
 p := CustomPayload{
-	Payload: &jwt.Claims{
+	Payload: jwt.Payload{
 		Issuer:         "gbrlsnchs",
 		Subject:        "someone",
 		Audience:       jwt.Audience{"gophers"},
