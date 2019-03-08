@@ -10,6 +10,7 @@
 
 <p align="center">
   <a target="_blank" href="https://travis-ci.org/gbrlsnchs/jwt"><img alt="Build Status" src="https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master"></a>
+  <a target="_blank" href="https://goreportcard.com/report/github.com/gbrlsnchs/jwt"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/gbrlsnchs/jwt"></a>
   <a target="_blank" href="https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge"><img alt="Sourcegraph" src="https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg"></a>
   <a target="_blank" href="https://godoc.org/github.com/gbrlsnchs/jwt"><img alt="GoDoc" src="https://godoc.org/github.com/gbrlsnchs/jwt?status.svg"></a>
   <a target="_blank" href="https://golang.org/doc/go1.11"><img alt="Minimal Version" src="https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg"></a>
