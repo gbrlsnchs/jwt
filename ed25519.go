@@ -35,7 +35,7 @@ func (e *Ed25519) Sign(payload []byte) ([]byte, error) {
 	return ed25519.Sign(e.priv, payload), nil
 }
 
-// Size returns the signature byte size.
+// SizeUp returns the signature byte size.
 func (e *Ed25519) SizeUp() (int, error) {
 	return ed25519.SignatureSize, nil
 }

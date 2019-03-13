@@ -91,10 +91,7 @@ func (e *ECDSA) Verify(payload, sig []byte) (err error) {
 	if sig, err = decodeToBytes(sig); err != nil {
 		return err
 	}
-	if err = e.verify(payload, sig); err != nil {
-		return err
-	}
-	return nil
+	return e.verify(payload, sig)
 }
 
 func (e *ECDSA) sign(payload []byte) ([]byte, error) {

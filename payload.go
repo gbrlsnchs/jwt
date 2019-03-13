@@ -1,5 +1,6 @@
 package jwt
 
+// Payload is a JWT payload according to the RFC 7519.
 type Payload struct {
 	Issuer         string   `json:"iss,omitempty"`
 	Subject        string   `json:"sub,omitempty"`

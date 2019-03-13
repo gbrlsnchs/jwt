@@ -93,10 +93,7 @@ func (r *RSA) Verify(payload, sig []byte) (err error) {
 	if sig, err = decodeToBytes(sig); err != nil {
 		return err
 	}
-	if err = r.verify(payload, sig); err != nil {
-		return err
-	}
-	return nil
+	return r.verify(payload, sig)
 }
 
 // WithPSS returns an RSA-PSS signing method.
