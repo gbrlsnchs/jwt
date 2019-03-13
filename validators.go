@@ -27,8 +27,7 @@ var (
 type ValidatorFunc func(*Payload) error
 
 // AudienceValidator validates the "aud" claim.
-// It checks if at least one of the audiences within the
-// JWT's payload is listed in the server's audience whitelist.
+// It checks if at least one of the audiences in the JWT's payload is listed in aud.
 func AudienceValidator(aud Audience) ValidatorFunc {
 	return func(p *Payload) error {
 		for _, serverAud := range aud {
