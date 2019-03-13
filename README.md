@@ -64,7 +64,7 @@ h := jwt.Header{KeyID: "kid"}
 p := jwt.Payload{
 	Issuer:         "gbrlsnchs",
 	Subject:        "someone",
-	Audience:       jwt.Audience{"gophers"},
+	Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
 	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 	NotBefore:      now.Add(30 * time.Minute).Unix(),
 	IssuedAt:       now.Unix(),
@@ -96,7 +96,7 @@ p := CustomPayload{
 	Payload: jwt.Payload{
 		Issuer:         "gbrlsnchs",
 		Subject:        "someone",
-		Audience:       jwt.Audience{"gophers"},
+		Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
 		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
 		NotBefore:      now.Add(30 * time.Minute).Unix(),
 		IssuedAt:       now.Unix(),
@@ -139,7 +139,7 @@ fmt.Println(h.KeyID)
 
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now, true)
-audValidator := jwt.AudienceValidator(jwt.Audience{"admin", "sudo"})
+audValidator := jwt.AudienceValidator(jwt.Audience{"https://golang.org", "https://jwt.io", "https://google.com", "https://reddit.com"})
 if err := p.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
