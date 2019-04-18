@@ -16,14 +16,14 @@ var (
 	ErrMissingVerifier = errors.New("jwt: verifier is nil")
 )
 
-// Decoder is a representation
-// of a parsed JWT string.
+// Decoder is a JWT decoder.
 type Decoder struct {
 	token []byte
 	h     Header
 	vr    Verifier
 }
 
+// NewDecoder creates a JWT decoder for a particular pair of token and Verifier.
 func NewDecoder(token []byte, vr Verifier) *Decoder {
 	return &Decoder{
 		token: token, // this ensures the Decoder is not reused
@@ -38,7 +38,12 @@ func NewDecoder(token []byte, vr Verifier) *Decoder {
 // (RFC 7515 and RFC 7516 respectively). So currently, for the token to be valid,
 // it must have 2 (two) periods. As JWE is not supported, it considers everything
 // after the second period to be part of the JWS.
-func (d Decoder) Decode(payload interface{}) error {
+//
+// The token must contain valid Base64 parts that when decoded present valid JSON inside.
+// Before verifying the signature, it checks whether the "alg" field is the correct one.
+//
+// Also, it accepts optional ValidatorFunc trailing arguments to also validate the payload's claims.
+func (d *Decoder) Decode(payload Validator, funcs ...ValidatorFunc) error {
 	if d.vr == nil {
 		return ErrMissingVerifier
 	}
@@ -61,7 +66,7 @@ func (d Decoder) Decode(payload interface{}) error {
 		dec      []byte // decoded header/payload
 		encoding = base64.RawURLEncoding
 	)
-	// Headed.
+	// JOSE header.
 	enc = d.header(sep1)
 	dec = make([]byte, encoding.DecodedLen(len(enc)))
 	if _, err = encoding.Decode(dec, enc); err != nil {
@@ -70,8 +75,7 @@ func (d Decoder) Decode(payload interface{}) error {
 	if err = json.Unmarshal(dec, &d.h); err != nil {
 		return err
 	}
-	// Check whether the incoming header
-	// contains the correct "alg" field.
+	// Check whether the incoming header contains the correct "alg" field.
 	if d.h.Algorithm != d.vr.String() {
 		return ErrAlgValidation
 	}
@@ -79,7 +83,7 @@ func (d Decoder) Decode(payload interface{}) error {
 		return err
 	}
 
-	// Claims.
+	// JSON claims.
 	enc = d.claims(sep1, sep2)
 	dec = make([]byte, encoding.DecodedLen(len(enc)))
 	if _, err = encoding.Decode(dec, enc); err != nil {
@@ -88,7 +92,7 @@ func (d Decoder) Decode(payload interface{}) error {
 	return json.Unmarshal(dec, &payload)
 }
 
-// Header returns the Decoder's JOSE Headed.
+// Header returns the decoded token's JOSE header.
 func (d *Decoder) Header() Header { return d.h }
 
 func (d Decoder) claims(sep1, sep2 int) []byte { return d.token[sep1+1 : sep2] }
