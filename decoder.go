@@ -9,8 +9,10 @@ import (
 
 var (
 	// ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
-	ErrMalformed       = errors.New("jwt: malformed token")
-	ErrAlgValidation   = errors.New("jwt: header contains unexpected algorithm")
+	ErrMalformed = errors.New("jwt: malformed token")
+	// ErrAlgValidation indicates an incoming JWT's "alg" field mismatches the Validator's.
+	ErrAlgValidation = errors.New("jwt: header contains unexpected algorithm")
+	// ErrMissingVerifier is the error for when a nil Verifier is used.
 	ErrMissingVerifier = errors.New("jwt: verifier is nil")
 )
 
