@@ -89,7 +89,10 @@ func (d *Decoder) Decode(payload Validator, funcs ...ValidatorFunc) error {
 	if _, err = encoding.Decode(dec, enc); err != nil {
 		return err
 	}
-	return json.Unmarshal(dec, &payload)
+	if err = json.Unmarshal(dec, payload); err != nil {
+		return err
+	}
+	return payload.Validate(funcs...)
 }
 
 // Header returns the decoded token's JOSE header.
