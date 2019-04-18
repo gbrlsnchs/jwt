@@ -2,6 +2,7 @@ package jwt_test
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"testing"
 
 	. "github.com/gbrlsnchs/jwt/v3"
@@ -15,22 +16,31 @@ const validToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
 
 func TestDecode(t *testing.T) {
 	testCases := []struct {
-		token string
-		err   error
+		token []byte
+		p     *Payload
+		err   interface{}
 	}{
-		{validToken, nil},
-		{validToken[:112], nil},
-		{validToken[:111], ErrMalformed},
-		{"..", ErrMalformed},
-		{"{}..", base64.CorruptInputError},
-		{"{}.{}.", base64.CorruptInputError},
-		{"e30.e30.", ErrAlgValidation},
-		{"not.valid.", base64.CorruptInputError},
+		{[]byte(validToken), new(Payload), nil},
+		{[]byte(validToken[:112]), new(Payload), ErrHMACVerification},
+		{[]byte(validToken[:111]), new(Payload), ErrMalformed},
+		{[]byte(".."), new(Payload), new(json.SyntaxError)},
+		{[]byte("{}.{}."), new(Payload), base64.CorruptInputError(0)},
+		{[]byte(validToken), nil, new(json.InvalidUnmarshalError)},
 	}
 	for _, tc := range testCases {
-		t.Run(tc.token, func(t *testing.T) {
-			_, err := Parse([]byte(tc.token))
-			assert.Equal(t, tc.err, err)
+		t.Run("", func(t *testing.T) {
+			assert := assert.New(t)
+			err := NewDecoder(tc.token, NewHMAC(SHA256, []byte("your-256-bit-secret"))).Decode(tc.p)
+			switch v := err.(type) {
+			case base64.CorruptInputError:
+				assert.IsType(tc.err, v)
+			case *json.SyntaxError:
+				assert.IsType(tc.err, v)
+			case *json.InvalidUnmarshalError:
+				assert.IsType(tc.err, v)
+			default:
+				assert.Equal(tc.err, v)
+			}
 		})
 	}
 }
