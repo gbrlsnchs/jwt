@@ -1,5 +1,11 @@
 package jwt
 
+var (
+	_ Validator = new(Payload)
+	_ Validator = &struct{ Payload }{}
+	_ Validator = &struct{ *Payload }{}
+)
+
 // Payload is a JWT payload according to the RFC 7519.
 type Payload struct {
 	Issuer         string   `json:"iss,omitempty"`
@@ -11,10 +17,10 @@ type Payload struct {
 	JWTID          string   `json:"jti,omitempty"`
 }
 
-// Validate validates claims and header fields.
-func (p *Payload) Validate(validators ...ValidatorFunc) error {
-	for _, vl := range validators {
-		if err := vl(p); err != nil {
+// Validate validates Payload claims.
+func (p *Payload) Validate(funcs ...ValidatorFunc) error {
+	for _, fn := range funcs {
+		if err := fn(p); err != nil {
 			return err
 		}
 	}
