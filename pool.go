@@ -5,21 +5,19 @@ import (
 	"sync"
 )
 
-type pool struct {
+type hashPool struct {
 	*sync.Pool
 }
 
-func newPool(hfunc func() hash.Hash) *pool {
-	var p pool
-	p.Pool = &sync.Pool{New: func() interface{} { return hfunc() }}
-	return &p
+func newHashPool(hfunc func() hash.Hash) *hashPool {
+	return &hashPool{&sync.Pool{New: func() interface{} { return hfunc() }}}
 }
 
-func (p *pool) sign(payload []byte) ([]byte, error) {
-	hh := p.Pool.Get().(hash.Hash)
+func (hp *hashPool) sign(payload []byte) ([]byte, error) {
+	hh := hp.Pool.Get().(hash.Hash)
 	defer func() {
 		hh.Reset()
-		p.Pool.Put(hh)
+		hp.Pool.Put(hh)
 	}()
 
 	if _, err := hh.Write(payload); err != nil {

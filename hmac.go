@@ -19,7 +19,7 @@ var (
 type HMAC struct {
 	key  []byte
 	hash crypto.Hash
-	pool *pool
+	pool *hashPool
 }
 
 // NewHMAC creates a new HMAC signing method with one of the available SHA functions.
@@ -30,7 +30,7 @@ func NewHMAC(sha Hash, key []byte) *HMAC {
 	return &HMAC{
 		key:  key,
 		hash: hh,
-		pool: newPool(func() hash.Hash { return hmac.New(hh.New, key) }),
+		pool: newHashPool(func() hash.Hash { return hmac.New(hh.New, key) }),
 	}
 }
 
