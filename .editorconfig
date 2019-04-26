@@ -6,6 +6,11 @@ insert_final_newline = false
 indent_size = 2
 indent_style = space
 
+[{README.md,*.go,Makefile}]
+indent_style = tab
+
 [{README.md,*.go}]
 indent_size = 8
-indent_style = tab
+
+[Makefile]
+indent_size = 4
