@@ -7,8 +7,7 @@ import (
 	_ "crypto/sha512" // imports SHA-384 and SHA-512 hash functions
 )
 
-// Hash is a hashing function
-// available in the JWT spec.
+// Hash is a hashing function available in the JWT spec.
 type Hash crypto.Hash
 
 const (
@@ -21,8 +20,16 @@ const (
 )
 
 func (h Hash) hash() crypto.Hash {
-	if h != SHA256 && h != SHA384 && h != SHA512 {
-		h = SHA256
+	if h.valid() {
+		return crypto.Hash(h)
 	}
-	return crypto.Hash(h)
+	// Assume SHA256 by default.
+	// It's safe enough and won't harm users.
+	return crypto.Hash(SHA256)
+}
+
+func (h Hash) valid() bool {
+	return h == SHA256 ||
+		h == SHA384 ||
+		h == SHA512
 }
