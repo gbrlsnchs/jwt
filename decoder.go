@@ -1,11 +1,6 @@
 package jwt
 
-import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
-	"errors"
-)
+import "errors"
 
 var (
 	// ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
@@ -16,7 +11,7 @@ var (
 	ErrMissingVerifier = errors.New("jwt: verifier is nil")
 )
 
-// Decoder is a JWT decoder.
+// Decoder is a JWT decoder. It is a wrapper over RawToken.
 type Decoder struct {
 	token []byte
 	h     Header
@@ -26,7 +21,7 @@ type Decoder struct {
 // NewDecoder creates a JWT decoder for a particular pair of token and Verifier.
 func NewDecoder(token []byte, vr Verifier) *Decoder {
 	return &Decoder{
-		token: token, // this ensures the Decoder is not reused
+		token: token, // this ensures the Decoder is not reused, as it's not concurrency-safe
 		vr:    vr,
 	}
 }
@@ -43,62 +38,58 @@ func NewDecoder(token []byte, vr Verifier) *Decoder {
 // Before verifying the signature, it checks whether the "alg" field is the correct one.
 //
 // Also, it accepts optional ValidatorFunc trailing arguments to also validate the payload's claims.
+//
+// Note that running
+//
+//	var p jwt.Payload
+//	err := jwt.NewDecoder(token, vr).
+//		Decode(&p, jwt.AudienceValidator("aud"), jwt.SubjectValidator("sub"))
+//	// handle error
+//
+// is the same as running
+//
+//	r, err := jwt.Parse(token)
+//	// handle error
+//
+//	var p jwt.Payload
+//	h, err := r.Decode(&p)
+//	// handle error
+//
+//	err = h.Validate(vr)
+//	// handle error
+//
+//	err = r.Verify(vr)
+//	// handle error
+//
+//	err = p.Validate(jwt.AudienceValidator("aud"), jwt.SubjectValidator("sub"))
+//	// handle error
+//
+// The main advantage of doing the latter is having more control between each step, otherwise running Decode is recommended.
 func (d *Decoder) Decode(payload Validator, funcs ...ValidatorFunc) error {
 	if d.vr == nil {
 		return ErrMissingVerifier
 	}
 
-	sep1 := bytes.IndexByte(d.token, '.')
-	if sep1 < 0 {
-		return ErrMalformed
-	}
-	cbytes := d.token[sep1+1:]
-	sep2 := bytes.IndexByte(cbytes, '.')
-	if sep2 < 0 {
-		return ErrMalformed
-	}
-	sep2 += sep1 + 1
-
-	// Next, unmarshal the token accordingly.
-	var (
-		err      error
-		enc      []byte // encoded header/payload
-		dec      []byte // decoded header/payload
-		encoding = base64.RawURLEncoding
-	)
-	// JOSE header.
-	enc = d.header(sep1)
-	dec = make([]byte, encoding.DecodedLen(len(enc)))
-	if _, err = encoding.Decode(dec, enc); err != nil {
+	r, err := Parse(d.token)
+	if err != nil {
 		return err
 	}
-	if err = json.Unmarshal(dec, &d.h); err != nil {
+
+	// Decode both header and payload.
+	if d.h, err = r.Decode(payload); err != nil {
 		return err
 	}
 	// Check whether the incoming header contains the correct "alg" field.
-	if d.h.Algorithm != d.vr.String() {
-		return ErrAlgValidation
-	}
-	if err = d.vr.Verify(d.payload(sep2), d.sig(sep2)); err != nil {
+	if err = d.h.Validate(d.vr); err != nil {
 		return err
 	}
-
-	// JSON claims.
-	enc = d.claims(sep1, sep2)
-	dec = make([]byte, encoding.DecodedLen(len(enc)))
-	if _, err = encoding.Decode(dec, enc); err != nil {
+	// Verify the signature.
+	if err = r.Verify(d.vr); err != nil {
 		return err
 	}
-	if err = json.Unmarshal(dec, payload); err != nil {
-		return err
-	}
+	// Validate payload claims.
 	return payload.Validate(funcs...)
 }
 
 // Header returns the decoded token's JOSE header.
 func (d *Decoder) Header() Header { return d.h }
-
-func (d Decoder) claims(sep1, sep2 int) []byte { return d.token[sep1+1 : sep2] }
-func (d Decoder) header(sep1 int) []byte       { return d.token[:sep1] }
-func (d Decoder) payload(sep2 int) []byte      { return d.token[:sep2] }
-func (d Decoder) sig(sep2 int) []byte          { return d.token[sep2+1:] }
