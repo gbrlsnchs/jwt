@@ -9,3 +9,11 @@ type Header struct {
 	Type        string `json:"typ,omitempty"`
 	ContentType string `json:"cty,omitempty"`
 }
+
+func (h Header) Validate(vr Verifier) error {
+	// Check whether the incoming header contains the correct "alg" field.
+	if h.Algorithm != vr.String() {
+		return ErrAlgValidation
+	}
+	return nil
+}
