@@ -1,5 +1,10 @@
 package jwt
 
+import "github.com/gbrlsnchs/jwt/v3/internal"
+
+// ErrAlgValidation indicates an incoming JWT's "alg" field mismatches the Validator's.
+var ErrAlgValidation = internal.NewError(`"alg" field mismatch`)
+
 // Header is a JOSE header narrowed down to the JWT specification from RFC 7519.
 //
 // Parameters are ordered according to the RFC 7515.
@@ -10,10 +15,10 @@ type Header struct {
 	ContentType string `json:"cty,omitempty"`
 }
 
+// Validate checks whether the incoming header contains the correct "alg" field.
 func (h Header) Validate(vr Verifier) error {
-	// Check whether the incoming header contains the correct "alg" field.
 	if h.Algorithm != vr.String() {
-		return ErrAlgValidation
+		return internal.Errorf("jwt: unexpected algorithm %q: %w", h.Algorithm, ErrAlgValidation)
 	}
 	return nil
 }
