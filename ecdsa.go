@@ -32,7 +32,7 @@ type ECDSA struct {
 	pub  *ecdsa.PublicKey
 	hash crypto.Hash
 
-	pool *pool
+	pool *hashPool
 }
 
 // NewECDSA creates a new ECDSA signing method with one of the available SHA functions.
@@ -44,7 +44,7 @@ func NewECDSA(sha Hash, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) *ECDSA {
 		priv: priv,
 		pub:  pub,
 		hash: hh,
-		pool: newPool(hh.New),
+		pool: newHashPool(hh.New),
 	}
 }
 

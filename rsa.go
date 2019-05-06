@@ -22,7 +22,7 @@ type RSA struct {
 
 	hash crypto.Hash
 	opts *rsa.PSSOptions
-	pool *pool
+	pool *hashPool
 }
 
 // NewRSA creates a new RSA signing method with one of the available SHA functions.
@@ -34,7 +34,7 @@ func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
 		priv: priv,
 		pub:  pub,
 		hash: hh,
-		pool: newPool(hh.New),
+		pool: newHashPool(hh.New),
 	}
 }
 
