@@ -15,8 +15,7 @@ type RawToken struct {
 	sep1, sep2 int
 }
 
-// Parse parses a byte slice representing a JWT and returns a raw JWT,
-// which can be verified and decoded into a struct that implements Token.
+// Parse parses a byte slice representing a JWT and returns a raw JWT.
 func Parse(token []byte) (RawToken, error) {
 	var t RawToken
 
