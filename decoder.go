@@ -1,15 +1,9 @@
 package jwt
 
-import "errors"
+import "github.com/gbrlsnchs/jwt/v3/internal"
 
-var (
-	// ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
-	ErrMalformed = errors.New("jwt: malformed token")
-	// ErrAlgValidation indicates an incoming JWT's "alg" field mismatches the Validator's.
-	ErrAlgValidation = errors.New("jwt: header contains unexpected algorithm")
-	// ErrMissingVerifier is the error for when a nil Verifier is used.
-	ErrMissingVerifier = errors.New("jwt: verifier is nil")
-)
+// ErrMissingVerifier is the error for when a nil Verifier is used.
+var ErrMissingVerifier = internal.NewError("jwt: verifier is nil")
 
 // Decoder is a JWT decoder. It is a wrapper over RawToken.
 type Decoder struct {
