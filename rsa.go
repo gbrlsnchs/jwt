@@ -5,6 +5,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"errors"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 var (
@@ -85,12 +87,12 @@ func (r *RSA) String() string {
 	}
 }
 
-// Verify verifies a payload and a signature.
+// Verify verifies the JWT signature based on its header and payload.
 func (r *RSA) Verify(payload, sig []byte) (err error) {
 	if r.pub == nil {
 		return ErrRSANilPubKey
 	}
-	if sig, err = decodeToBytes(sig); err != nil {
+	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
 	return r.verify(payload, sig)

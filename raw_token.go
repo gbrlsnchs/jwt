@@ -39,10 +39,10 @@ func Parse(token []byte) (RawToken, error) {
 // Decode decodes a raw JWT into a payload and returns its header.
 func (r RawToken) Decode(payload interface{}) (Header, error) {
 	var h Header
-	if err := decode(r.header(), &h); err != nil {
+	if err := internal.Decode(r.header(), &h); err != nil {
 		return h, err
 	}
-	return h, decode(r.payload(), payload)
+	return h, internal.Decode(r.payload(), payload)
 }
 
 // Verify verifies a JWT signature with a given Verifier.

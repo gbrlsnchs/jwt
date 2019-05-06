@@ -5,6 +5,8 @@ import (
 	"crypto/hmac"
 	"errors"
 	"hash"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 var (
@@ -63,7 +65,7 @@ func (h *HMAC) String() string {
 
 // Verify verifies a hp and a signature.
 func (h *HMAC) Verify(hp, sig []byte) (err error) {
-	if sig, err = decodeToBytes(sig); err != nil {
+	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
 	sig2, err := h.Sign(hp)

@@ -6,6 +6,8 @@ import (
 	"crypto/rand"
 	"errors"
 	"math/big"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 var (
@@ -88,7 +90,7 @@ func (e *ECDSA) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrECDSANilPubKey
 	}
-	if sig, err = decodeToBytes(sig); err != nil {
+	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
 	return e.verify(payload, sig)

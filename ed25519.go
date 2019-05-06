@@ -3,6 +3,7 @@ package jwt
 import (
 	"errors"
 
+	"github.com/gbrlsnchs/jwt/v3/internal"
 	"golang.org/x/crypto/ed25519"
 )
 
@@ -50,7 +51,7 @@ func (e *Ed25519) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrEd25519PubKey
 	}
-	if sig, err = decodeToBytes(sig); err != nil {
+	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
 	if !ed25519.Verify(e.pub, payload, sig) {
