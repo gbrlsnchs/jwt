@@ -12,10 +12,11 @@ lint:
 
 test-units: export GO111MODULE := on
 test-units: go_test_flags := -v
-ifdef RUN_PATTERN
-test-units: go_test_flags += -run=${RUN_PATTERN}
+ifdef GO_TEST_RUN
+test-units: go_test_flags += -run=${GO_TEST_RUN}
 endif
-test-units: go_test_cmd := go test ${go_test_flags} ./...
+test-units: GO_TEST_TARGET ?= ./...
+test-units: go_test_cmd := go test ${go_test_flags} ${GO_TEST_TARGET}
 test-units:
 	@echo "+++ 'test-units' (${go_test_cmd})"
 	@${go_test_cmd}
