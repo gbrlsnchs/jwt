@@ -23,13 +23,13 @@ func Parse(token []byte) (RawToken, error) {
 	if sep1 < 0 {
 		return t, ErrMalformed
 	}
-	t.sep1 = sep1
 
 	cbytes := token[sep1+1:]
 	sep2 := bytes.IndexByte(cbytes, '.')
 	if sep2 < 0 {
 		return t, ErrMalformed
 	}
+	t.sep1 = sep1
 	t.sep2 = sep1 + 1 + sep2
 	t.token = token
 	return t, nil
