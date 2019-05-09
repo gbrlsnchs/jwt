@@ -36,17 +36,21 @@ func NewHMAC(sha Hash, key []byte) *HMAC {
 	}
 }
 
-// Sign signs a hp and returns the signature.
-func (h *HMAC) Sign(hp []byte) ([]byte, error) {
-	if string(h.key) == "" {
+// Sign signs a header and a payload, both encoded to Base64
+// and separated by a dot, then returns the signature.
+func (h *HMAC) Sign(headerPayload []byte) ([]byte, error) {
+	if !h.Valid() {
 		return nil, ErrNoHMACKey
 	}
-	return h.pool.sign(hp)
+	return h.pool.sign(headerPayload)
 }
 
-// SizeUp returns the signature byte size.
-func (h *HMAC) SizeUp() (int, error) {
-	return h.hash.Size(), nil
+// Size returns the signature byte size.
+func (h *HMAC) Size() int {
+	if !h.Valid() {
+		return 0
+	}
+	return h.hash.Size()
 }
 
 // String returns the signing method name.
@@ -63,12 +67,17 @@ func (h *HMAC) String() string {
 	}
 }
 
-// Verify verifies a hp and a signature.
-func (h *HMAC) Verify(hp, sig []byte) (err error) {
+// Valid checks whether the key is not empty.
+func (h *HMAC) Valid() bool {
+	return string(h.key) != ""
+}
+
+// Verify verifies a header/payload and a signature.
+func (h *HMAC) Verify(headerPayload, sig []byte) (err error) {
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
-	sig2, err := h.Sign(hp)
+	sig2, err := h.Sign(headerPayload)
 	if err != nil {
 		return err
 	}
