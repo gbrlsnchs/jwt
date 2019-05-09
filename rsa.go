@@ -43,12 +43,28 @@ func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
 	}
 }
 
+// PSS returns an RSA-PSS signing method.
+func (r *RSA) PSS() *RSA {
+	r.opts = &rsa.PSSOptions{
+		SaltLength: rsa.PSSSaltLengthAuto,
+		Hash:       r.hash,
+	}
+	return r
+}
+
 // Sign signs a payload and returns the signature.
 func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	if r.priv == nil {
 		return nil, ErrRSANilPrivKey
 	}
-	return r.sign(payload)
+	sum, err := r.pool.sign(payload)
+	if err != nil {
+		return nil, err
+	}
+	if r.opts != nil {
+		return rsa.SignPSS(rand.Reader, r.priv, r.hash, sum, r.opts)
+	}
+	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, sum)
 }
 
 // SizeUp returns the signature byte size.
@@ -99,26 +115,6 @@ func (r *RSA) Verify(payload, sig []byte) (err error) {
 		return err
 	}
 	return r.verify(payload, sig)
-}
-
-// WithPSS returns an RSA-PSS signing method.
-func (r *RSA) WithPSS() *RSA {
-	r.opts = &rsa.PSSOptions{
-		SaltLength: rsa.PSSSaltLengthAuto,
-		Hash:       r.hash,
-	}
-	return r
-}
-
-func (r *RSA) sign(payload []byte) ([]byte, error) {
-	sum, err := r.pool.sign(payload)
-	if err != nil {
-		return nil, err
-	}
-	if r.opts != nil {
-		return rsa.SignPSS(rand.Reader, r.priv, r.hash, sum, r.opts)
-	}
-	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, sum)
 }
 
 func (r *RSA) verify(payload, sig []byte) error {
