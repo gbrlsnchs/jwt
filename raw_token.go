@@ -13,6 +13,7 @@ var ErrMalformed = internal.NewError("jwt: malformed token")
 type RawToken struct {
 	token      []byte
 	sep1, sep2 int
+	malformed  bool
 }
 
 // Parse parses a byte slice representing a JWT and returns a raw JWT.
@@ -21,12 +22,14 @@ func Parse(token []byte) (RawToken, error) {
 
 	sep1 := bytes.IndexByte(token, '.')
 	if sep1 < 0 {
+		t.malformed = true
 		return t, ErrMalformed
 	}
 
 	cbytes := token[sep1+1:]
 	sep2 := bytes.IndexByte(cbytes, '.')
 	if sep2 < 0 {
+		t.malformed = true
 		return t, ErrMalformed
 	}
 	t.sep1 = sep1
@@ -38,6 +41,9 @@ func Parse(token []byte) (RawToken, error) {
 // Decode decodes a raw JWT into a payload and returns its header.
 func (r RawToken) Decode(payload interface{}) (Header, error) {
 	var h Header
+	if r.malformed {
+		return h, ErrMalformed
+	}
 	if err := internal.Decode(r.header(), &h); err != nil {
 		return h, err
 	}
@@ -46,6 +52,9 @@ func (r RawToken) Decode(payload interface{}) (Header, error) {
 
 // Verify verifies a JWT signature with a given Verifier.
 func (r RawToken) Verify(vr Verifier) error {
+	if r.malformed {
+		return ErrMalformed
+	}
 	return vr.Verify(r.headerPayload(), r.sig())
 }
 
