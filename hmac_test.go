@@ -3,101 +3,76 @@ package jwt_test
 import (
 	"testing"
 
-	. "github.com/gbrlsnchs/jwt/v3"
-	"github.com/stretchr/testify/suite"
+	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
-func TestHMAC(t *testing.T) {
-	testCases := []payloadTestSuite{
-		// HS256
+var (
+	defaultHMACPayload  = []byte("eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ")
+	temperedHMACPayload = []byte("eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0")
+
+	defaultHMACSignatures = map[jwt.Hash][]byte{
+		jwt.SHA256: []byte("SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"),
+		jwt.SHA384: []byte("8aMsJp4VGY_Ia2s9iWrS8jARCggx0FDRn2FehblXyvGYRrVVbu3LkKKqx_MEuDjQ"),
+		jwt.SHA512: []byte("_MRZSQUbU6G_jPvXIlFsWSU-PKT203EdcU388r5EWxSxg8QpB3AmEGSo2fBfMYsOaxvzos6ehRm4CYO1MrdwUg"),
+	}
+	defaultHMACHeaders = map[jwt.Hash][]byte{
+		jwt.SHA256: []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"),
+		jwt.SHA384: []byte("eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9"),
+		jwt.SHA512: []byte("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9"),
+	}
+)
+
+func claims(header, payload []byte) (c []byte) {
+	c = append(make([]byte, 0, len(header)+1+len(payload)), header...)
+	c = append(c, '.')
+	c = append(c, payload...)
+	return
+}
+
+func TestHMACSign(t *testing.T) {
+	decodedSigs := make(map[jwt.Hash][]byte, 3)
+	for k, v := range defaultHMACSignatures {
+		sig, err := internal.DecodeToBytes(v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		decodedSigs[k] = sig
+	}
+	testCases := []struct {
+		h             *jwt.HMAC
+		headerPayload []byte
+		want          []byte
+		err           error
+	}{
 		{
-			s:       NewHMAC(SHA256, []byte("")),
-			vr:      NewHMAC(SHA256, []byte("")),
-			signErr: ErrNoHMACKey,
+			jwt.NewHMAC(jwt.SHA256, []byte("your-256-bit-secret")),
+			claims(defaultHMACHeaders[jwt.SHA256], defaultHMACPayload),
+			decodedSigs[jwt.SHA256],
+			nil,
 		},
 		{
-			s:  NewHMAC(SHA256, []byte("secret")),
-			vr: NewHMAC(SHA256, []byte("secret")),
+			jwt.NewHMAC(jwt.SHA384, []byte("your-384-bit-secret")),
+			claims(defaultHMACHeaders[jwt.SHA384], defaultHMACPayload),
+			decodedSigs[jwt.SHA384],
+			nil,
 		},
 		{
-			s:         NewHMAC(SHA256, []byte("secret")),
-			vr:        NewHMAC(SHA256, []byte("not_secret")),
-			decodeErr: ErrHMACVerification,
+			jwt.NewHMAC(jwt.SHA512, []byte("your-512-bit-secret")),
+			claims(defaultHMACHeaders[jwt.SHA512], defaultHMACPayload),
+			decodedSigs[jwt.SHA512],
+			nil,
 		},
-		{
-			s:         NewHMAC(SHA256, []byte("not_secret")),
-			vr:        NewHMAC(SHA256, []byte("secret")),
-			decodeErr: ErrHMACVerification,
-		},
-		{
-			s:         NewHMAC(SHA384, []byte("secret")),
-			vr:        NewHMAC(SHA256, []byte("secret")),
-			decodeErr: ErrAlgValidation,
-		},
-		/*
-			TODO(gbrlsnchs):
-			s: HS256, vr: None/RS256/ES256/Ed25519
-		*/
-		// HS384
-		{
-			s:       NewHMAC(SHA384, []byte("")),
-			vr:      NewHMAC(SHA384, []byte("")),
-			signErr: ErrNoHMACKey,
-		},
-		{
-			s:  NewHMAC(SHA384, []byte("secret")),
-			vr: NewHMAC(SHA384, []byte("secret")),
-		},
-		{
-			s:         NewHMAC(SHA384, []byte("secret")),
-			vr:        NewHMAC(SHA384, []byte("not_secret")),
-			decodeErr: ErrHMACVerification,
-		},
-		{
-			s:         NewHMAC(SHA384, []byte("not_secret")),
-			vr:        NewHMAC(SHA384, []byte("secret")),
-			decodeErr: ErrHMACVerification,
-		},
-		{
-			s:         NewHMAC(SHA512, []byte("secret")),
-			vr:        NewHMAC(SHA384, []byte("secret")),
-			decodeErr: ErrAlgValidation,
-		},
-		/*
-			TODO(gbrlsnchs):
-			s: HS384, vr: None/RS384/ES384/Ed25519
-		*/
-		// HS512
-		{
-			s:       NewHMAC(SHA512, []byte("")),
-			vr:      NewHMAC(SHA512, []byte("")),
-			signErr: ErrNoHMACKey,
-		},
-		{
-			s:  NewHMAC(SHA512, []byte("secret")),
-			vr: NewHMAC(SHA512, []byte("secret")),
-		},
-		{
-			s:         NewHMAC(SHA512, []byte("secret")),
-			vr:        NewHMAC(SHA512, []byte("not_secret")),
-			decodeErr: ErrHMACVerification,
-		},
-		{
-			s:         NewHMAC(SHA512, []byte("not_secret")),
-			vr:        NewHMAC(SHA512, []byte("secret")),
-			decodeErr: ErrHMACVerification,
-		},
-		{
-			s:         NewHMAC(SHA256, []byte("secret")),
-			vr:        NewHMAC(SHA512, []byte("secret")),
-			decodeErr: ErrAlgValidation,
-		},
-		/*
-			TODO(gbrlsnchs):
-			s: HS512, vr: None/RS512/ES512/Ed25519
-		*/
 	}
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) { suite.Run(t, &tc) })
+		t.Run("", func(t *testing.T) {
+			sig, err := tc.h.Sign(tc.headerPayload)
+			if want, got := tc.want, sig; string(want) != string(got) {
+				t.Errorf("\nwant %s\ngot %s", want, got)
+			}
+			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
+				t.Errorf("want %#v, got %#v", want, got)
+			}
+		})
 	}
 }
