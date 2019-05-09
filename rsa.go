@@ -14,6 +14,9 @@ var (
 	ErrRSANilPrivKey = errors.New("jwt: RSA private key is nil")
 	// ErrRSANilPubKey is the error for trying to verify a JWT with a nil public key.
 	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
+
+	_ Signer   = new(RSA)
+	_ Verifier = new(RSA)
 )
 
 // RSA is a signing method that uses the RSA cryptosystem
