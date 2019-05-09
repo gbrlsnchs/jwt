@@ -99,6 +99,25 @@ func TestHMACSize(t *testing.T) {
 	}
 }
 
+func TestHMACString(t *testing.T) {
+	testCases := []struct {
+		h    *jwt.HMAC
+		want string
+	}{
+		{jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]), jwt.MethodHS256},
+		{jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]), jwt.MethodHS384},
+		{jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]), jwt.MethodHS512},
+		{jwt.NewHMAC(jwt.Hash(0), defaultHMACSecrets[jwt.SHA256]), jwt.MethodHS256},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			if want, got := tc.want, tc.h.String(); want != got {
+				t.Errorf("want %s, got %s", want, got)
+			}
+		})
+	}
+}
+
 func TestHMACVerify(t *testing.T) {
 	testCases := []struct {
 		h             *jwt.HMAC
