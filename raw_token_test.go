@@ -18,24 +18,28 @@ var (
 
 func TestParse(t *testing.T) {
 	testCases := []struct {
-		rt    jwt.RawToken
 		token []byte
+		want  jwt.RawToken
 		err   error
 	}{
-		{validRawToken, []byte(validToken), nil},
-		{validRawToken2, []byte(validToken[:112]), nil},
-		{invalidRawToken, []byte(validToken[:111]), jwt.ErrMalformed},
-		{validRawToken3, []byte("a.a."), nil},  // parsable, not valid
-		{validRawToken4, []byte("a.a.a"), nil}, // parsable, not valid
+		{[]byte(validToken), validRawToken, nil},
+		{[]byte(validToken[:112]), validRawToken2, nil},
+		{[]byte(validToken[:111]), invalidRawToken, jwt.ErrMalformed},
+		{[]byte("a.a."), validRawToken3, nil},  // parsable, not valid
+		{[]byte("a.a.a"), validRawToken4, nil}, // parsable, not valid
 	}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			rt, err := jwt.Parse(tc.token)
+			if want, got := tc.want, rt; !reflect.DeepEqual(want, got) {
+				t.Errorf("want %v, got %v", want, got)
+			}
 			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
 				t.Fatalf("want %v, got %v", want, got)
 			}
-			if want, got := tc.rt, rt; !reflect.DeepEqual(want, got) {
-				t.Errorf("want %v, got %v", want, got)
+		})
+	}
+}
 			}
 		})
 	}
