@@ -3,7 +3,12 @@ package jwt
 import (
 	"encoding/base64"
 	"encoding/json"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
+
+// ErrZeroSize means there is something wrong with the hashing method.
+var ErrZeroSize = internal.NewError("jwt: hash size is zero")
 
 // Sign signs a JWT (header and payload) with a signing method that implements the Signer interface.
 func Sign(h Header, payload interface{}, s Signer) ([]byte, error) {
@@ -21,14 +26,16 @@ func Sign(h Header, payload interface{}, s Signer) ([]byte, error) {
 		return nil, err
 	}
 
-	sigSize, err := s.SizeUp()
-	if err != nil {
-		return nil, err
+	sz := s.Size()
+	if sz == 0 {
+		if _, ok := s.(*None); !ok {
+			return nil, ErrZeroSize
+		}
 	}
 	enc := base64.RawURLEncoding
 	h64len := enc.EncodedLen(len(hb))
 	p64len := enc.EncodedLen(len(pb))
-	sig64len := enc.EncodedLen(sigSize)
+	sig64len := enc.EncodedLen(sz)
 	token := make([]byte, h64len+1+p64len+1+sig64len)
 
 	enc.Encode(token, hb)
