@@ -102,3 +102,39 @@ func TestHMACSize(t *testing.T) {
 		})
 	}
 }
+
+func TestHMACVerify(t *testing.T) {
+	testCases := []struct {
+		h             *jwt.HMAC
+		headerPayload []byte
+		sig           []byte
+		err           error
+	}{
+		{
+			jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]),
+			claims(defaultHMACHeaders[jwt.SHA256], defaultHMACPayload),
+			defaultHMACSignatures[jwt.SHA256],
+			nil,
+		},
+		{
+			jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]),
+			claims(defaultHMACHeaders[jwt.SHA384], defaultHMACPayload),
+			defaultHMACSignatures[jwt.SHA384],
+			nil,
+		},
+		{
+			jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]),
+			claims(defaultHMACHeaders[jwt.SHA512], defaultHMACPayload),
+			defaultHMACSignatures[jwt.SHA512],
+			nil,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			err := tc.h.Verify(tc.headerPayload, tc.sig)
+			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
+				t.Errorf("want %#v, got %#v", want, got)
+			}
+		})
+	}
+}
