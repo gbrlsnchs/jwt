@@ -21,6 +21,11 @@ var (
 		jwt.SHA384: []byte("eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9"),
 		jwt.SHA512: []byte("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9"),
 	}
+	defaultHMACSecrets = map[jwt.Hash][]byte{
+		jwt.SHA256: []byte("your-256-bit-secret"),
+		jwt.SHA384: []byte("your-384-bit-secret"),
+		jwt.SHA512: []byte("your-512-bit-secret"),
+	}
 )
 
 func claims(header, payload []byte) (c []byte) {
@@ -46,19 +51,19 @@ func TestHMACSign(t *testing.T) {
 		err           error
 	}{
 		{
-			jwt.NewHMAC(jwt.SHA256, []byte("your-256-bit-secret")),
+			jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]),
 			claims(defaultHMACHeaders[jwt.SHA256], defaultHMACPayload),
 			decodedSigs[jwt.SHA256],
 			nil,
 		},
 		{
-			jwt.NewHMAC(jwt.SHA384, []byte("your-384-bit-secret")),
+			jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]),
 			claims(defaultHMACHeaders[jwt.SHA384], defaultHMACPayload),
 			decodedSigs[jwt.SHA384],
 			nil,
 		},
 		{
-			jwt.NewHMAC(jwt.SHA512, []byte("your-512-bit-secret")),
+			jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]),
 			claims(defaultHMACHeaders[jwt.SHA512], defaultHMACPayload),
 			decodedSigs[jwt.SHA512],
 			nil,
