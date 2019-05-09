@@ -45,7 +45,7 @@ Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, 
 Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Installing
-`go get -u github.com/gbrlsnchs/jwt/v3`
+`GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3`
 
 ### Importing
 ```go
