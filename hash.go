@@ -20,16 +20,10 @@ const (
 )
 
 func (h Hash) hash() crypto.Hash {
-	if h.valid() {
+	if h == SHA256 || h == SHA384 || h == SHA512 {
 		return crypto.Hash(h)
 	}
 	// Assume SHA256 by default.
 	// It's safe enough and won't harm users.
 	return crypto.Hash(SHA256)
-}
-
-func (h Hash) valid() bool {
-	return h == SHA256 ||
-		h == SHA384 ||
-		h == SHA512
 }
