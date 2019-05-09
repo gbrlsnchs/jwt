@@ -37,6 +37,8 @@ func claims(header, payload []byte) (c []byte) {
 }
 
 func TestHMACSign(t *testing.T) {
+	// Decode signatures in order to check them,
+	// as default ones come Base64 encoded.
 	decodedSigs := make(map[jwt.Hash][]byte, 3)
 	for k, v := range defaultHMACSignatures {
 		sig, err := internal.DecodeToBytes(v)
