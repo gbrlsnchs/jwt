@@ -8,21 +8,23 @@ import (
 	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
-var (
-	defaultHMACPayload  = []byte("eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ")
-	temperedHMACPayload = []byte("eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0")
+type testTable map[jwt.Hash][]byte
 
-	defaultHMACSignatures = map[jwt.Hash][]byte{
+var (
+	defaultPayload  = []byte("eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ")
+	temperedPayload = []byte("eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0")
+
+	defaultHMACSignatures = testTable{
 		jwt.SHA256: []byte("SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"),
 		jwt.SHA384: []byte("8aMsJp4VGY_Ia2s9iWrS8jARCggx0FDRn2FehblXyvGYRrVVbu3LkKKqx_MEuDjQ"),
 		jwt.SHA512: []byte("_MRZSQUbU6G_jPvXIlFsWSU-PKT203EdcU388r5EWxSxg8QpB3AmEGSo2fBfMYsOaxvzos6ehRm4CYO1MrdwUg"),
 	}
-	defaultHMACHeaders = map[jwt.Hash][]byte{
+	defaultHMACHeaders = testTable{
 		jwt.SHA256: []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"),
 		jwt.SHA384: []byte("eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9"),
 		jwt.SHA512: []byte("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9"),
 	}
-	defaultHMACSecrets = map[jwt.Hash][]byte{
+	defaultHMACSecrets = testTable{
 		jwt.SHA256: []byte("your-256-bit-secret"),
 		jwt.SHA384: []byte("your-384-bit-secret"),
 		jwt.SHA512: []byte("your-512-bit-secret"),
@@ -37,7 +39,7 @@ func claims(header, payload []byte) (c []byte) {
 }
 
 func TestHMACSign(t *testing.T) {
-	ds, err := decodeSigs()
+	ds, err := decodeSigs(defaultHMACSignatures)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,19 +51,19 @@ func TestHMACSign(t *testing.T) {
 	}{
 		{
 			jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]),
-			claims(defaultHMACHeaders[jwt.SHA256], defaultHMACPayload),
+			claims(defaultHMACHeaders[jwt.SHA256], defaultPayload),
 			ds[jwt.SHA256],
 			nil,
 		},
 		{
 			jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]),
-			claims(defaultHMACHeaders[jwt.SHA384], defaultHMACPayload),
+			claims(defaultHMACHeaders[jwt.SHA384], defaultPayload),
 			ds[jwt.SHA384],
 			nil,
 		},
 		{
 			jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]),
-			claims(defaultHMACHeaders[jwt.SHA512], defaultHMACPayload),
+			claims(defaultHMACHeaders[jwt.SHA512], defaultPayload),
 			ds[jwt.SHA512],
 			nil,
 		},
@@ -106,19 +108,19 @@ func TestHMACVerify(t *testing.T) {
 	}{
 		{
 			jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]),
-			claims(defaultHMACHeaders[jwt.SHA256], defaultHMACPayload),
+			claims(defaultHMACHeaders[jwt.SHA256], defaultPayload),
 			defaultHMACSignatures[jwt.SHA256],
 			nil,
 		},
 		{
 			jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]),
-			claims(defaultHMACHeaders[jwt.SHA384], defaultHMACPayload),
+			claims(defaultHMACHeaders[jwt.SHA384], defaultPayload),
 			defaultHMACSignatures[jwt.SHA384],
 			nil,
 		},
 		{
 			jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]),
-			claims(defaultHMACHeaders[jwt.SHA512], defaultHMACPayload),
+			claims(defaultHMACHeaders[jwt.SHA512], defaultPayload),
 			defaultHMACSignatures[jwt.SHA512],
 			nil,
 		},
@@ -134,9 +136,9 @@ func TestHMACVerify(t *testing.T) {
 }
 
 // decodeSigs returns a map with Base64 decoded signatures.
-func decodeSigs() (map[jwt.Hash][]byte, error) {
-	ds := make(map[jwt.Hash][]byte, 3)
-	for k, v := range defaultHMACSignatures {
+func decodeSigs(encSigs testTable) (testTable, error) {
+	ds := make(testTable, 3)
+	for k, v := range encSigs {
 		sig, err := internal.DecodeToBytes(v)
 		if err != nil {
 			return nil, err
