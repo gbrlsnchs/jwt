@@ -37,15 +37,9 @@ func claims(header, payload []byte) (c []byte) {
 }
 
 func TestHMACSign(t *testing.T) {
-	// Decode signatures in order to check them,
-	// as default ones come Base64 encoded.
-	decodedSigs := make(map[jwt.Hash][]byte, 3)
-	for k, v := range defaultHMACSignatures {
-		sig, err := internal.DecodeToBytes(v)
-		if err != nil {
-			t.Fatal(err)
-		}
-		decodedSigs[k] = sig
+	ds, err := decodeSigs()
+	if err != nil {
+		t.Fatal(err)
 	}
 	testCases := []struct {
 		h             *jwt.HMAC
@@ -56,19 +50,19 @@ func TestHMACSign(t *testing.T) {
 		{
 			jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]),
 			claims(defaultHMACHeaders[jwt.SHA256], defaultHMACPayload),
-			decodedSigs[jwt.SHA256],
+			ds[jwt.SHA256],
 			nil,
 		},
 		{
 			jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]),
 			claims(defaultHMACHeaders[jwt.SHA384], defaultHMACPayload),
-			decodedSigs[jwt.SHA384],
+			ds[jwt.SHA384],
 			nil,
 		},
 		{
 			jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]),
 			claims(defaultHMACHeaders[jwt.SHA512], defaultHMACPayload),
-			decodedSigs[jwt.SHA512],
+			ds[jwt.SHA512],
 			nil,
 		},
 	}
@@ -137,4 +131,17 @@ func TestHMACVerify(t *testing.T) {
 			}
 		})
 	}
+}
+
+// decodeSigs returns a map with Base64 decoded signatures.
+func decodeSigs() (map[jwt.Hash][]byte, error) {
+	ds := make(map[jwt.Hash][]byte, 3)
+	for k, v := range defaultHMACSignatures {
+		sig, err := internal.DecodeToBytes(v)
+		if err != nil {
+			return nil, err
+		}
+		ds[k] = sig
+	}
+	return ds, nil
 }
