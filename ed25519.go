@@ -14,6 +14,9 @@ var (
 	ErrEd25519PubKey = errors.New("jwt: Ed25519 public key is nil")
 	// ErrEd25519Verification is the error for when verification with Ed25519 fails.
 	ErrEd25519Verification = errors.New("jwt: Ed25519 verification failed")
+
+	_ Signer   = new(Ed25519)
+	_ Verifier = new(Ed25519)
 )
 
 // Ed25519 is a signing method that uses EdDSA

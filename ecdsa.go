@@ -17,6 +17,9 @@ var (
 	ErrECDSANilPubKey = errors.New("jwt: ECDSA public key is nil")
 	// ErrECDSAVerification is the error for an invalid signature.
 	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
+
+	_ Signer   = new(ECDSA)
+	_ Verifier = new(ECDSA)
 )
 
 func byteSize(bitSize int) int {
