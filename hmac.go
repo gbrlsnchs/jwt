@@ -14,6 +14,9 @@ var (
 	ErrNoHMACKey = errors.New("jwt: HMAC key is empty")
 	// ErrHMACVerification is the error for an invalid signature.
 	ErrHMACVerification = errors.New("jwt: HMAC verification failed")
+
+	_ Signer   = new(HMAC)
+	_ Verifier = new(HMAC)
 )
 
 // HMAC is a signing method that uses an HMAC
@@ -39,7 +42,7 @@ func NewHMAC(sha Hash, key []byte) *HMAC {
 // Sign signs a header and a payload, both encoded to Base64
 // and separated by a dot, then returns the signature.
 func (h *HMAC) Sign(headerPayload []byte) ([]byte, error) {
-	if !h.Valid() {
+	if string(h.key) == "" {
 		return nil, ErrNoHMACKey
 	}
 	return h.pool.sign(headerPayload)
@@ -47,9 +50,6 @@ func (h *HMAC) Sign(headerPayload []byte) ([]byte, error) {
 
 // Size returns the signature byte size.
 func (h *HMAC) Size() int {
-	if !h.Valid() {
-		return 0
-	}
 	return h.hash.Size()
 }
 
@@ -65,11 +65,6 @@ func (h *HMAC) String() string {
 	default:
 		return ""
 	}
-}
-
-// Valid checks whether the key is not empty.
-func (h *HMAC) Valid() bool {
-	return string(h.key) != ""
 }
 
 // Verify verifies a header/payload and a signature.
