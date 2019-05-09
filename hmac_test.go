@@ -1,6 +1,7 @@
 package jwt_test
 
 import (
+	"crypto"
 	"testing"
 
 	"github.com/gbrlsnchs/jwt/v3"
@@ -77,6 +78,24 @@ func TestHMACSign(t *testing.T) {
 			}
 			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
 				t.Errorf("want %#v, got %#v", want, got)
+			}
+		})
+	}
+}
+
+func TestHMACSize(t *testing.T) {
+	testCases := []struct {
+		h    *jwt.HMAC
+		want int
+	}{
+		{jwt.NewHMAC(jwt.SHA256, defaultHMACSecrets[jwt.SHA256]), crypto.SHA256.Size()},
+		{jwt.NewHMAC(jwt.SHA384, defaultHMACSecrets[jwt.SHA384]), crypto.SHA384.Size()},
+		{jwt.NewHMAC(jwt.SHA512, defaultHMACSecrets[jwt.SHA512]), crypto.SHA512.Size()},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			if want, got := tc.want, tc.h.Size(); want != got {
+				t.Errorf("want %d, got %d", want, got)
 			}
 		})
 	}
