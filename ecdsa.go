@@ -61,17 +61,13 @@ func (e *ECDSA) Sign(payload []byte) ([]byte, error) {
 	return e.sign(payload)
 }
 
-// SizeUp returns the signature byte size.
-func (e *ECDSA) SizeUp() (int, error) {
-	pub := e.pub
-	if pub == nil {
-		priv := e.priv
-		if priv == nil {
-			return 0, ErrECDSANilPrivKey
-		}
-		pub = priv.Public().(*ecdsa.PublicKey)
+// Size returns the signature byte size.
+func (e *ECDSA) Size() int {
+	if e.pub == nil {
+		return 0
 	}
-	return byteSize(pub.Params().BitSize) * 2, nil
+	// TODO(gbrlsnchs): check whether "math" package has a function to calculate bits
+	return byteSize(e.pub.Params().BitSize) * 2
 }
 
 // String returns the signing method name.
