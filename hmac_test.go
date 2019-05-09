@@ -72,7 +72,7 @@ func TestHMACSign(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			sig, err := tc.h.Sign(tc.headerPayload)
 			if want, got := tc.want, sig; string(want) != string(got) {
-				t.Errorf("\nwant %s\ngot %s", want, got)
+				t.Errorf("want %x, got %x", want, got)
 			}
 			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
 				t.Errorf("want %#v, got %#v", want, got)
