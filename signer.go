@@ -7,5 +7,4 @@ type Signer interface {
 	fmt.Stringer
 	Sign([]byte) ([]byte, error)
 	Size() int
-	Valid() bool
 }
