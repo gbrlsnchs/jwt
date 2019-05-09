@@ -9,8 +9,8 @@ func (n *None) Sign(_ []byte) ([]byte, error) {
 }
 
 // SizeUp always returns 0 and a nil error.
-func (n *None) SizeUp() (int, error) {
-	return 0, nil
+func (n *None) Size() int {
+	return 0
 }
 
 // String returns the string representation
