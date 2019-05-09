@@ -67,17 +67,12 @@ func (r *RSA) Sign(payload []byte) ([]byte, error) {
 	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, sum)
 }
 
-// SizeUp returns the signature byte size.
-func (r *RSA) SizeUp() (int, error) {
-	pub := r.pub
-	if pub == nil {
-		priv := r.priv
-		if priv == nil {
-			return 0, ErrRSANilPrivKey
-		}
-		pub = r.priv.Public().(*rsa.PublicKey)
+// Size returns the signature byte size.
+func (r *RSA) Size() int {
+	if r.pub == nil {
+		return 0
 	}
-	return pub.Size(), nil
+	return r.pub.Size()
 }
 
 // String returns the signing method name.
