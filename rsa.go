@@ -35,6 +35,9 @@ type RSA struct {
 // a pool of hashing functions to reduce garbage collection cleanups.
 func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
 	hh := sha.hash()
+	if pub == nil {
+		pub = &priv.PublicKey
+	}
 	return &RSA{
 		priv: priv,
 		pub:  pub,
