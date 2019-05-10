@@ -1,6 +1,7 @@
 package jwt_test
 
 import (
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"testing"
@@ -49,8 +50,9 @@ V6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9
 MwIDAQAB
 -----END PUBLIC KEY-----`))
 
-	defaultRSAPrivateKey, _ = x509.ParsePKCS1PrivateKey(defaultRSAPrivateKeyBlock.Bytes)
-	defaultRSAPublicKey, _  = x509.ParsePKCS1PublicKey(defaultRSAPublicKeyBlock.Bytes)
+	defaultRSAPrivateKey, rsaPrivKeyErr = x509.ParsePKCS1PrivateKey(defaultRSAPrivateKeyBlock.Bytes)
+	rsaPKIXPublicKey, rsaPublicKeyErr   = x509.ParsePKIXPublicKey(defaultRSAPublicKeyBlock.Bytes)
+	defaultRSAPublicKey, _              = rsaPKIXPublicKey.(*rsa.PublicKey)
 
 	defaultRSAHeaders = testTable{
 		jwt.SHA256: []byte("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9"),
@@ -75,14 +77,17 @@ MwIDAQAB
 )
 
 func TestRSASign(t *testing.T) {
+	if rsaPrivKeyErr != nil {
+		t.Fatal(rsaPrivKeyErr)
+	}
 	ds, err := decodeSigs(defaultRSASignatures)
 	if err != nil {
 		t.Fatal(err)
 	}
-	dsPSS, err := decodeSigs(defaultRSAPSSSignatures)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// dsPSS, err := decodeSigs(defaultRSAPSSSignatures)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 	testCases := []struct {
 		r             *jwt.RSA
 		headerPayload []byte
@@ -133,6 +138,82 @@ func TestRSASign(t *testing.T) {
 			if want, got := tc.want, sig; string(want) != string(got) {
 				t.Errorf("want %x, got %x", want, got)
 			}
+			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
+				t.Errorf("want %#v, got %#v", want, got)
+			}
+		})
+	}
+}
+
+func TestRSASize(t *testing.T) {
+	testCases := []struct {
+		h    *jwt.RSA
+		want int
+	}{
+		{jwt.NewRSA(jwt.SHA256, defaultRSAPrivateKey, nil), defaultRSAPublicKey.Size()},
+		{jwt.NewRSA(jwt.SHA384, defaultRSAPrivateKey, nil), defaultRSAPublicKey.Size()},
+		{jwt.NewRSA(jwt.SHA512, defaultRSAPrivateKey, nil), defaultRSAPublicKey.Size()},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			if want, got := tc.want, tc.h.Size(); want != got {
+				t.Errorf("want %d, got %d", want, got)
+			}
+		})
+	}
+}
+
+func TestRSAString(t *testing.T) {
+	testCases := []struct {
+		h    *jwt.RSA
+		want string
+	}{
+		{jwt.NewRSA(jwt.SHA256, defaultRSAPrivateKey, nil), jwt.MethodRS256},
+		{jwt.NewRSA(jwt.SHA384, defaultRSAPrivateKey, nil), jwt.MethodRS384},
+		{jwt.NewRSA(jwt.SHA512, defaultRSAPrivateKey, nil), jwt.MethodRS512},
+		{jwt.NewRSA(jwt.Hash(0), defaultRSAPrivateKey, nil), jwt.MethodRS256},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			if want, got := tc.want, tc.h.String(); want != got {
+				t.Errorf("want %s, got %s", want, got)
+			}
+		})
+	}
+}
+
+func TestRSAVerify(t *testing.T) {
+	if rsaPublicKeyErr != nil {
+		t.Fatal(rsaPublicKeyErr)
+	}
+	testCases := []struct {
+		r             *jwt.RSA
+		headerPayload []byte
+		sig           []byte
+		err           error
+	}{
+		{
+			jwt.NewRSA(jwt.SHA256, nil, defaultRSAPublicKey),
+			claims(defaultRSAHeaders[jwt.SHA256], defaultPayload),
+			defaultRSASignatures[jwt.SHA256],
+			nil,
+		},
+		{
+			jwt.NewRSA(jwt.SHA384, nil, defaultRSAPublicKey),
+			claims(defaultRSAHeaders[jwt.SHA384], defaultPayload),
+			defaultRSASignatures[jwt.SHA384],
+			nil,
+		},
+		{
+			jwt.NewRSA(jwt.SHA512, nil, defaultRSAPublicKey),
+			claims(defaultRSAHeaders[jwt.SHA512], defaultPayload),
+			defaultRSASignatures[jwt.SHA512],
+			nil,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			err := tc.r.Verify(tc.headerPayload, tc.sig)
 			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
 				t.Errorf("want %#v, got %#v", want, got)
 			}
