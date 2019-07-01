@@ -29,7 +29,7 @@ func NewEd25519(priv ed25519.PrivateKey, pub ed25519.PublicKey) Algorithm {
 }
 
 // Name returns the algorithm's name.
-func Name() string {
+func (*edDSA) Name() string {
 	return "Ed25519"
 }
 
@@ -42,7 +42,7 @@ func (e *edDSA) Sign(headerPayload []byte) ([]byte, error) {
 }
 
 // Size returns the signature byte size.
-func (e *edDSA) Size() int {
+func (*edDSA) Size() int {
 	return ed25519.SignatureSize
 }
 
@@ -51,7 +51,7 @@ func (e *edDSA) Verify(payload, sig []byte) (err error) {
 	if e.pub == nil {
 		return ErrEd25519PubKey
 	}
-	if sig, err = DecodeToBytes(sig); err != nil {
+	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
 	if !ed25519.Verify(e.pub, payload, sig) {
