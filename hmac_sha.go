@@ -64,12 +64,12 @@ func (hs *hmacSHA) Sign(headerPayload []byte) ([]byte, error) {
 	return hs.pool.sign(headerPayload)
 }
 
-// Size returns the signature byte size.
+// Size returns the signature's byte size.
 func (hs *hmacSHA) Size() int {
 	return hs.size
 }
 
-// Verify verifies a signature based on headerPayload.
+// Verify verifies a signature based on headerPayload using HMAC-SHA.
 func (hs *hmacSHA) Verify(headerPayload, sig []byte) (err error) {
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
