@@ -11,9 +11,9 @@ import (
 
 var (
 	// ErrHMACMissingKey is the error for trying to sign or verify a JWT with an empty key.
-	ErrHMACMissingKey = errors.New("jwt: hmacSHA key is empty")
+	ErrHMACMissingKey = errors.New("jwt: HMAC key is empty")
 	// ErrHMACVerification is the error for an invalid signature.
-	ErrHMACVerification = errors.New("jwt: hmacSHA verification failed")
+	ErrHMACVerification = errors.New("jwt: HMAC verification failed")
 
 	_ Algorithm = new(hmacSHA)
 )
