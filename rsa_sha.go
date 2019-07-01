@@ -99,7 +99,7 @@ func (rs *RSA) Sign(headerPayload []byte) ([]byte, error) {
 	return rsa.SignPKCS1v15(rand.Reader, rs.priv, rs.sha, sum)
 }
 
-// Size returns the signature byte size.
+// Size returns the signature's byte size.
 func (rs *RSA) Size() int {
 	if rs.pub == nil {
 		return 0
