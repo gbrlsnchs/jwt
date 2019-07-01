@@ -45,7 +45,7 @@ func newECDSASHA(name string, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey, sha 
 		priv: priv,
 		pub:  pub,
 		sha:  sha,
-		size: byteSize(es.pub.Params().BitSize) * 2,
+		size: byteSize(pub.Params().BitSize) * 2,
 		pool: newHashPool(sha.New),
 	}
 }
@@ -80,7 +80,7 @@ func (es *ecdsaSHA) Sign(headerPayload []byte) ([]byte, error) {
 
 // Size returns the signature's byte size.
 func (es *ecdsaSHA) Size() int {
-	es.size
+	return es.size
 }
 
 // Verify verifies a signature based on headerPayload using ECDSA-SHA.
