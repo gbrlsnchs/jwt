@@ -15,113 +15,112 @@ var (
 	// ErrRSANilPubKey is the error for trying to verify a JWT with a nil public key.
 	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
 
-	_ Signer   = new(RSA)
-	_ Verifier = new(RSA)
+	_ Algorithm = new(rsaSHA)
 )
 
-// RSA is a signing method that uses the RSA cryptosystem
-// with either PKCS1v15 or PSS to sign and verify SHA signatures.
-type RSA struct {
+type rsaSHA struct {
+	name string
 	priv *rsa.PrivateKey
 	pub  *rsa.PublicKey
-
-	hash crypto.Hash
-	opts *rsa.PSSOptions
+	sha  crypto.Hash
+	size int
 	pool *hashPool
+	opts *rsa.PSSOptions
 }
 
-// NewRSA creates a new RSA signing method with one of the available SHA functions.
-// The RSA pointer returned can be reused both to sign and verify, as it maintains
-// a pool of hashing functions to reduce garbage collection cleanups.
-func NewRSA(sha Hash, priv *rsa.PrivateKey, pub *rsa.PublicKey) *RSA {
-	hh := sha.hash()
+func newRSASHA(name string, priv *rsa.PrivateKey, pub *rsa.PublicKey, sha crypto.Hash, pss bool) *rsaSHA {
 	if pub == nil {
 		pub = &priv.PublicKey
 	}
-	return &RSA{
+	rs := &rsaSHA{
+		name: name, // cache name
 		priv: priv,
 		pub:  pub,
-		hash: hh,
+		sha:  sha,
+		size: pub.Size(), // cache size
 		pool: newHashPool(hh.New),
 	}
-}
-
-// PSS returns an RSA-PSS signing method.
-func (r *RSA) PSS() *RSA {
-	r.opts = &rsa.PSSOptions{
-		SaltLength: rsa.PSSSaltLengthAuto,
-		Hash:       r.hash,
+	if pss {
+		rs.opts = &rsa.PSSOptions{
+			SaltLength: rsa.PSSSaltLengthAuto,
+			Hash:       sha,
+		}
 	}
-	return r
+	return rs
 }
 
-// Sign signs a payload and returns the signature.
-func (r *RSA) Sign(payload []byte) ([]byte, error) {
-	if r.priv == nil {
+// NewRS256 creates a new algorithm using RSA and SHA-256.
+func NewRS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
+	return newRSASHA("RS256", priv, pub, crypto.SHA256, false)
+}
+
+// NewRS384 creates a new algorithm using RSA and SHA-384.
+func NewRS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
+	return newRSASHA("RS384", priv, pub, crypto.SHA384, false)
+}
+
+// NewRS512 creates a new algorithm using RSA and SHA-512.
+func NewRS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
+	return newRSASHA("RS512", priv, pub, crypto.SHA512, false)
+}
+
+// NewPS256 creates a new algorithm using RSA-PSS and SHA-256.
+func NewPS256(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
+	return newRSASHA("PS256", priv, pub, crypto.SHA256, true)
+}
+
+// NewPS384 creates a new algorithm using RSA-PSS and SHA-384.
+func NewPS384(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
+	return newRSASHA("PS384", priv, pub, crypto.SHA384, true)
+}
+
+// NewPS512 creates a new algorithm using RSA-PSS and SHA-512.
+func NewPS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
+	return newRSASHA("PS512", priv, pub, crypto.SHA512, true)
+}
+
+// Name returns the algorithm's name.
+func (rs *RSA) Name() string {
+	return rs.name
+}
+
+// Sign signs headerPayload using either RSA-SHA or RSA-PSS-SHA algorithms.
+func (rs *RSA) Sign(headerPayload []byte) ([]byte, error) {
+	if rs.priv == nil {
 		return nil, ErrRSANilPrivKey
 	}
-	sum, err := r.pool.sign(payload)
+	sum, err := rs.pool.sign(headerPayload)
 	if err != nil {
 		return nil, err
 	}
-	if r.opts != nil {
-		return rsa.SignPSS(rand.Reader, r.priv, r.hash, sum, r.opts)
+	if rs.opts != nil {
+		return rsa.SignPSS(rand.Reader, rs.priv, rs.sha, sum, rs.opts)
 	}
-	return rsa.SignPKCS1v15(rand.Reader, r.priv, r.hash, sum)
+	return rsa.SignPKCS1v15(rand.Reader, rs.priv, rs.sha, sum)
 }
 
 // Size returns the signature byte size.
-func (r *RSA) Size() int {
-	if r.pub == nil {
+func (rs *RSA) Size() int {
+	if rs.pub == nil {
 		return 0
 	}
-	return r.pub.Size()
+	return rs.pub.Size()
 }
 
-// String returns the signing method name.
-func (r *RSA) String() string {
-	if r.opts != nil {
-		switch r.hash {
-		case crypto.SHA256:
-			return MethodPS256
-		case crypto.SHA384:
-			return MethodPS384
-		case crypto.SHA512:
-			return MethodPS512
-		default:
-			return ""
-		}
-	}
-	switch r.hash {
-	case crypto.SHA256:
-		return MethodRS256
-	case crypto.SHA384:
-		return MethodRS384
-	case crypto.SHA512:
-		return MethodRS512
-	default:
-		return ""
-	}
-}
-
-// Verify verifies the JWT signature based on its header and payload.
-func (r *RSA) Verify(payload, sig []byte) (err error) {
-	if r.pub == nil {
+// Verify verifies a signature based on headerPayload using either RSA-SHA or RSA-PSS-SHA.
+func (rs *RSA) Verify(payload, sig []byte) (err error) {
+	if rs.pub == nil {
 		return ErrRSANilPubKey
 	}
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
-	return r.verify(payload, sig)
-}
-
-func (r *RSA) verify(payload, sig []byte) error {
-	sum, err := r.pool.sign(payload)
+	sum, err := rs.pool.sign(headerPayload)
 	if err != nil {
 		return err
 	}
-	if r.opts != nil {
-		return rsa.VerifyPSS(r.pub, r.hash, sum, sig, r.opts)
+	if rs.opts != nil {
+		return rsa.VerifyPSS(rs.pub, rs.sha, sum, sig, rs.opts)
 	}
-	return rsa.VerifyPKCS1v15(r.pub, r.hash, sum, sig)
+	return rsa.VerifyPKCS1v15(rs.pub, rs.sha, sum, sig)
 }
