@@ -56,8 +56,7 @@ func (hs *hmacSHA) Name() string {
 	return hs.name
 }
 
-// Sign signs a header and a payload, both encoded to Base64
-// and separated by a dot, then returns the signature.
+// Sign signs headerPayload using the HMAC-SHA algorithm.
 func (hs *hmacSHA) Sign(headerPayload []byte) ([]byte, error) {
 	if string(hs.key) == "" {
 		return nil, ErrHMACMissingKey
@@ -70,7 +69,7 @@ func (hs *hmacSHA) Size() int {
 	return hs.size
 }
 
-// Verify verifies a signature based on a header and a payload.
+// Verify verifies a signature based on headerPayload.
 func (hs *hmacSHA) Verify(headerPayload, sig []byte) (err error) {
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
