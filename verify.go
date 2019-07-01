@@ -2,17 +2,12 @@ package jwt
 
 import (
 	"strings"
-	"unsafe"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 // ErrAlgValidation indicates an incoming JWT's "alg" field mismatches the Validator's.
 var ErrAlgValidation = internal.NewError(`"alg" field mismatch`)
-
-func helper(b []byte) string {
-	return *(*string)(unsafe.Pointer(&b))
-}
 
 // Verify verifies a token's signature.
 func Verify(alg Algorithm, token string) (RawToken, error) {
