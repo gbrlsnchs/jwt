@@ -38,7 +38,7 @@ func newRSASHA(name string, priv *rsa.PrivateKey, pub *rsa.PublicKey, sha crypto
 		pub:  pub,
 		sha:  sha,
 		size: pub.Size(), // cache size
-		pool: newHashPool(hh.New),
+		pool: newHashPool(sha.New),
 	}
 	if pss {
 		rs.opts = &rsa.PSSOptions{
@@ -108,7 +108,7 @@ func (rs *rsaSHA) Size() int {
 }
 
 // Verify verifies a signature based on headerPayload using either RSA-SHA or RSA-PSS-SHA.
-func (rs *rsaSHA) Verify(payload, sig []byte) (err error) {
+func (rs *rsaSHA) Verify(headerPayload, sig []byte) (err error) {
 	if rs.pub == nil {
 		return ErrRSANilPubKey
 	}
