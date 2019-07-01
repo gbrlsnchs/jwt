@@ -10,69 +10,72 @@ import (
 )
 
 var (
-	// ErrNoHMACKey is the error for trying to sign or verify a JWT with an empty key.
-	ErrNoHMACKey = errors.New("jwt: HMAC key is empty")
+	// ErrHMACMissingKey is the error for trying to sign or verify a JWT with an empty key.
+	ErrHMACMissingKey = errors.New("jwt: hmacSHA key is empty")
 	// ErrHMACVerification is the error for an invalid signature.
-	ErrHMACVerification = errors.New("jwt: HMAC verification failed")
+	ErrHMACVerification = errors.New("jwt: hmacSHA verification failed")
 
-	_ Signer   = new(HMAC)
-	_ Verifier = new(HMAC)
+	_ Algorithm = new(hmacSHA)
 )
 
-// HMAC is a signing method that uses an HMAC
-// of SHA hashes to both sign and verify tokens.
-type HMAC struct {
+type hmacSHA struct {
+	name string
 	key  []byte
-	hash crypto.Hash
+	sha  crypto.Hash
+	size int
 	pool *hashPool
 }
 
-// NewHMAC creates a new HMAC signing method with one of the available SHA functions.
-// The HMAC pointer returned can be reused both to sign and verify, as it maintains
-// a pool of hashing functions to reduce garbage collection cleanups.
-func NewHMAC(sha Hash, key []byte) *HMAC {
-	hh := sha.hash()
-	return &HMAC{
+func newHMACSHA(name string, key []byte, sha crypto.Hash) *hmacSHA {
+	return &hmacSHA{
+		name: name, // cache name
 		key:  key,
-		hash: hh,
-		pool: newHashPool(func() hash.Hash { return hmac.New(hh.New, key) }),
+		sha:  sha,
+		size: sha.Size(), // cache size
+		pool: newHashPool(func() hash.Hash { return hmac.New(sha.New, key) }),
 	}
+}
+
+// NewHS256 creates a new algorithm using HMAC and SHA-256.
+func NewHS256(key []byte) Algorithm {
+	return newHMACSHA("HS256", key, crypto.SHA256)
+}
+
+// NewHS384 creates a new algorithm using HMAC and SHA-384.
+func NewHS384(key []byte) Algorithm {
+	return newHMACSHA("HS384", key, crypto.SHA384)
+}
+
+// NewHS512 creates a new algorithm using HMAC and SHA-512.
+func NewHS512(key []byte) Algorithm {
+	return newHMACSHA("HS512", key, crypto.SHA512)
+}
+
+// Name returns the algorithm's name.
+func (hs *hmacSHA) Name() string {
+	return hs.name
 }
 
 // Sign signs a header and a payload, both encoded to Base64
 // and separated by a dot, then returns the signature.
-func (h *HMAC) Sign(headerPayload []byte) ([]byte, error) {
-	if string(h.key) == "" {
-		return nil, ErrNoHMACKey
+func (hs *hmacSHA) Sign(headerPayload []byte) ([]byte, error) {
+	if string(hs.key) == "" {
+		return nil, ErrHMACMissingKey
 	}
-	return h.pool.sign(headerPayload)
+	return hs.pool.sign(headerPayload)
 }
 
 // Size returns the signature byte size.
-func (h *HMAC) Size() int {
-	return h.hash.Size()
+func (hs *hmacSHA) Size() int {
+	return hs.size
 }
 
-// String returns the signing method name.
-func (h *HMAC) String() string {
-	switch h.hash {
-	case crypto.SHA256:
-		return MethodHS256
-	case crypto.SHA384:
-		return MethodHS384
-	case crypto.SHA512:
-		return MethodHS512
-	default:
-		return ""
-	}
-}
-
-// Verify verifies a header/payload and a signature.
-func (h *HMAC) Verify(headerPayload, sig []byte) (err error) {
+// Verify verifies a signature based on a header and a payload.
+func (hs *hmacSHA) Verify(headerPayload, sig []byte) (err error) {
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
-	sig2, err := h.Sign(headerPayload)
+	sig2, err := hs.Sign(headerPayload)
 	if err != nil {
 		return err
 	}
