@@ -1,7 +1,7 @@
 package jwt
 
-// SigningMethod is a signing method both signing and verifying a JWT.
-type SigningMethod interface {
+// Algorithm is an algorithm for both signing and verifying a JWT.
+type Algorithm interface {
 	Name() string
 	Sign(headerPayload []byte) ([]byte, error)
 	Size() int
