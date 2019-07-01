@@ -80,12 +80,12 @@ func NewPS512(priv *rsa.PrivateKey, pub *rsa.PublicKey) Algorithm {
 }
 
 // Name returns the algorithm's name.
-func (rs *RSA) Name() string {
+func (rs *rsaSHA) Name() string {
 	return rs.name
 }
 
 // Sign signs headerPayload using either RSA-SHA or RSA-PSS-SHA algorithms.
-func (rs *RSA) Sign(headerPayload []byte) ([]byte, error) {
+func (rs *rsaSHA) Sign(headerPayload []byte) ([]byte, error) {
 	if rs.priv == nil {
 		return nil, ErrRSANilPrivKey
 	}
@@ -100,7 +100,7 @@ func (rs *RSA) Sign(headerPayload []byte) ([]byte, error) {
 }
 
 // Size returns the signature's byte size.
-func (rs *RSA) Size() int {
+func (rs *rsaSHA) Size() int {
 	if rs.pub == nil {
 		return 0
 	}
@@ -108,7 +108,7 @@ func (rs *RSA) Size() int {
 }
 
 // Verify verifies a signature based on headerPayload using either RSA-SHA or RSA-PSS-SHA.
-func (rs *RSA) Verify(payload, sig []byte) (err error) {
+func (rs *rsaSHA) Verify(payload, sig []byte) (err error) {
 	if rs.pub == nil {
 		return ErrRSANilPubKey
 	}
