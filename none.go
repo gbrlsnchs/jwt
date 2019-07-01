@@ -1,25 +1,20 @@
 package jwt
 
-// None is an unsecured signer and verifier.
-type None struct{}
+var _ Algorithm = none{}
+
+type none struct{}
+
+// None returns a dull, unsecured algorithm.
+func None() Algorithm { return none{} }
+
+// Name always returns "none".
+func (none) Name() string { return "none" }
 
 // Sign always returns a nil byte slice and a nil error.
-func (n *None) Sign(_ []byte) ([]byte, error) {
-	return nil, nil
-}
+func (none) Sign(_ []byte) ([]byte, error) { return nil, nil }
 
-// SizeUp always returns 0 and a nil error.
-func (n *None) Size() int {
-	return 0
-}
-
-// String returns the string representation
-// for the "none" signing method.
-func (n *None) String() string {
-	return MethodNone
-}
+// Size always returns 0 and a nil error.
+func (none) Size() int { return 0 }
 
 // Verify always returns a nil error.
-func (n *None) Verify(_, _ []byte) error {
-	return nil
-}
+func (none) Verify(_, _ []byte) error { return nil }
