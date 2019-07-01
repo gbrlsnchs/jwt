@@ -36,7 +36,7 @@ func Verify(alg Algorithm, token string) (RawToken, error) {
 	raw.valid = true
 
 	if alg.Name() != raw.hd.Algorithm {
-		return internal.Errorf("jwt: unexpected algorithm %q: %w", raw.hd.Algorithm, ErrAlgValidation)
+		return raw, internal.Errorf("jwt: unexpected algorithm %q: %w", raw.hd.Algorithm, ErrAlgValidation)
 	}
 	return raw, alg.Verify(raw.headerPayload(), raw.sig())
 }
