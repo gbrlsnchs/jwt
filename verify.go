@@ -20,14 +20,12 @@ func Verify(alg Algorithm, token string) (RawToken, error) {
 
 	sep1 := strings.IndexByte(token, '.')
 	if sep1 < 0 {
-		raw.malformed = true
 		return raw, ErrMalformed
 	}
 
 	cbytes := token[sep1+1:]
 	sep2 := strings.IndexByte(cbytes, '.')
 	if sep2 < 0 {
-		raw.malformed = true
 		return raw, ErrMalformed
 	}
 	raw = raw.withSeps(sep1, sep2)
@@ -35,6 +33,8 @@ func Verify(alg Algorithm, token string) (RawToken, error) {
 	if err := internal.Decode(raw.header(), &raw.hd); err != nil {
 		return raw, err
 	}
+	raw.valid = true
+
 	if alg.Name() != raw.hd.Algorithm {
 		return internal.Errorf("jwt: unexpected algorithm %q: %w", raw.hd.Algorithm, ErrAlgValidation)
 	}

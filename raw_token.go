@@ -9,14 +9,14 @@ var ErrMalformed = internal.NewError("jwt: malformed token")
 type RawToken struct {
 	token      []byte
 	sep1, sep2 int
-	malformed  bool
+	valid      bool
 
 	hd Header
 }
 
 // Decode decodes a raw JWT into a payload and returns its header.
 func (raw RawToken) Decode(payload interface{}) error {
-	if raw.malformed {
+	if !raw.valid {
 		return ErrMalformed
 	}
 	return internal.Decode(raw.payload(), payload)
