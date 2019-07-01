@@ -1,10 +1,6 @@
 package jwt
 
-import (
-	"bytes"
-
-	"github.com/gbrlsnchs/jwt/v3/internal"
-)
+import "github.com/gbrlsnchs/jwt/v3/internal"
 
 // ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
 var ErrMalformed = internal.NewError("jwt: malformed token")
@@ -14,51 +10,31 @@ type RawToken struct {
 	token      []byte
 	sep1, sep2 int
 	malformed  bool
-}
 
-// Parse parses a byte slice representing a JWT and returns a raw JWT.
-func Parse(token []byte) (RawToken, error) {
-	var t RawToken
-
-	sep1 := bytes.IndexByte(token, '.')
-	if sep1 < 0 {
-		t.malformed = true
-		return t, ErrMalformed
-	}
-
-	cbytes := token[sep1+1:]
-	sep2 := bytes.IndexByte(cbytes, '.')
-	if sep2 < 0 {
-		t.malformed = true
-		return t, ErrMalformed
-	}
-	t.sep1 = sep1
-	t.sep2 = sep1 + 1 + sep2
-	t.token = token
-	return t, nil
+	hd Header
 }
 
 // Decode decodes a raw JWT into a payload and returns its header.
-func (r RawToken) Decode(payload interface{}) (Header, error) {
-	var h Header
-	if r.malformed {
-		return h, ErrMalformed
-	}
-	if err := internal.Decode(r.header(), &h); err != nil {
-		return h, err
-	}
-	return h, internal.Decode(r.payload(), payload)
-}
-
-// Verify verifies a JWT signature with a given Verifier.
-func (r RawToken) Verify(vr Verifier) error {
-	if r.malformed {
+func (raw RawToken) Decode(payload interface{}) error {
+	if raw.malformed {
 		return ErrMalformed
 	}
-	return vr.Verify(r.headerPayload(), r.sig())
+	return internal.Decode(raw.payload(), payload)
 }
 
-func (r RawToken) header() []byte        { return r.token[:r.sep1] }
-func (r RawToken) headerPayload() []byte { return r.token[:r.sep2] }
-func (r RawToken) payload() []byte       { return r.token[r.sep1+1 : r.sep2] }
-func (r RawToken) sig() []byte           { return r.token[r.sep2+1:] }
+// Header returns a JOSE Header extracted from a JWT.
+func (raw RawToken) Header() Header {
+	return raw.hd
+}
+
+func (raw RawToken) header() []byte        { return raw.token[:raw.sep1] }
+func (raw RawToken) headerPayload() []byte { return raw.token[:raw.sep2] }
+func (raw RawToken) payload() []byte       { return raw.token[raw.sep1+1 : raw.sep2] }
+func (raw RawToken) sig() []byte           { return raw.token[raw.sep2+1:] }
+
+func (raw RawToken) withSeps(sep1, sep2 int) RawToken {
+	raw.sep1 = sep1
+	raw.sep2 = sep1 + 1 + sep2
+	raw.token = token
+	return r
+}
