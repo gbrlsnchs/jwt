@@ -12,11 +12,11 @@ import (
 
 var (
 	// ErrECDSANilPrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrECDSANilPrivKey = errors.New("jwt: ecdsaSHA private key is nil")
+	ErrECDSANilPrivKey = errors.New("jwt: ECDSA private key is nil")
 	// ErrECDSANilPubKey is the error for trying to verify a JWT with a nil public key.
-	ErrECDSANilPubKey = errors.New("jwt: ecdsaSHA public key is nil")
+	ErrECDSANilPubKey = errors.New("jwt: ECDSA public key is nil")
 	// ErrECDSAVerification is the error for an invalid signature.
-	ErrECDSAVerification = errors.New("jwt: ecdsaSHA verification failed")
+	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
 
 	_ Algorithm = new(ecdsaSHA)
 )
@@ -29,8 +29,6 @@ func byteSize(bitSize int) int {
 	return byteSize
 }
 
-// ecdsaSHA is a signing method that uses
-// elliptic curve cryptography to sign SHA hashes.
 type ecdsaSHA struct {
 	name string
 	priv *ecdsa.PrivateKey
