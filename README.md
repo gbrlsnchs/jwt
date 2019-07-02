@@ -78,7 +78,7 @@ log.Printf("token = %s", token)
 ```
 
 ### Signing a JWT with public claims
-#### First, create a custom type and embed a JWT pointer in it
+#### First, create a custom type and embed a `Payload` in it
 ```go
 type CustomPayload struct {
 	jwt.Payload
