@@ -320,7 +320,21 @@ func TestSign(t *testing.T) {
 				verifyErr:   nil,
 			},
 		},
-		"Ed25519": []testCase{},
+		"Ed25519": []testCase{
+			{
+				alg:       jwt.NewEd25519(ed25519PrivateKey1, nil),
+				hd:        jwt.Header{},
+				payload:   tp,
+				verifyAlg: jwt.NewEd25519(ed25519PrivateKey1, nil),
+				wantHeader: jwt.Header{
+					Algorithm: "Ed25519",
+					Type:      "JWT",
+				},
+				wantPayload: tp,
+				signErr:     nil,
+				verifyErr:   nil,
+			},
+		},
 	}
 	for k, v := range testCases {
 		t.Run(k, func(t *testing.T) {
