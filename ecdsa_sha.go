@@ -40,6 +40,9 @@ type ecdsaSHA struct {
 }
 
 func newECDSASHA(name string, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey, sha crypto.Hash) *ecdsaSHA {
+	if pub == nil {
+		pub = &priv.PublicKey
+	}
 	return &ecdsaSHA{
 		name: name,
 		priv: priv,
