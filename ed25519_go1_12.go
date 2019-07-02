@@ -25,6 +25,9 @@ type edDSA struct {
 
 // NewEd25519 creates a new algorithm using EdDSA and SHA-512.
 func NewEd25519(priv ed25519.PrivateKey, pub ed25519.PublicKey) Algorithm {
+	if pub == nil {
+		pub = priv.Public().(ed25519.PublicKey)
+	}
 	return &edDSA{priv: priv, pub: pub}
 }
 
