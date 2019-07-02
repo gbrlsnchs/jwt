@@ -59,9 +59,9 @@ import (
 ### Signing a simple JWT
 ```go
 now := time.Now()
-hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-h := jwt.Header{KeyID: "kid"}
-p := jwt.Payload{
+hs256 := jwt.NewHS256([]byte("secret"))
+hd := jwt.Header{KeyID: "kid"}
+pl := jwt.Payload{
 	Issuer:         "gbrlsnchs",
 	Subject:        "someone",
 	Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
@@ -70,7 +70,7 @@ p := jwt.Payload{
 	IssuedAt:       now.Unix(),
 	JWTID:          "foobar",
 }
-token, err := jwt.Sign(h, p, hs256)
+token, err := jwt.Sign(hs256, hd, pl)
 if err != nil {
 	// Handle error.
 }
@@ -90,9 +90,9 @@ type CustomPayload struct {
 #### Now initialize, marshal and sign it
 ```go
 now := time.Now()
-hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-h := jwt.Header{KeyID: "kid"}
-p := CustomPayload{
+hs256 := jwt.NewHS256([]byte("secret"))
+hd := jwt.Header{KeyID: "kid"}
+pl := CustomPayload{
 	Payload: jwt.Payload{
 		Issuer:         "gbrlsnchs",
 		Subject:        "someone",
@@ -105,7 +105,7 @@ p := CustomPayload{
 	IsLoggedIn:  true,
 	CustomField: "myCustomField",
 }
-token, err := jwt.Sign(h, p, hs256)
+token, err := jwt.Sign(hs256, hd, pl)
 if err != nil {
 	// Handle error.
 }
@@ -115,32 +115,34 @@ log.Printf("token = %s", token)
 ### Verifying and validating a JWT
 ```go
 now := time.Now()
-hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
+hs256 := jwt.NewHS256([]byte("secret"))
 token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
 	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
 	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
 
-raw, err := jwt.Parse(token) 
+raw, err := jwt.Verify(hs256, token) 
 if err != nil {
 	// Handle error.
 }
-if err = raw.Verify(hs256); err != nil {
-	// Handle error.
-}
 var (
-	h jwt.Header
-	p CustomPayload
+	hd = raw.Header()
+	pl CustomPayload
 )
-if h, err = raw.Decode(&p); err != nil {
+if err = raw.Decode(&pl); err != nil {
 	// Handle error.
 }
-fmt.Println(h.Algorithm)
-fmt.Println(h.KeyID)
+fmt.Println(hd.Algorithm)
+fmt.Println(hd.KeyID)
 
 iatValidator := jwt.IssuedAtValidator(now)
 expValidator := jwt.ExpirationTimeValidator(now, true)
-audValidator := jwt.AudienceValidator(jwt.Audience{"https://golang.org", "https://jwt.io", "https://google.com", "https://reddit.com"})
-if err := p.Validate(iatValidator, expValidator, audValidator); err != nil {
+audValidator := jwt.AudienceValidator(jwt.Audience{
+	"https://golang.org",
+	"https://jwt.io",
+	"https://google.com",
+	"https://reddit.com",
+})
+if err := pl.Validate(iatValidator, expValidator, audValidator); err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error
