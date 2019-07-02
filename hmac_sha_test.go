@@ -1,3 +1,6 @@
 package jwt_test
 
-var hmacKey = []byte("secret")
+var (
+	hmacKey1 = []byte("secret")
+	hmacKey2 = []byte("terces")
+)

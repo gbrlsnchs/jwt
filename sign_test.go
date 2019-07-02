@@ -41,10 +41,10 @@ func TestSign(t *testing.T) {
 	testCases := map[string][]testCase{
 		"HMAC": []testCase{
 			{
-				alg:       jwt.NewHS256(hmacKey),
+				alg:       jwt.NewHS256(hmacKey1),
 				hd:        jwt.Header{},
 				payload:   tp,
-				verifyAlg: jwt.NewHS256(hmacKey),
+				verifyAlg: jwt.NewHS256(hmacKey1),
 				wantHeader: jwt.Header{
 					Algorithm: "HS256",
 					Type:      "JWT",
@@ -54,10 +54,10 @@ func TestSign(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewHS384(hmacKey),
+				alg:       jwt.NewHS384(hmacKey1),
 				hd:        jwt.Header{},
 				payload:   tp,
-				verifyAlg: jwt.NewHS384(hmacKey),
+				verifyAlg: jwt.NewHS384(hmacKey1),
 				wantHeader: jwt.Header{
 					Algorithm: "HS384",
 					Type:      "JWT",
@@ -67,10 +67,10 @@ func TestSign(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewHS512(hmacKey),
+				alg:       jwt.NewHS512(hmacKey1),
 				hd:        jwt.Header{},
 				payload:   tp,
-				verifyAlg: jwt.NewHS512(hmacKey),
+				verifyAlg: jwt.NewHS512(hmacKey1),
 				wantHeader: jwt.Header{
 					Algorithm: "HS512",
 					Type:      "JWT",
