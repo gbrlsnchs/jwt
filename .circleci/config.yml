@@ -1,0 +1,47 @@
+version: 2.1
+
+executors:
+  golang:
+    parameters:
+      version:
+        description: Go version
+        type: string
+    docker:
+      - image: circleci/golang:<< parameters.version >>
+
+workflows:
+  test:
+    jobs:
+      - go1_9
+      - go1_10
+      - go1_11
+      - go1_12
+
+jobs:
+  go1_12: &template
+    executor:
+      name: golang
+      version: "1.12"
+    steps:
+      - checkout
+      - run: make
+      - run: make test
+
+  go1_11:
+    <<: *template
+    executor:
+      name: golang
+      version: "1.11"
+
+  go1_10: &nomod_template
+    <<: *template
+    executor:
+      name: golang
+      version: "1.10"
+    working_directory: /go/src/github.com/gbrlsnchs/jwt
+
+  go1_9:
+    <<: *nomod_template
+    executor:
+      name: golang
+      version: "1.9"
