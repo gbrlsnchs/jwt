@@ -80,7 +80,7 @@ type CustomPayload struct {
 }
 ```
 
-#### Now initialize, marshal and sign it
+#### Now initialize and sign it
 ```go
 now := time.Now()
 hs256 := jwt.NewHS256([]byte("secret"))
