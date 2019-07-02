@@ -9,11 +9,11 @@ import (
 
 var (
 	// ErrEd25519PrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrEd25519PrivKey = internal.NewError("jwt: edDSA private key is nil")
+	ErrEd25519PrivKey = internal.NewError("jwt: Ed25519 private key is nil")
 	// ErrEd25519PubKey is the error for trying to verify a JWT with a nil public key.
-	ErrEd25519PubKey = internal.NewError("jwt: edDSA public key is nil")
+	ErrEd25519PubKey = internal.NewError("jwt: Ed25519 public key is nil")
 	// ErrEd25519Verification is the error for when verification with edDSA fails.
-	ErrEd25519Verification = internal.NewError("jwt: edDSA verification failed")
+	ErrEd25519Verification = internal.NewError("jwt: Ed25519 verification failed")
 
 	_ Algorithm = new(edDSA)
 )
