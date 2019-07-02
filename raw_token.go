@@ -32,9 +32,9 @@ func (raw RawToken) headerPayload() []byte { return raw.token[:raw.sep2] }
 func (raw RawToken) payload() []byte       { return raw.token[raw.sep1+1 : raw.sep2] }
 func (raw RawToken) sig() []byte           { return raw.token[raw.sep2+1:] }
 
-func (raw RawToken) withSeps(sep1, sep2 int) RawToken {
+func (raw RawToken) withToken(token []byte, sep1, sep2 int) RawToken {
 	raw.sep1 = sep1
 	raw.sep2 = sep1 + 1 + sep2
 	raw.token = token
-	return r
+	return raw
 }
