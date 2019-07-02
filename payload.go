@@ -1,11 +1,5 @@
 package jwt
 
-var (
-	_ Validator = new(Payload)
-	_ Validator = &struct{ Payload }{}
-	_ Validator = &struct{ *Payload }{}
-)
-
 // Payload is a JWT payload according to the RFC 7519.
 type Payload struct {
 	Issuer         string   `json:"iss,omitempty"`
