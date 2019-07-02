@@ -1,36 +1,17 @@
 # jwt (JSON Web Token for Go)
+[![JWT compatible](https://jwt.io/img/badge.svg)](https://jwt.io)  
 
-<p align="center">
-  <img src="encoded_jwt.png" width="75%" height="75%">
-</p>
-
-<p align="center">
-  <img src="gopher_head.png" width="25%" height="25%">
-</p>
-
-<p align="center">
-  <a target="_blank" href="https://travis-ci.org/gbrlsnchs/jwt"><img alt="Build Status" src="https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master"></a>
-  <a target="_blank" href="https://goreportcard.com/report/github.com/gbrlsnchs/jwt"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/gbrlsnchs/jwt"></a>
-  <a target="_blank" href="https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge"><img alt="Sourcegraph" src="https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg"></a>
-  <a target="_blank" href="https://godoc.org/github.com/gbrlsnchs/jwt"><img alt="GoDoc" src="https://godoc.org/github.com/gbrlsnchs/jwt?status.svg"></a>
-  <a target="_blank" href="https://golang.org/doc/go1.11"><img alt="Minimal Version" src="https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg"></a>
-  <a target="_blank" href="https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img alt="Join the chat at https://gitter.im/gbrlsnchs/jwt" src="https://badges.gitter.im/gbrlsnchs/jwt.svg"></a>
-</p>
-
-<p align="center">
-  <a target="_blank" href="https://jwt.io"><img alt="JWT compatible" src="https://jwt.io/img/badge.svg"></a>
-</p>
-
-## Important
-Branch `master` is unstable, **always** use tagged versions. That way it is possible to differentiate pre-release tags from production ones.
-In other words, API changes all the time in `master`. It's a place for public experiment. Thus, make use of the latest stable version via Go modules.
+[![CircleCI](https://circleci.com/gh/gbrlsnchs/jwt.svg?style=shield)](https://circleci.com/gh/gbrlsnchs/jwt)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gbrlsnchs/jwt)](https://goreportcard.com/report/github.com/gbrlsnchs/jwt)
+[![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
+[![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
 
 Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library](https://github.com/auth0/node-jsonwebtoken)'s API while following the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
-Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
+Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided (not yet but is in the roadmap, see #17). Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
 
 ### Supported signing methods
 |         | SHA-256            | SHA-384            | SHA-512            |
@@ -40,6 +21,10 @@ Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, 
 | RSA-PSS | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | ECDSA   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | EdDSA   | :heavy_minus_sign: | :heavy_minus_sign: | :heavy_check_mark: |
+
+## Important
+Branch `master` is unstable, **always** use tagged versions. That way it is possible to differentiate pre-release tags from production ones.
+In other words, API changes all the time in `master`. It's a place for public experiment. Thus, make use of the latest stable version via Go modules.
 
 ## Usage
 Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
@@ -56,7 +41,10 @@ import (
 )
 ```
 
-### Signing a simple JWT
+### Examples
+<details><summary><b>Signing a JWT with default claims</b></summary>
+<p>
+
 ```go
 now := time.Now()
 hs256 := jwt.NewHS256([]byte("secret"))
@@ -77,7 +65,12 @@ if err != nil {
 log.Printf("token = %s", token)
 ```
 
-### Signing a JWT with public claims
+</p>
+</details>
+
+<details><summary><b>Signing a JWT with custom claims</b></summary>
+<p>
+
 #### First, create a custom type and embed a `Payload` in it
 ```go
 type CustomPayload struct {
@@ -112,7 +105,12 @@ if err != nil {
 log.Printf("token = %s", token)
 ```
 
-### Verifying and validating a JWT
+</p>
+</details>
+
+<details><summary><b>Verifying and validating a JWT</b></summary>
+<p>
+
 ```go
 now := time.Now()
 hs256 := jwt.NewHS256([]byte("secret"))
@@ -153,6 +151,9 @@ if err := pl.Validate(iatValidator, expValidator, audValidator); err != nil {
 	}
 }
 ```
+
+</p>
+</details>
 
 ## Contributing
 ### How to help
