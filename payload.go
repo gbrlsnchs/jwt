@@ -10,13 +10,3 @@ type Payload struct {
 	IssuedAt       int64    `json:"iat,omitempty"`
 	JWTID          string   `json:"jti,omitempty"`
 }
-
-// Validate validates Payload claims.
-func (p *Payload) Validate(funcs ...ValidatorFunc) error {
-	for _, fn := range funcs {
-		if err := fn(p); err != nil {
-			return err
-		}
-	}
-	return nil
-}
