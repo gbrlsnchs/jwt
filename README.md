@@ -48,7 +48,6 @@ import (
 ```go
 now := time.Now()
 hs256 := jwt.NewHS256([]byte("secret"))
-hd := jwt.Header{KeyID: "kid"}
 pl := jwt.Payload{
 	Issuer:         "gbrlsnchs",
 	Subject:        "someone",
@@ -58,7 +57,7 @@ pl := jwt.Payload{
 	IssuedAt:       now.Unix(),
 	JWTID:          "foobar",
 }
-token, err := jwt.Sign(hs256, hd, pl)
+token, err := jwt.Sign(pl, hs256)
 if err != nil {
 	// Handle error.
 }
@@ -84,7 +83,6 @@ type CustomPayload struct {
 ```go
 now := time.Now()
 hs256 := jwt.NewHS256([]byte("secret"))
-hd := jwt.Header{KeyID: "kid"}
 pl := CustomPayload{
 	Payload: jwt.Payload{
 		Issuer:         "gbrlsnchs",
@@ -98,7 +96,7 @@ pl := CustomPayload{
 	IsLoggedIn:  true,
 	CustomField: "myCustomField",
 }
-token, err := jwt.Sign(hs256, hd, pl)
+token, err := jwt.Sign(pl, hs256)
 if err != nil {
 	// Handle error.
 }
@@ -111,6 +109,16 @@ log.Printf("token = %s", token)
 <details><summary><b>Verifying and validating a JWT</b></summary>
 <p>
 
+<details><summary><b>Set "cty" and "kid" claims</b></summary>
+<p>
+
+```go
+token, err := jwt.Sign(pl, hs256, jwt.ContentType("JWT"), jwt.KeyID("0xDEADBABE"))
+```
+
+</p>
+</details>
+
 ```go
 now := time.Now()
 hs256 := jwt.NewHS256([]byte("secret"))
@@ -118,29 +126,22 @@ token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
 	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
 	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
 
-raw, err := jwt.Verify(hs256, token) 
-if err != nil {
-	// Handle error.
-}
 var (
-	hd = raw.Header()
-	pl CustomPayload
+	hd jwt.Header
+	payload CustomPayload
 )
-if err = raw.Decode(&pl); err != nil {
-	// Handle error.
-}
-fmt.Println(hd.Algorithm)
-fmt.Println(hd.KeyID)
-
-iatValidator := jwt.IssuedAtValidator(now)
-expValidator := jwt.ExpirationTimeValidator(now, true)
-audValidator := jwt.AudienceValidator(jwt.Audience{
+iatValidator := payload.IssuedAtValidator(now)
+expValidator := payload.ExpirationTimeValidator(now, true)
+audValidator := payload.AudienceValidator(jwt.Audience{
 	"https://golang.org",
 	"https://jwt.io",
 	"https://google.com",
 	"https://reddit.com",
 })
-if err := pl.Validate(iatValidator, expValidator, audValidator); err != nil {
+err = jwt.Verify(token, hs256,
+	jwt.DecodeHeader(&hd, true),
+	jwt.DecodePayload(&payload, iatValidator, expValidator, audValidator))
+if err != nil {
 	switch err {
 	case jwt.ErrIatValidation:
 		// handle "iat" validation error
@@ -148,8 +149,13 @@ if err := pl.Validate(iatValidator, expValidator, audValidator); err != nil {
 		// handle "exp" validation error
 	case jwt.ErrAudValidation:
 		// handle "aud" validation error
+	default:
+		// handle other errors
 	}
 }
+
+fmt.Println(hd.Algorithm)
+fmt.Println(hd.KeyID)
 ```
 
 </p>
