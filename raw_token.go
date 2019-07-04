@@ -9,32 +9,33 @@ var ErrMalformed = internal.NewError("jwt: malformed token")
 type RawToken struct {
 	token      []byte
 	sep1, sep2 int
-	valid      bool
 
-	hd Header
+	alg Algorithm
+
+	// Verify options.
+	payloadAddr       interface{}
+	payloadValidators []ValidatorFunc
 }
 
-// Decode decodes a raw JWT into a payload and returns its header.
-func (raw RawToken) Decode(payload interface{}) error {
-	if !raw.valid {
-		return ErrMalformed
+func (rt *RawToken) header() []byte        { return rt.token[:rt.sep1] }
+func (rt *RawToken) headerPayload() []byte { return rt.token[:rt.sep2] }
+func (rt *RawToken) payload() []byte       { return rt.token[rt.sep1+1 : rt.sep2] }
+func (rt *RawToken) sig() []byte           { return rt.token[rt.sep2+1:] }
+
+func (rt *RawToken) setToken(token []byte, sep1, sep2 int) {
+	rt.sep1 = sep1
+	rt.sep2 = sep1 + 1 + sep2
+	rt.token = token
+}
+
+func (rt *RawToken) decode() (err error) {
+	if err = internal.Decode(rt.payload(), rt.payloadAddr); err != nil {
+		return err
 	}
-	return internal.Decode(raw.payload(), payload)
-}
-
-// Header returns a JOSE Header extracted from a JWT.
-func (raw RawToken) Header() Header {
-	return raw.hd
-}
-
-func (raw RawToken) header() []byte        { return raw.token[:raw.sep1] }
-func (raw RawToken) headerPayload() []byte { return raw.token[:raw.sep2] }
-func (raw RawToken) payload() []byte       { return raw.token[raw.sep1+1 : raw.sep2] }
-func (raw RawToken) sig() []byte           { return raw.token[raw.sep2+1:] }
-
-func (raw RawToken) withToken(token []byte, sep1, sep2 int) RawToken {
-	raw.sep1 = sep1
-	raw.sep2 = sep1 + 1 + sep2
-	raw.token = token
-	return raw
+	for _, vd := range rt.payloadValidators {
+		if err = vd(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
