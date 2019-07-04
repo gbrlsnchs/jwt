@@ -32,6 +32,7 @@ func TestSign(t *testing.T) {
 		payload interface{}
 
 		verifyAlg   jwt.Algorithm
+		opts        []func(*jwt.RawToken)
 		wantHeader  jwt.Header
 		wantPayload testPayload
 
@@ -340,7 +341,7 @@ func TestSign(t *testing.T) {
 		t.Run(k, func(t *testing.T) {
 			for _, tc := range v {
 				t.Run(tc.alg.Name(), func(t *testing.T) {
-					token, err := jwt.Sign(tc.alg, tc.hd, tc.payload)
+					token, err := jwt.Sign(tc.payload, tc.alg)
 					if want, got := tc.signErr, err; !internal.ErrorIs(got, want) {
 						t.Fatalf("want %v, got %v", want, got)
 					}
@@ -348,19 +349,18 @@ func TestSign(t *testing.T) {
 						return
 					}
 
-					raw, err := jwt.Verify(tc.verifyAlg, token)
+					var (
+						hd      jwt.Header
+						payload testPayload
+					)
+					err = jwt.Verify(token, tc.verifyAlg,
+						jwt.DecodeHeader(&hd, false),
+						jwt.DecodePayload(&payload))
 					if want, got := tc.verifyErr, err; !internal.ErrorIs(got, want) {
 						t.Fatalf("want %v, got %v", want, got)
 					}
-					if err != nil {
-						return
-					}
-					if want, got := tc.wantHeader, raw.Header(); !reflect.DeepEqual(got, want) {
+					if want, got := tc.wantHeader, hd; !reflect.DeepEqual(got, want) {
 						t.Errorf("want %#+v, got %#+v", want, got)
-					}
-					var payload testPayload
-					if err = raw.Decode(&payload); err != nil {
-						t.Fatal(err)
 					}
 					if want, got := tc.wantPayload, payload; !reflect.DeepEqual(got, want) {
 						t.Errorf("want %#+v, got %#+v", want, got)
