@@ -50,6 +50,7 @@ jobs:
     steps:
       - checkout
       - run: go get -u golang.org/x/crypto/ed25519
+      - run: go get -u golang.org/x/xerrors
       - test
 
   go1_9:
