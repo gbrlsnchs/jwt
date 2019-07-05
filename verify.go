@@ -74,3 +74,5 @@ func ValidateHeader(rt *RawToken) error {
 	var hd Header
 	return DecodeHeader(&hd, true)(rt)
 }
+
+var _ VerifyOption = ValidateHeader // compile-time test
