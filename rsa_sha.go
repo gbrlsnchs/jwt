@@ -37,7 +37,7 @@ func newRSASHA(name string, priv *rsa.PrivateKey, pub *rsa.PublicKey, sha crypto
 		priv: priv,
 		pub:  pub,
 		sha:  sha,
-		size: pub.Size(), // cache size
+		size: internal.RSASignatureSize(pub), // cache size
 		pool: newHashPool(sha.New),
 	}
 	if pss {
