@@ -26,6 +26,9 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &unix); err != nil {
 		return err
 	}
+	if unix == 0 {
+		return nil
+	}
 	tt := time.Unix(unix, 0)
 	if tt.Before(internal.Epoch) {
 		tt = internal.Epoch
