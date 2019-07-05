@@ -49,7 +49,7 @@ jobs:
     working_directory: /go/src/github.com/gbrlsnchs/jwt
     steps:
       - checkout
-      - run: go get -u golang.org/x/crypto
+      - run: go get -u golang.org/x/crypto/ed25519
       - test
 
   go1_9:
