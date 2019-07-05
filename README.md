@@ -32,130 +32,139 @@ Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 ### Installing
 `GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3`
 
-### Importing
+### Signing
 ```go
 import (
-	// ...
+	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
 )
-```
 
-### Examples
-<details><summary><b>Signing a JWT with default claims</b></summary>
-<p>
-
-```go
-now := time.Now()
-hs256 := jwt.NewHS256([]byte("secret"))
-pl := jwt.Payload{
-	Issuer:         "gbrlsnchs",
-	Subject:        "someone",
-	Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
-	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-	NotBefore:      now.Add(30 * time.Minute).Unix(),
-	IssuedAt:       now.Unix(),
-	JWTID:          "foobar",
-}
-token, err := jwt.Sign(pl, hs256)
-if err != nil {
-	// Handle error.
-}
-log.Printf("token = %s", token)
-```
-
-</p>
-</details>
-
-<details><summary><b>Signing a JWT with custom claims</b></summary>
-<p>
-
-#### First, create a custom type and embed a `Payload` in it
-```go
 type CustomPayload struct {
 	jwt.Payload
-	IsLoggedIn  bool   `json:"isLoggedIn"`
-	CustomField string `json:"customField,omitempty"`
+	Foo string `json:"foo,omitempty"`
+	Bar int    `json:"bar,omitempty"`
 }
-```
 
-#### Now initialize and sign it
-```go
-now := time.Now()
-hs256 := jwt.NewHS256([]byte("secret"))
-pl := CustomPayload{
-	Payload: jwt.Payload{
-		Issuer:         "gbrlsnchs",
-		Subject:        "someone",
-		Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
-		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-		NotBefore:      now.Add(30 * time.Minute).Unix(),
-		IssuedAt:       now.Unix(),
-		JWTID:          "foobar",
-	},
-	IsLoggedIn:  true,
-	CustomField: "myCustomField",
-}
-token, err := jwt.Sign(pl, hs256)
-if err != nil {
-	// Handle error.
-}
-log.Printf("token = %s", token)
-```
+var hs = jwt.NewHS256([]byte("secret"))
 
-</p>
-</details>
-
-<details><summary><b>Verifying and validating a JWT</b></summary>
-<p>
-
-<details><summary><b>Set "cty" and "kid" claims</b></summary>
-<p>
-
-```go
-token, err := jwt.Sign(pl, hs256, jwt.ContentType("JWT"), jwt.KeyID("0xDEADBABE"))
-```
-
-</p>
-</details>
-
-```go
-now := time.Now()
-hs256 := jwt.NewHS256([]byte("secret"))
-token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
-	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
-	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
-
-var (
-	hd jwt.Header
-	payload CustomPayload
-)
-iatValidator := payload.IssuedAtValidator(now)
-expValidator := payload.ExpirationTimeValidator(now, true)
-audValidator := payload.AudienceValidator(jwt.Audience{
-	"https://golang.org",
-	"https://jwt.io",
-	"https://google.com",
-	"https://reddit.com",
-})
-err = jwt.Verify(token, hs256,
-	jwt.DecodeHeader(&hd, true),
-	jwt.DecodePayload(&payload, iatValidator, expValidator, audValidator))
-if err != nil {
-	switch err {
-	case jwt.ErrIatValidation:
-		// handle "iat" validation error
-	case jwt.ErrExpValidation:
-		// handle "exp" validation error
-	case jwt.ErrAudValidation:
-		// handle "aud" validation error
-	default:
-		// handle other errors
+func main() {
+	now := time.Now()
+	pl := CustomPayload{
+		Payload: jwt.Payload{
+			Issuer:         "gbrlsnchs",
+			Subject:        "someone",
+			Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
+			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
+			NotBefore:      now.Add(30 * time.Minute).Unix(),
+			IssuedAt:       now.Unix(),
+			JWTID:          "foobar",
+		},
+		Foo: "foo",
+		Bar: 1337,
 	}
+
+	token, err := jwt.Sign(pl, hs)
+	if err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+### Verifying (and decoding)
+```go
+import "github.com/gbrlsnchs/jwt/v3"
+
+type CustomPayload struct {
+	jwt.Payload
+	Foo string `json:"foo,omitempty"`
+	Bar int    `json:"bar,omitempty"`
 }
 
-fmt.Println(hd.Algorithm)
-fmt.Println(hd.KeyID)
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	var pl CustomPayload
+	if err := jwt.Verify(token, hs, jwt.DecodePayload(&pl)); err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+### Other examples
+<details><summary><b>Setting "cty" and "kid" claims</b></summary>
+<p>
+
+```go
+import (
+	"time"
+
+	"github.com/gbrlsnchs/jwt/v3"
+)
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	pl := jwt.Payload{
+		Subject:  "gbrlsnchs",
+		Issuer:   "gsr.dev",
+		IssuedAt: time.Now().Unix(),
+	}
+
+	token, err := jwt.Sign(pl, hs, jwt.ContentType("JWT"), jwt.KeyID("my_key"))
+	if err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+</p>
+</details>
+
+<details><summary><b>Validating "alg" before verifying</b></summary>
+<p>
+
+#### Without decoding the header
+```go
+import "github.com/gbrlsnchs/jwt/v3"
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	if err := jwt.Verify(token, hs, jwt.ValidateHeader); err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+#### Decoding the header
+```go
+import "github.com/gbrlsnchs/jwt/v3"
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	var hd jwt.Header
+	if err := jwt.Verify(token, hs, jwt.DecodeHeader(&hd, true)); err != nil {
+		// ...
+	}
+
+	// ...
+}
 ```
 
 </p>
