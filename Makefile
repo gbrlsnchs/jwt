@@ -13,7 +13,7 @@ lint:
 	@golint -set_exit_status ./...
 
 bench:
-	go test -v -run=^$$ -bench=.
+	@go test -v -run=^$$ -bench=.
 
 test: lint
-	go test -v ./...
+	@go test -v ./...
