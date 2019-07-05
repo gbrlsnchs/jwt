@@ -6,6 +6,11 @@
 [![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
 [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Compatibility
+[![Version Compatibility](https://img.shields.io/badge/go%20modules-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
+[![Version Compatibility](https://img.shields.io/badge/vgo-go1.10-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
+[![go get](https://img.shields.io/badge/go%20get-go1.9.7+,%20go1.10.3+%20and%20go1.11-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
+
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
 
@@ -60,7 +65,7 @@ $ vgo get -u github.com/gbrlsnchs/jwt/v3
 </p>
 </details>
 
-<details><summary><b>Go 1.10.3 (without <code>vgo</code>) and Go 1.9.7</b></summary>
+<details><summary><b>Go 1.9.7+, Go 1.10.3+ (without <code>vgo</code>) and Go 1.11 (when <code>GO111MODULE=off</code>)</b></summary>
 <p>
 
 ```sh
