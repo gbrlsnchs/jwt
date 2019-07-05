@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
-	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 type testPayload struct {
@@ -342,7 +341,7 @@ func TestSign(t *testing.T) {
 			for _, tc := range v {
 				t.Run(tc.alg.Name(), func(t *testing.T) {
 					token, err := jwt.Sign(tc.payload, tc.alg)
-					if want, got := tc.signErr, err; !internal.ErrorIs(got, want) {
+					if want, got := tc.signErr, err; got != want {
 						t.Fatalf("want %v, got %v", want, got)
 					}
 					if err != nil {
@@ -356,7 +355,7 @@ func TestSign(t *testing.T) {
 					err = jwt.Verify(token, tc.verifyAlg,
 						jwt.DecodeHeader(&hd, false),
 						jwt.DecodePayload(&payload))
-					if want, got := tc.verifyErr, err; !internal.ErrorIs(got, want) {
+					if want, got := tc.verifyErr, err; got != want {
 						t.Fatalf("want %v, got %v", want, got)
 					}
 					if want, got := tc.wantHeader, hd; !reflect.DeepEqual(got, want) {

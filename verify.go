@@ -2,12 +2,13 @@ package jwt
 
 import (
 	"bytes"
+	"errors"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 // ErrAlgValidation indicates an incoming JWT's "alg" field mismatches the Validator's.
-var ErrAlgValidation = internal.NewError(`"alg" field mismatch`)
+var ErrAlgValidation = errors.New(`jwt: "alg" field mismatch`)
 
 // VerifyOption is a functional option for verifying.
 type VerifyOption func(*RawToken) error
@@ -53,7 +54,7 @@ func DecodeHeader(hd *Header, validate bool) VerifyOption {
 			return err
 		}
 		if validate && rt.alg.Name() != hd.Algorithm {
-			return internal.Errorf("jwt: unexpected algorithm %q: %w", hd.Algorithm, ErrAlgValidation)
+			return ErrAlgValidation
 		}
 		return nil
 	}
