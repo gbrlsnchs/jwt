@@ -1,4 +1,4 @@
-export GO111MODULE := on
+export GO111MODULE ?= on
 GO_COMMAND ?= go
 
 all: export GO111MODULE := off

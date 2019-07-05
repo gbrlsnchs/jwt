@@ -36,6 +36,7 @@ jobs:
   go1_10: &nomod_template
     <<: *template
     environment:
+      GO111MODULE: off
       GO_COMMAND: vgo
     executor:
       name: golang
