@@ -20,7 +20,7 @@ bench:
 	@${GO_COMMAND} test -v -run=^$$ -bench=.
 
 ifeq (${GO_COMMAND},vgo)
-test: undefine GO111MODULE
+undefine GO111MODULE
 endif
 test: lint
 	@${GO_COMMAND} test -v ./...
