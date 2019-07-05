@@ -101,10 +101,7 @@ func (rs *rsaSHA) Sign(headerPayload []byte) ([]byte, error) {
 
 // Size returns the signature's byte size.
 func (rs *rsaSHA) Size() int {
-	if rs.pub == nil {
-		return 0
-	}
-	return rs.pub.Size()
+	return rs.size
 }
 
 // Verify verifies a signature based on headerPayload using either RSA-SHA or RSA-PSS-SHA.
