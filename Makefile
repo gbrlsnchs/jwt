@@ -13,6 +13,7 @@ fix:
 	@goimports -w *.go
 
 lint:
+	@echo "Linting..."
 	@! goimports -d . | grep -vF "no errors"
 	@golint -set_exit_status ./...
 
@@ -23,4 +24,5 @@ ifeq (${GO_COMMAND},vgo)
 undefine GO111MODULE
 endif
 test: lint
+	@echo "Testing..."
 	@${GO_COMMAND} test -v ./...
