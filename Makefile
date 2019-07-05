@@ -1,4 +1,5 @@
 export GO111MODULE := on
+GO_COMMAND ?= go
 
 all: export GO111MODULE := off
 all:
@@ -13,7 +14,7 @@ lint:
 	@golint -set_exit_status ./...
 
 bench:
-	@go test -v -run=^$$ -bench=.
+	@${GO_COMMAND} test -v -run=^$$ -bench=.
 
 test: lint
-	@go test -v ./...
+	@${GO_COMMAND} test -v ./...
