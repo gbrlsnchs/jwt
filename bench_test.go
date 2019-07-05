@@ -21,9 +21,9 @@ func BenchmarkSign(b *testing.B) {
 			Issuer:         "gbrlsnchs",
 			Subject:        "someone",
 			Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
-			ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-			NotBefore:      now.Add(30 * time.Minute).Unix(),
-			IssuedAt:       now.Unix(),
+			ExpirationTime: jwt.NumericDate(now.Add(24 * 30 * 12 * time.Hour)),
+			NotBefore:      jwt.NumericDate(now.Add(30 * time.Minute)),
+			IssuedAt:       jwt.NumericDate(now),
 			JWTID:          "foobar",
 		}
 	)

@@ -15,15 +15,22 @@ type testPayload struct {
 	Int    int    `json:"int,omitempty"`
 }
 
-var tp = testPayload{
-	Payload: jwt.Payload{
-		Subject:   "test",
-		Audience:  jwt.Audience{"github.com", "gsr.dev"},
-		NotBefore: time.Now().Unix(),
-	},
-	String: "foobar",
-	Int:    1337,
-}
+var (
+	now = time.Now()
+	tp  = testPayload{
+		Payload: jwt.Payload{
+			Issuer:         "gbrlsnchs",
+			Subject:        "someone",
+			Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
+			ExpirationTime: jwt.NumericDate(now.Add(24 * 30 * 12 * time.Hour)),
+			NotBefore:      jwt.NumericDate(now.Add(30 * time.Minute)),
+			IssuedAt:       jwt.NumericDate(now),
+			JWTID:          "foobar",
+		},
+		String: "foobar",
+		Int:    1337,
+	}
+)
 
 func TestSign(t *testing.T) {
 	type testCase struct {
