@@ -35,6 +35,8 @@ jobs:
 
   go1_10: &nomod_template
     <<: *template
+    environment:
+      GO_COMMAND: vgo
     executor:
       name: golang
       version: "1.10"
