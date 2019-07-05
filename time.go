@@ -3,9 +3,9 @@ package jwt
 import (
 	"encoding/json"
 	"time"
-)
 
-var epoch = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC)
+	"github.com/gbrlsnchs/jwt/v3/internal"
+)
 
 // Time is the allowed format for time, as per the RFC 7519.
 type Time struct {
@@ -14,7 +14,7 @@ type Time struct {
 
 // MarshalJSON implements a marshaling function for time-related claims.
 func (t Time) MarshalJSON() ([]byte, error) {
-	if t.Before(epoch) {
+	if t.Before(internal.Epoch) {
 		return json.Marshal(0)
 	}
 	return json.Marshal(t.Unix())
@@ -22,12 +22,13 @@ func (t Time) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements an unmarshaling function for time-related claims.
 func (t *Time) UnmarshalJSON(b []byte) error {
-	var tt time.Time
-	if err := json.Unmarshal(b, &tt); err != nil {
+	var unix int64
+	if err := json.Unmarshal(b, &unix); err != nil {
 		return err
 	}
-	if tt.Before(epoch) {
-		tt = epoch
+	tt := time.Unix(unix, 0)
+	if tt.Before(internal.Epoch) {
+		tt = internal.Epoch
 	}
 	t.Time = tt
 	return nil
