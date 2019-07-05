@@ -5,6 +5,9 @@ all: export GO111MODULE := off
 all:
 	go get -u golang.org/x/tools/cmd/goimports
 	go get -u golang.org/x/lint/golint
+ifeq (${GO_COMMAND},vgo)
+	go get -u golang.org/x/vgo
+endif
 
 fix:
 	@goimports -w *.go
