@@ -4,51 +4,51 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3"
 )
 
 func TestValidators(t *testing.T) {
 	now := time.Now()
-	iat := now.Unix()
-	exp := now.Add(24 * time.Hour).Unix()
-	nbf := now.Add(15 * time.Second).Unix()
+	iat := jwt.Time{now}
+	exp := jwt.Time{now.Add(24 * time.Hour)}
+	nbf := jwt.Time{now.Add(15 * time.Second)}
 	jti := "jti"
-	aud := Audience{"aud", "aud1", "aud2", "aud3"}
+	aud := jwt.Audience{"aud", "aud1", "aud2", "aud3"}
 	sub := "sub"
 	iss := "iss"
 	testCases := []struct {
 		claim string
-		vl    ValidatorFunc
+		vl    jwt.ValidatorFunc
 		err   error
 	}{
-		{"iss", (&Payload{Issuer: iss}).IssuerValidator("iss"), nil},
-		{"iss", (&Payload{Issuer: iss}).IssuerValidator("not_iss"), ErrIssValidation},
-		{"sub", (&Payload{Subject: sub}).SubjectValidator("sub"), nil},
-		{"sub", (&Payload{Subject: sub}).SubjectValidator("not_sub"), ErrSubValidation},
-		{"aud", (&Payload{Audience: aud}).AudienceValidator(Audience{"aud"}), nil},
-		{"aud", (&Payload{Audience: aud}).AudienceValidator(Audience{"foo", "aud1"}), nil},
-		{"aud", (&Payload{Audience: aud}).AudienceValidator(Audience{"bar", "aud2"}), nil},
-		{"aud", (&Payload{Audience: aud}).AudienceValidator(Audience{"baz", "aud3"}), nil},
-		{"aud", (&Payload{Audience: aud}).AudienceValidator(Audience{"qux", "aud4"}), ErrAudValidation},
-		{"aud", (&Payload{Audience: aud}).AudienceValidator(Audience{"not_aud"}), ErrAudValidation},
-		{"exp", (&Payload{ExpirationTime: exp}).ExpirationTimeValidator(now, true), nil},
-		{"exp", (&Payload{ExpirationTime: exp}).ExpirationTimeValidator(now, false), nil},
-		{"exp", (&Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0), true), nil},
-		{"exp", (&Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0), false), nil},
-		{"exp", (&Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0), true), ErrExpValidation},
-		{"exp", (&Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0), false), ErrExpValidation},
-		{"exp", (&Payload{}).ExpirationTimeValidator(time.Now(), false), nil},
-		{"exp", (&Payload{}).ExpirationTimeValidator(time.Now(), true), ErrExpValidation},
-		{"nbf", (&Payload{NotBefore: nbf}).NotBeforeValidator(now), ErrNbfValidation},
-		{"nbf", (&Payload{NotBefore: nbf}).NotBeforeValidator(time.Unix(now.Unix()+int64(15*time.Second), 0)), nil},
-		{"nbf", (&Payload{NotBefore: nbf}).NotBeforeValidator(time.Unix(now.Unix()-int64(15*time.Second), 0)), ErrNbfValidation},
-		{"nbf", (&Payload{}).NotBeforeValidator(time.Now()), nil},
-		{"iat", (&Payload{IssuedAt: iat}).IssuedAtValidator(now), nil},
-		{"iat", (&Payload{IssuedAt: iat}).IssuedAtValidator(time.Unix(now.Unix()+1, 0)), nil},
-		{"iat", (&Payload{IssuedAt: iat}).IssuedAtValidator(time.Unix(now.Unix()-1, 0)), ErrIatValidation},
-		{"iat", (&Payload{}).IssuedAtValidator(time.Now()), nil},
-		{"jti", (&Payload{JWTID: jti}).JWTIDValidator("jti"), nil},
-		{"jti", (&Payload{JWTID: jti}).JWTIDValidator("not_jti"), ErrJtiValidation},
+		{"iss", (&jwt.Payload{Issuer: iss}).IssuerValidator("iss"), nil},
+		{"iss", (&jwt.Payload{Issuer: iss}).IssuerValidator("not_iss"), jwt.ErrIssValidation},
+		{"sub", (&jwt.Payload{Subject: sub}).SubjectValidator("sub"), nil},
+		{"sub", (&jwt.Payload{Subject: sub}).SubjectValidator("not_sub"), jwt.ErrSubValidation},
+		{"aud", (&jwt.Payload{Audience: aud}).AudienceValidator(jwt.Audience{"aud"}), nil},
+		{"aud", (&jwt.Payload{Audience: aud}).AudienceValidator(jwt.Audience{"foo", "aud1"}), nil},
+		{"aud", (&jwt.Payload{Audience: aud}).AudienceValidator(jwt.Audience{"bar", "aud2"}), nil},
+		{"aud", (&jwt.Payload{Audience: aud}).AudienceValidator(jwt.Audience{"baz", "aud3"}), nil},
+		{"aud", (&jwt.Payload{Audience: aud}).AudienceValidator(jwt.Audience{"qux", "aud4"}), jwt.ErrAudValidation},
+		{"aud", (&jwt.Payload{Audience: aud}).AudienceValidator(jwt.Audience{"not_aud"}), jwt.ErrAudValidation},
+		{"exp", (&jwt.Payload{ExpirationTime: exp}).ExpirationTimeValidator(now, true), nil},
+		{"exp", (&jwt.Payload{ExpirationTime: exp}).ExpirationTimeValidator(now, false), nil},
+		{"exp", (&jwt.Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0), true), nil},
+		{"exp", (&jwt.Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()-int64(24*time.Hour), 0), false), nil},
+		{"exp", (&jwt.Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0), true), jwt.ErrExpValidation},
+		{"exp", (&jwt.Payload{ExpirationTime: exp}).ExpirationTimeValidator(time.Unix(now.Unix()+int64(24*time.Hour), 0), false), jwt.ErrExpValidation},
+		{"exp", (&jwt.Payload{}).ExpirationTimeValidator(time.Now(), false), nil},
+		{"exp", (&jwt.Payload{}).ExpirationTimeValidator(time.Now(), true), jwt.ErrExpValidation},
+		{"nbf", (&jwt.Payload{NotBefore: nbf}).NotBeforeValidator(now), jwt.ErrNbfValidation},
+		{"nbf", (&jwt.Payload{NotBefore: nbf}).NotBeforeValidator(time.Unix(now.Unix()+int64(15*time.Second), 0)), nil},
+		{"nbf", (&jwt.Payload{NotBefore: nbf}).NotBeforeValidator(time.Unix(now.Unix()-int64(15*time.Second), 0)), jwt.ErrNbfValidation},
+		{"nbf", (&jwt.Payload{}).NotBeforeValidator(time.Now()), nil},
+		{"iat", (&jwt.Payload{IssuedAt: iat}).IssuedAtValidator(now), nil},
+		{"iat", (&jwt.Payload{IssuedAt: iat}).IssuedAtValidator(time.Unix(now.Unix()+1, 0)), nil},
+		{"iat", (&jwt.Payload{IssuedAt: iat}).IssuedAtValidator(time.Unix(now.Unix()-1, 0)), jwt.ErrIatValidation},
+		{"iat", (&jwt.Payload{}).IssuedAtValidator(time.Now()), nil},
+		{"jti", (&jwt.Payload{JWTID: jti}).JWTIDValidator("jti"), nil},
+		{"jti", (&jwt.Payload{JWTID: jti}).JWTIDValidator("not_jti"), jwt.ErrJtiValidation},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.claim, func(t *testing.T) {
