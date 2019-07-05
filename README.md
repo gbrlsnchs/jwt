@@ -30,7 +30,48 @@ In other words, API changes all the time in `master`. It's a place for public ex
 Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Installing
-`GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3`
+<details><summary><b>Go 1.12 onward</b></summary>
+<p>
+
+```sh
+$ go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.11</b></summary>
+<p>
+
+```sh
+$ GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.10 with <code>vgo</code></b></summary>
+<p>
+
+```sh
+$ vgo get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.10.3 (without <code>vgo</code>) and Go 1.9.7</b></summary>
+<p>
+
+```sh
+$ go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+#### Important
+Your project must be inside the `GOPATH`.
+
+</p>
+</details>
 
 ### Signing
 ```go
