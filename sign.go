@@ -22,6 +22,10 @@ func Sign(payload interface{}, alg Algorithm, opts ...SignOption) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
+
+	if payload == nil {
+		payload = Payload{}
+	}
 	// Marshal the claims part of the JWT.
 	pb, err := json.Marshal(payload)
 	if err != nil {
