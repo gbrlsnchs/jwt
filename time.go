@@ -12,9 +12,22 @@ type Time struct {
 	time.Time
 }
 
+// NumericDate is a resolved Unix time.
+func NumericDate(tt time.Time) Time {
+	if tt.Before(internal.Epoch) {
+		tt = internal.Epoch
+	}
+	return Time{time.Unix(tt.Unix(), 0)}
+}
+
+// IsZero checks whether no seconds have elapsed since epoch.
+func (t Time) IsZero() bool {
+	return t.Before(internal.Epoch) || t.Equal(internal.Epoch)
+}
+
 // MarshalJSON implements a marshaling function for time-related claims.
 func (t Time) MarshalJSON() ([]byte, error) {
-	if t.Before(internal.Epoch) {
+	if t.IsZero() {
 		return json.Marshal(0)
 	}
 	return json.Marshal(t.Unix())
