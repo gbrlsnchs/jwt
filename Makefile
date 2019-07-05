@@ -12,5 +12,8 @@ lint:
 	@! goimports -d . | grep -vF "no errors"
 	@golint -set_exit_status ./...
 
+bench:
+	@go test -v -run=^$$ -bench=.
+
 test: lint
 	@go test -v ./...
