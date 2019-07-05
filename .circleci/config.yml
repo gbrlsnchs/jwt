@@ -9,6 +9,12 @@ executors:
     docker:
       - image: circleci/golang:<< parameters.version >>
 
+commands:
+  test:
+    steps:
+      - run: make
+      - run: make test
+
 workflows:
   test:
     jobs:
@@ -24,8 +30,7 @@ jobs:
       version: "1.12"
     steps:
       - checkout
-      - run: make
-      - run: make test
+      - test
 
   go1_11:
     <<: *template
@@ -42,6 +47,10 @@ jobs:
       name: golang
       version: "1.10"
     working_directory: /go/src/github.com/gbrlsnchs/jwt
+    steps:
+      - checkout
+      - run: go get -u golang.org/x/crypto
+      - test
 
   go1_9:
     <<: *nomod_template
