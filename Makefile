@@ -1,4 +1,4 @@
-export GO111MODULE ?= on
+export GO111MODULE := on
 GO_COMMAND ?= go
 
 all: export GO111MODULE := off
@@ -19,8 +19,5 @@ lint:
 bench:
 	@${GO_COMMAND} test -v -run=^$$ -bench=.
 
-ifeq (${GO_COMMAND},vgo)
-undefine GO111MODULE
-endif
 test: lint
 	@${GO_COMMAND} test -v ./...
