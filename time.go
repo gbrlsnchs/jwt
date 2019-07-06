@@ -13,11 +13,11 @@ type Time struct {
 }
 
 // NumericDate is a resolved Unix time.
-func NumericDate(tt time.Time) Time {
+func NumericDate(tt time.Time) *Time {
 	if tt.Before(internal.Epoch) {
 		tt = internal.Epoch
 	}
-	return Time{time.Unix(tt.Unix(), 0)}
+	return &Time{time.Unix(tt.Unix(), 0)}
 }
 
 // IsZero checks whether no seconds have elapsed since epoch.
