@@ -43,8 +43,8 @@ func TestTimeUnmarshalJSON(t *testing.T) {
 		want jwt.Time
 	}{
 		{now.Unix(), jwt.Time{now}},
-		{internal.Epoch.Unix() - 1337, jwt.Time{internal.Epoch}},
-		{internal.Epoch.Unix(), jwt.Time{internal.Epoch}},
+		{internal.Epoch.Unix() - 1337, jwt.Time{}},
+		{internal.Epoch.Unix(), jwt.Time{}},
 		{internal.Epoch.Unix() + 1337, jwt.Time{internal.Epoch.Add(1337 * time.Second)}},
 	}
 	for _, tc := range testCases {
