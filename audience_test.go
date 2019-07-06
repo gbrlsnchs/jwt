@@ -9,6 +9,21 @@ import (
 )
 
 func TestAudienceMarshal(t *testing.T) {
+	t.Run("omitempty", func(t *testing.T) {
+		var (
+			b   []byte
+			err error
+			v   = struct {
+				Audience jwt.Audience `json:"aud,omitempty"`
+			}{}
+		)
+		if b, err = json.Marshal(v); err != nil {
+			t.Fatal(err)
+		}
+		checkAudMarshal(t, "{}", b)
+
+	})
+
 	testCases := []struct {
 		aud      jwt.Audience
 		expected string
@@ -37,20 +52,6 @@ func TestAudienceMarshal(t *testing.T) {
 			checkAudMarshal(t, tc.expected, b)
 		})
 	}
-}
-
-func TestAudienceOmitempty(t *testing.T) {
-	var (
-		b   []byte
-		err error
-		v   = struct {
-			Audience jwt.Audience `json:"aud,omitempty"`
-		}{}
-	)
-	if b, err = json.Marshal(v); err != nil {
-		t.Fatal(err)
-	}
-	checkAudMarshal(t, "{}", b)
 }
 
 func TestAudienceUnmarshal(t *testing.T) {
