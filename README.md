@@ -8,7 +8,6 @@
 
 ## Compatibility
 [![Version Compatibility](https://img.shields.io/badge/go%20modules-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
-[![Version Compatibility](https://img.shields.io/badge/vgo-go1.10-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 [![go get](https://img.shields.io/badge/go%20get-go1.9.7+,%20go1.10.3+%20and%20go1.11-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 
 ## About
