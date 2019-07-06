@@ -54,16 +54,6 @@ $ GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3
 </p>
 </details>
 
-<details><summary><b>Go 1.10 with <code>vgo</code></b></summary>
-<p>
-
-```sh
-$ vgo get -u github.com/gbrlsnchs/jwt/v3
-```
-
-</p>
-</details>
-
 <details><summary><b>Go 1.9.7+, Go 1.10.3+ (without <code>vgo</code>) and Go 1.11 (when <code>GO111MODULE=off</code>)</b></summary>
 <p>
 
