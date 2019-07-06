@@ -35,14 +35,13 @@ func Verify(token []byte, alg Algorithm, opts ...VerifyOption) error {
 			return err
 		}
 	}
+	if err = alg.Verify(rt.headerPayload(), rt.sig()); err != nil {
+		return err
+	}
 	if rt.payloadAddr != nil {
 		if err = rt.decode(); err != nil {
 			return err
 		}
-	}
-
-	if err = alg.Verify(rt.headerPayload(), rt.sig()); err != nil {
-		return err
 	}
 	return nil
 }
