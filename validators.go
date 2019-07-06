@@ -42,12 +42,9 @@ func (pl *Payload) AudienceValidator(aud Audience) ValidatorFunc {
 }
 
 // ExpirationTimeValidator validates the "exp" claim.
-func (pl *Payload) ExpirationTimeValidator(now time.Time, validateZero bool) ValidatorFunc {
+func (pl *Payload) ExpirationTimeValidator(now time.Time) ValidatorFunc {
 	return func() error {
-		if !validateZero && pl.ExpirationTime.IsZero() {
-			return nil
-		}
-		if now.After(pl.ExpirationTime.Time) {
+		if pl.ExpirationTime == nil || NumericDate(now).After(pl.ExpirationTime.Time) {
 			return ErrExpValidation
 		}
 		return nil
@@ -57,7 +54,7 @@ func (pl *Payload) ExpirationTimeValidator(now time.Time, validateZero bool) Val
 // IssuedAtValidator validates the "iat" claim.
 func (pl *Payload) IssuedAtValidator(now time.Time) ValidatorFunc {
 	return func() error {
-		if now.Before(pl.IssuedAt.Time) {
+		if pl.IssuedAt != nil && NumericDate(now).Before(pl.IssuedAt.Time) {
 			return ErrIatValidation
 		}
 		return nil
@@ -87,7 +84,7 @@ func (pl *Payload) JWTIDValidator(jti string) ValidatorFunc {
 // NotBeforeValidator validates the "nbf" claim.
 func (pl *Payload) NotBeforeValidator(now time.Time) ValidatorFunc {
 	return func() error {
-		if now.Before(pl.NotBefore.Time) {
+		if pl.NotBefore != nil && NumericDate(now).Before(pl.NotBefore.Time) {
 			return ErrNbfValidation
 		}
 		return nil
