@@ -21,12 +21,12 @@ func NumericDate(tt time.Time) *Time {
 }
 
 // IsZero checks whether no seconds have elapsed since epoch.
-func (t Time) IsZero() bool {
-	return t.Before(internal.Epoch) || t.Equal(internal.Epoch)
+func (t *Time) IsZero() bool {
+	return t == nil || t.Before(internal.Epoch) || t.Equal(internal.Epoch)
 }
 
 // MarshalJSON implements a marshaling function for time-related claims.
-func (t Time) MarshalJSON() ([]byte, error) {
+func (t *Time) MarshalJSON() ([]byte, error) {
 	if t.IsZero() {
 		return json.Marshal(0)
 	}
