@@ -12,7 +12,8 @@ var ErrAlgValidation = internal.NewError(`"alg" field mismatch`)
 // VerifyOption is a functional option for verifying.
 type VerifyOption func(*RawToken) error
 
-// Verify verifies a token's signature.
+// Verify verifies a token's signature using alg. Before verification, opts is iterated and
+// each option in it is run.
 func Verify(token []byte, alg Algorithm, opts ...VerifyOption) error {
 	rt := &RawToken{alg: alg}
 
@@ -46,7 +47,7 @@ func Verify(token []byte, alg Algorithm, opts ...VerifyOption) error {
 	return nil
 }
 
-// DecodeHeader decodes into hd and validates it when validate is true.
+// DecodeHeader decodes into hd. If validate is truthy, hd is also validated.
 func DecodeHeader(hd *Header, validate bool) VerifyOption {
 	return func(rt *RawToken) error {
 		if err := internal.Decode(rt.header(), hd); err != nil {
@@ -59,7 +60,8 @@ func DecodeHeader(hd *Header, validate bool) VerifyOption {
 	}
 }
 
-// DecodePayload decodes into payload and run validators, if any.
+// DecodePayload flags a payload to be decoded. After decoding, validators is iterated and
+// each validator in it is run.
 func DecodePayload(payload interface{}, validators ...ValidatorFunc) VerifyOption {
 	return func(rt *RawToken) (err error) {
 		rt.payloadAddr = payload
@@ -75,4 +77,7 @@ func ValidateHeader(rt *RawToken) error {
 	return DecodeHeader(&hd, true)(rt)
 }
 
-var _ VerifyOption = ValidateHeader // compile-time test
+// Compile-time checks.
+var _ VerifyOption = ValidateHeader
+var _ VerifyOption = DecodeHeader(nil, false)
+var _ VerifyOption = DecodePayload(nil)
