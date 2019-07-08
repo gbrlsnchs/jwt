@@ -13,6 +13,7 @@ type RawToken struct {
 	alg Algorithm
 
 	// Verify options.
+	hdAddr            *Header
 	payloadAddr       interface{}
 	payloadValidators []ValidatorFunc
 }

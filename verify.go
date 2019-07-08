@@ -49,10 +49,15 @@ func Verify(token []byte, alg Algorithm, opts ...VerifyOption) error {
 // DecodeHeader decodes into hd. If validate is truthy, hd is also validated.
 func DecodeHeader(hd *Header, validate bool) VerifyOption {
 	return func(rt *RawToken) error {
-		if err := internal.Decode(rt.header(), hd); err != nil {
-			return err
+		if rt.hdAddr == nil {
+			var hd Header
+			if err := internal.Decode(rt.header(), &hd); err != nil {
+				return err
+			}
+			rt.hdAddr = &hd
 		}
-		if validate && rt.alg.Name() != hd.Algorithm {
+		*hd = *rt.hdAddr
+		if validate && rt.alg.Name() != rt.hdAddr.Algorithm {
 			return internal.Errorf("jwt: unexpected algorithm %q: %w", hd.Algorithm, ErrAlgValidation)
 		}
 		return nil
