@@ -14,52 +14,71 @@ var (
 	ErrEd25519PrivKey = errors.New("jwt: Ed25519 private key is nil")
 	// ErrEd25519PubKey is the error for trying to verify a JWT with a nil public key.
 	ErrEd25519PubKey = errors.New("jwt: Ed25519 public key is nil")
-	// ErrEd25519Verification is the error for when verification with edDSA fails.
+	// ErrEd25519Verification is the error for when verification with Ed25519 fails.
 	ErrEd25519Verification = errors.New("jwt: Ed25519 verification failed")
 
-	_ Algorithm = new(edDSA)
+	_ Algorithm = new(Ed25519)
 )
 
-type edDSA struct {
+// Ed25519PrivateKey is an option to set a private key to the Ed25519 algorithm.
+func Ed25519PrivateKey(priv ed25519.PrivateKey) func(*Ed25519) {
+	return func(ed *Ed25519) {
+		ed.priv = priv
+	}
+}
+
+// Ed25519PublicKey is an option to set a public key to the Ed25519 algorithm.
+func Ed25519PublicKey(pub ed25519.PublicKey) func(*Ed25519) {
+	return func(ed *Ed25519) {
+		ed.pub = pub
+	}
+}
+
+// Ed25519 is an algorithm that uses EdDSA to sign SHA-512 hashes.
+type Ed25519 struct {
 	priv ed25519.PrivateKey
 	pub  ed25519.PublicKey
 }
 
 // NewEd25519 creates a new algorithm using EdDSA and SHA-512.
-func NewEd25519(priv ed25519.PrivateKey, pub ed25519.PublicKey) Algorithm {
-	if pub == nil {
-		pub = priv.Public().(ed25519.PublicKey)
+func NewEd25519(opts ...func(*Ed25519)) *Ed25519 {
+	var ed Ed25519
+	for _, opt := range opts {
+		opt(&ed)
 	}
-	return &edDSA{priv: priv, pub: pub}
+	if ed.pub == nil {
+		ed.pub = ed.priv.Public().(ed25519.PublicKey)
+	}
+	return &ed
 }
 
 // Name returns the algorithm's name.
-func (*edDSA) Name() string {
+func (*Ed25519) Name() string {
 	return "Ed25519"
 }
 
 // Sign signs headerPayload using the Ed25519 algorithm.
-func (e *edDSA) Sign(headerPayload []byte) ([]byte, error) {
-	if e.priv == nil {
+func (ed *Ed25519) Sign(headerPayload []byte) ([]byte, error) {
+	if ed.priv == nil {
 		return nil, ErrEd25519PrivKey
 	}
-	return ed25519.Sign(e.priv, headerPayload), nil
+	return ed25519.Sign(ed.priv, headerPayload), nil
 }
 
 // Size returns the signature byte size.
-func (*edDSA) Size() int {
+func (*Ed25519) Size() int {
 	return ed25519.SignatureSize
 }
 
 // Verify verifies a payload and a signature.
-func (e *edDSA) Verify(payload, sig []byte) (err error) {
-	if e.pub == nil {
+func (ed *Ed25519) Verify(payload, sig []byte) (err error) {
+	if ed.pub == nil {
 		return ErrEd25519PubKey
 	}
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
 	}
-	if !ed25519.Verify(e.pub, payload, sig) {
+	if !ed25519.Verify(ed.pub, payload, sig) {
 		return ErrEd25519Verification
 	}
 	return nil
