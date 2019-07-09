@@ -360,9 +360,7 @@ func TestSign(t *testing.T) {
 						hd      jwt.Header
 						payload testPayload
 					)
-					err = jwt.Verify(token, tc.verifyAlg,
-						jwt.DecodeHeader(&hd, false),
-						jwt.DecodePayload(&payload))
+					hd, err = jwt.Verify(token, &payload, tc.verifyAlg)
 					if want, got := tc.verifyErr, err; !internal.ErrorIs(got, want) {
 						t.Fatalf("want %v, got %v", want, got)
 					}
