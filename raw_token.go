@@ -13,10 +13,8 @@ type RawToken struct {
 	hd  Header
 	alg Algorithm
 
-	// Verify options.
-	hdAddr            *Header
-	payloadAddr       interface{}
-	payloadValidators []ValidatorFunc
+	pl  *Payload
+	vds []ValidatorFunc
 }
 
 func (rt *RawToken) header() []byte        { return rt.token[:rt.sep1] }
@@ -30,12 +28,12 @@ func (rt *RawToken) setToken(token []byte, sep1, sep2 int) {
 	rt.token = token
 }
 
-func (rt *RawToken) decode() (err error) {
-	if err = internal.Decode(rt.payload(), rt.payloadAddr); err != nil {
+func (rt *RawToken) decode(payload interface{}) (err error) {
+	if err = internal.Decode(rt.payload(), payload); err != nil {
 		return err
 	}
-	for _, vd := range rt.payloadValidators {
-		if err = vd(); err != nil {
+	for _, vd := range rt.vds {
+		if err = vd(rt.pl); err != nil {
 			return err
 		}
 	}
