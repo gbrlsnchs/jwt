@@ -119,7 +119,7 @@ func main() {
 }
 ```
 
-### Verifying (and decoding)
+### Verifying
 ```go
 import "github.com/gbrlsnchs/jwt/v3"
 
@@ -135,7 +135,8 @@ func main() {
 	// ...
 
 	var pl CustomPayload
-	if err := jwt.Verify(token, hs, jwt.DecodePayload(&pl)); err != nil {
+	hd, err := jwt.Verify(token, hs, &pl)
+	if err != nil {
 		// ...
 	}
 
@@ -143,10 +144,11 @@ func main() {
 }
 ```
 
-### Other examples
+### Other use case examples
 <details><summary><b>Setting "cty" and "kid" claims</b></summary>
 <p>
 
+The "cty" and "kid" claims can be set by passing options to the `jwt.Sign` function:
 ```go
 import (
 	"time"
@@ -178,7 +180,7 @@ func main() {
 <details><summary><b>Validating "alg" before verifying</b></summary>
 <p>
 
-#### Without decoding the header
+For validating the "alg" field in a JOSE header **before** verification, the `jwt.ValidateHeader` option must be passed to `jwt.Verify`.
 ```go
 import "github.com/gbrlsnchs/jwt/v3"
 
@@ -187,7 +189,8 @@ var hs = jwt.NewHS256([]byte("secret"))
 func main() {
 	// ...
 
-	if err := jwt.Verify(token, hs, jwt.ValidateHeader); err != nil {
+	var pl jwt.Payload
+	if _, err := jwt.Verify(token, hs, &pl, jwt.ValidateHeader); err != nil {
 		// ...
 	}
 
@@ -195,7 +198,9 @@ func main() {
 }
 ```
 
-#### Decoding the header
+</p>
+</details>
+
 ```go
 import "github.com/gbrlsnchs/jwt/v3"
 
