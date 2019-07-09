@@ -17,17 +17,12 @@ func NumericDate(tt time.Time) *Time {
 	if tt.Before(internal.Epoch) {
 		tt = internal.Epoch
 	}
-	return &Time{time.Unix(tt.Unix(), 0)}
-}
-
-// IsZero checks whether no seconds have elapsed since epoch.
-func (t *Time) IsZero() bool {
-	return t == nil || t.Before(internal.Epoch) || t.Equal(internal.Epoch)
+	return &Time{time.Unix(tt.Unix(), 0)} // set time using Unix time
 }
 
 // MarshalJSON implements a marshaling function for time-related claims.
-func (t *Time) MarshalJSON() ([]byte, error) {
-	if t.IsZero() {
+func (t Time) MarshalJSON() ([]byte, error) {
+	if t.Before(internal.Epoch) {
 		return json.Marshal(0)
 	}
 	return json.Marshal(t.Unix())
@@ -35,14 +30,14 @@ func (t *Time) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements an unmarshaling function for time-related claims.
 func (t *Time) UnmarshalJSON(b []byte) error {
-	var unix int64
+	var unix *int64
 	if err := json.Unmarshal(b, &unix); err != nil {
 		return err
 	}
-	if unix <= 0 {
+	if unix == nil {
 		return nil
 	}
-	tt := time.Unix(unix, 0)
+	tt := time.Unix(*unix, 0)
 	if tt.Before(internal.Epoch) {
 		tt = internal.Epoch
 	}

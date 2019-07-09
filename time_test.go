@@ -18,6 +18,7 @@ func TestTimeMarshalJSON(t *testing.T) {
 		{jwt.Time{}, 0},
 		{jwt.Time{now}, now.Unix()},
 		{jwt.Time{now.Add(24 * time.Hour)}, now.Add(24 * time.Hour).Unix()},
+		{jwt.Time{now.Add(24 * 30 * 12 * time.Hour)}, now.Add(24 * 30 * 12 * time.Hour).Unix()},
 	}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -39,17 +40,23 @@ func TestTimeMarshalJSON(t *testing.T) {
 func TestTimeUnmarshalJSON(t *testing.T) {
 	now := time.Now()
 	testCases := []struct {
-		n    int64
-		want jwt.Time
+		n     int64
+		want  jwt.Time
+		isNil bool
 	}{
-		{now.Unix(), jwt.Time{now}},
-		{internal.Epoch.Unix() - 1337, jwt.Time{}},
-		{internal.Epoch.Unix(), jwt.Time{}},
-		{internal.Epoch.Unix() + 1337, jwt.Time{internal.Epoch.Add(1337 * time.Second)}},
+		{now.Unix(), jwt.Time{now}, false},
+		{internal.Epoch.Unix() - 1337, jwt.Time{internal.Epoch}, false},
+		{internal.Epoch.Unix(), jwt.Time{internal.Epoch}, false},
+		{internal.Epoch.Unix() + 1337, jwt.Time{internal.Epoch.Add(1337 * time.Second)}, false},
+		{0, jwt.Time{}, true},
 	}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			b, err := json.Marshal(tc.n)
+			var n *int64
+			if !tc.isNil {
+				n = &tc.n
+			}
+			b, err := json.Marshal(n)
 			if err != nil {
 				t.Fatal(err)
 			}
