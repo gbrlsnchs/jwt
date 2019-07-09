@@ -32,6 +32,14 @@ func Verify(token []byte, payload interface{}, alg Algorithm, opts ...VerifyOpti
 	rt.setToken(token, sep1, sep2)
 
 	var err error
+	if err = rt.decodeHeader(); err != nil {
+		return rt.hd, err
+	}
+	if rv, ok := alg.(Resolver); ok {
+		if err = rv.Resolve(rt.hd); err != nil {
+			return rt.hd, err
+		}
+	}
 	for _, opt := range opts {
 		if err = opt(rt); err != nil {
 			return rt.hd, err
