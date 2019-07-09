@@ -15,7 +15,7 @@ var (
 	ErrECDSANilPrivKey = errors.New("jwt: ECDSA private key is nil")
 	// ErrECDSANilPubKey is the error for trying to verify a JWT with a nil public key.
 	ErrECDSANilPubKey = errors.New("jwt: ECDSA public key is nil")
-	// ErrECDSAVerification is the error for an invalid signature.
+	// ErrECDSAVerification is the error for an invalid ECDSA signature.
 	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
 
 	_ Algorithm = new(ecdsaSHA)
