@@ -26,7 +26,7 @@ func TestDecode(t *testing.T) {
 		{rawURLEnc, "{}", "", false},
 		{rawURLEnc, `{"x":"test"}`, "test", false},
 		{stdEnc, "{}", "", true},
-		{stdEnc, `{"x":"test"}`, "test", false},
+		{stdEnc, `{"x":"test"}`, "test", false}, // the output is the same as with RawURLEncoding
 		{nil, "{}", "", true},
 		{nil, `{"x":"test"}`, "", true},
 	}
@@ -38,11 +38,10 @@ func TestDecode(t *testing.T) {
 			}
 			t.Logf("b64: %s", b64)
 			var (
-				dt     decodeTest
-				err    = internal.Decode([]byte(b64), &dt)
-				b64err = new(base64.CorruptInputError)
+				dt  decodeTest
+				err = internal.Decode([]byte(b64), &dt)
 			)
-			if want, got := tc.errors, internal.ErrorAs(err, b64err); want != got {
+			if want, got := tc.errors, err != nil; want != got {
 				t.Fatalf("want %t, got %t: %v", want, got, err)
 			}
 			if want, got := tc.expected, dt.X; want != got {
