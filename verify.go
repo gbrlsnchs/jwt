@@ -60,12 +60,11 @@ func ValidateHeader(rt *RawToken) error {
 	return nil
 }
 
-// DecodePayload flags a payload to be decoded. After decoding, validators is iterated and
-// each validator in it is run.
-func DecodePayload(payload interface{}, validators ...ValidatorFunc) VerifyOption {
-	return func(rt *RawToken) (err error) {
-		rt.payloadAddr = payload
-		rt.payloadValidators = validators
+// ValidatePayload runs validators against a Payload after it's been decoded.
+func ValidatePayload(pl *Payload, vds ...ValidatorFunc) VerifyOption {
+	return func(rt *RawToken) error {
+		rt.pl = pl
+		rt.vds = vds
 		return nil
 	}
 }
