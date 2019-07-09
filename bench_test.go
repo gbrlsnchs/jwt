@@ -71,56 +71,8 @@ func BenchmarkVerify(b *testing.B) {
 	b.Run("Default", func(b *testing.B) {
 		b.ReportAllocs()
 		for n := 0; n < b.N; n++ {
-			if err = jwt.Verify(token, benchHS256); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
-	b.Run("ValidateHeader", func(b *testing.B) {
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			if err = jwt.Verify(token, benchHS256, jwt.ValidateHeader); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
-	b.Run("DecodePayload", func(b *testing.B) {
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
 			var pl jwt.Payload
-			if err = jwt.Verify(token, benchHS256, jwt.DecodePayload(&pl)); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-	b.Run("Full decode", func(b *testing.B) {
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			var (
-				hd jwt.Header
-				pl jwt.Payload
-			)
-			if err = jwt.Verify(token, benchHS256,
-				jwt.DecodeHeader(&hd, false), jwt.DecodePayload(&pl)); err != nil {
-				b.Fatal(err)
-			}
-		}
-	})
-
-	b.Run("Payload validator", func(b *testing.B) {
-		b.ReportAllocs()
-		for n := 0; n < b.N; n++ {
-			var pl jwt.Payload
-			audValidator := pl.AudienceValidator(jwt.Audience{
-				"https://golang.org",
-				"https://jwt.io",
-				"https://google.com",
-				"https://reddit.com",
-			})
-			if err = jwt.Verify(token, benchHS256,
-				jwt.DecodePayload(&pl, audValidator)); err != nil {
+			if _, err = jwt.Verify(token, &pl, benchHS256); err != nil {
 				b.Fatal(err)
 			}
 		}
