@@ -24,12 +24,12 @@ var (
 
 // ValidatorFunc is a function for running extra
 // validators when parsing a Payload string.
-type ValidatorFunc func() error
+type ValidatorFunc func(*Payload) error
 
 // AudienceValidator validates the "aud" claim.
 // It checks if at least one of the audiences in the JWT's payload is listed in aud.
-func (pl *Payload) AudienceValidator(aud Audience) ValidatorFunc {
-	return func() error {
+func AudienceValidator(aud Audience) ValidatorFunc {
+	return func(pl *Payload) error {
 		for _, serverAud := range aud {
 			for _, clientAud := range pl.Audience {
 				if clientAud == serverAud {
@@ -42,8 +42,8 @@ func (pl *Payload) AudienceValidator(aud Audience) ValidatorFunc {
 }
 
 // ExpirationTimeValidator validates the "exp" claim.
-func (pl *Payload) ExpirationTimeValidator(now time.Time) ValidatorFunc {
-	return func() error {
+func ExpirationTimeValidator(now time.Time) ValidatorFunc {
+	return func(pl *Payload) error {
 		if pl.ExpirationTime == nil || NumericDate(now).After(pl.ExpirationTime.Time) {
 			return ErrExpValidation
 		}
@@ -52,8 +52,8 @@ func (pl *Payload) ExpirationTimeValidator(now time.Time) ValidatorFunc {
 }
 
 // IssuedAtValidator validates the "iat" claim.
-func (pl *Payload) IssuedAtValidator(now time.Time) ValidatorFunc {
-	return func() error {
+func IssuedAtValidator(now time.Time) ValidatorFunc {
+	return func(pl *Payload) error {
 		if pl.IssuedAt != nil && NumericDate(now).Before(pl.IssuedAt.Time) {
 			return ErrIatValidation
 		}
@@ -62,8 +62,8 @@ func (pl *Payload) IssuedAtValidator(now time.Time) ValidatorFunc {
 }
 
 // IssuerValidator validates the "iss" claim.
-func (pl *Payload) IssuerValidator(iss string) ValidatorFunc {
-	return func() error {
+func IssuerValidator(iss string) ValidatorFunc {
+	return func(pl *Payload) error {
 		if pl.Issuer != iss {
 			return ErrIssValidation
 		}
@@ -71,9 +71,9 @@ func (pl *Payload) IssuerValidator(iss string) ValidatorFunc {
 	}
 }
 
-// JWTIDValidator validates the "jti" claim.
-func (pl *Payload) JWTIDValidator(jti string) ValidatorFunc {
-	return func() error {
+// IDValidator validates the "jti" claim.
+func IDValidator(jti string) ValidatorFunc {
+	return func(pl *Payload) error {
 		if pl.JWTID != jti {
 			return ErrJtiValidation
 		}
@@ -82,8 +82,8 @@ func (pl *Payload) JWTIDValidator(jti string) ValidatorFunc {
 }
 
 // NotBeforeValidator validates the "nbf" claim.
-func (pl *Payload) NotBeforeValidator(now time.Time) ValidatorFunc {
-	return func() error {
+func NotBeforeValidator(now time.Time) ValidatorFunc {
+	return func(pl *Payload) error {
 		if pl.NotBefore != nil && NumericDate(now).Before(pl.NotBefore.Time) {
 			return ErrNbfValidation
 		}
@@ -92,8 +92,8 @@ func (pl *Payload) NotBeforeValidator(now time.Time) ValidatorFunc {
 }
 
 // SubjectValidator validates the "sub" claim.
-func (pl *Payload) SubjectValidator(sub string) ValidatorFunc {
-	return func() error {
+func SubjectValidator(sub string) ValidatorFunc {
+	return func(pl *Payload) error {
 		if pl.Subject != sub {
 			return ErrSubValidation
 		}
