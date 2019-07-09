@@ -10,6 +10,7 @@ type RawToken struct {
 	token      []byte
 	sep1, sep2 int
 
+	hd  Header
 	alg Algorithm
 
 	// Verify options.
@@ -37,6 +38,13 @@ func (rt *RawToken) decode() (err error) {
 		if err = vd(); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (rt *RawToken) decodeHeader() error {
+	if err := internal.Decode(rt.header(), &rt.hd); err != nil {
+		return err
 	}
 	return nil
 }
