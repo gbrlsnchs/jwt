@@ -133,9 +133,9 @@ func TestVerify(t *testing.T) {
 		},
 		"RSA": []testCase{
 			{
-				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS256(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS256",
 					Type:      "JWT",
@@ -145,9 +145,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS256",
 					Type:      "JWT",
@@ -157,9 +157,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS256(rsaPrivateKey2, nil),
+				verifyAlg: jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS256",
 					Type:      "JWT",
@@ -169,9 +169,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS256(nil, rsaPublicKey1),
+				verifyAlg: jwt.NewRS256(jwt.RSAPublicKey(rsaPublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS256",
 					Type:      "JWT",
@@ -181,9 +181,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS256(nil, rsaPublicKey2),
+				verifyAlg: jwt.NewRS256(jwt.RSAPublicKey(rsaPublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS256",
 					Type:      "JWT",
@@ -193,9 +193,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS384",
 					Type:      "JWT",
@@ -205,9 +205,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS256(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS384",
 					Type:      "JWT",
@@ -217,9 +217,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(rsaPrivateKey2, nil),
+				verifyAlg: jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS384",
 					Type:      "JWT",
@@ -229,9 +229,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(nil, rsaPublicKey1),
+				verifyAlg: jwt.NewRS384(jwt.RSAPublicKey(rsaPublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS384",
 					Type:      "JWT",
@@ -241,9 +241,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(nil, rsaPublicKey2),
+				verifyAlg: jwt.NewRS384(jwt.RSAPublicKey(rsaPublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS384",
 					Type:      "JWT",
@@ -253,9 +253,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS512(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS512",
 					Type:      "JWT",
@@ -265,9 +265,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS512",
 					Type:      "JWT",
@@ -277,9 +277,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS512(rsaPrivateKey2, nil),
+				verifyAlg: jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS512",
 					Type:      "JWT",
@@ -289,9 +289,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS512(nil, rsaPublicKey1),
+				verifyAlg: jwt.NewRS512(jwt.RSAPublicKey(rsaPublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS512",
 					Type:      "JWT",
@@ -301,9 +301,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS512(nil, rsaPublicKey2),
+				verifyAlg: jwt.NewRS512(jwt.RSAPublicKey(rsaPublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "RS512",
 					Type:      "JWT",
@@ -315,9 +315,9 @@ func TestVerify(t *testing.T) {
 		},
 		"RSA-PSS": []testCase{
 			{
-				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS256(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS256",
 					Type:      "JWT",
@@ -327,9 +327,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS256(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS256",
 					Type:      "JWT",
@@ -339,9 +339,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS256",
 					Type:      "JWT",
@@ -351,9 +351,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS256(rsaPrivateKey2, nil),
+				verifyAlg: jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS256",
 					Type:      "JWT",
@@ -363,9 +363,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS256(nil, rsaPublicKey1),
+				verifyAlg: jwt.NewPS256(jwt.RSAPublicKey(rsaPublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS256",
 					Type:      "JWT",
@@ -375,9 +375,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS256(nil, rsaPublicKey2),
+				verifyAlg: jwt.NewPS256(jwt.RSAPublicKey(rsaPublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS256",
 					Type:      "JWT",
@@ -387,9 +387,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS384",
 					Type:      "JWT",
@@ -399,9 +399,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS384",
 					Type:      "JWT",
@@ -411,9 +411,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS256(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewPS256(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS384",
 					Type:      "JWT",
@@ -423,9 +423,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS384(rsaPrivateKey2, nil),
+				verifyAlg: jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS384",
 					Type:      "JWT",
@@ -435,9 +435,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS384(nil, rsaPublicKey1),
+				verifyAlg: jwt.NewPS384(jwt.RSAPublicKey(rsaPublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS384",
 					Type:      "JWT",
@@ -447,9 +447,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS384(nil, rsaPublicKey2),
+				verifyAlg: jwt.NewPS384(jwt.RSAPublicKey(rsaPublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS384",
 					Type:      "JWT",
@@ -459,9 +459,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS512(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS512",
 					Type:      "JWT",
@@ -471,9 +471,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewRS512(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewRS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS512",
 					Type:      "JWT",
@@ -483,9 +483,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS384(rsaPrivateKey1, nil),
+				verifyAlg: jwt.NewPS384(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS512",
 					Type:      "JWT",
@@ -495,9 +495,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS512(rsaPrivateKey2, nil),
+				verifyAlg: jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS512",
 					Type:      "JWT",
@@ -507,9 +507,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrRSAVerification,
 			},
 			{
-				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS512(nil, rsaPublicKey1),
+				verifyAlg: jwt.NewPS512(jwt.RSAPublicKey(rsaPublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS512",
 					Type:      "JWT",
@@ -519,9 +519,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
+				alg:       jwt.NewPS512(jwt.RSAPrivateKey(rsaPrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewPS512(nil, rsaPublicKey2),
+				verifyAlg: jwt.NewPS512(jwt.RSAPublicKey(rsaPublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "PS512",
 					Type:      "JWT",
