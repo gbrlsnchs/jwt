@@ -72,7 +72,7 @@ func BenchmarkVerify(b *testing.B) {
 		b.ReportAllocs()
 		for n := 0; n < b.N; n++ {
 			var pl jwt.Payload
-			if _, err = jwt.Verify(token, &pl, benchHS256); err != nil {
+			if _, err = jwt.Verify(token, benchHS256, &pl); err != nil {
 				b.Fatal(err)
 			}
 		}

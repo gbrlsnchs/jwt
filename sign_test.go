@@ -34,7 +34,6 @@ var (
 func TestSign(t *testing.T) {
 	type testCase struct {
 		alg     jwt.Algorithm
-		hd      jwt.Header
 		payload interface{}
 
 		verifyAlg   jwt.Algorithm
@@ -49,7 +48,6 @@ func TestSign(t *testing.T) {
 		"HMAC": []testCase{
 			{
 				alg:       jwt.NewHS256(hmacKey1),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewHS256(hmacKey1),
 				wantHeader: jwt.Header{
@@ -62,7 +60,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewHS384(hmacKey1),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewHS384(hmacKey1),
 				wantHeader: jwt.Header{
@@ -75,7 +72,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewHS512(hmacKey1),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewHS512(hmacKey1),
 				wantHeader: jwt.Header{
@@ -90,7 +86,6 @@ func TestSign(t *testing.T) {
 		"RSA": []testCase{
 			{
 				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewRS256(rsaPrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -103,7 +98,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewRS256(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewRS256(nil, rsaPublicKey1),
 				wantHeader: jwt.Header{
@@ -116,7 +110,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewRS384(rsaPrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -129,7 +122,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewRS384(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewRS384(nil, rsaPublicKey1),
 				wantHeader: jwt.Header{
@@ -142,7 +134,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewRS512(rsaPrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -155,7 +146,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewRS512(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewRS512(nil, rsaPublicKey1),
 				wantHeader: jwt.Header{
@@ -170,7 +160,6 @@ func TestSign(t *testing.T) {
 		"RSA-PSS": []testCase{
 			{
 				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewPS256(rsaPrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -183,7 +172,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewPS256(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewPS256(nil, rsaPublicKey1),
 				wantHeader: jwt.Header{
@@ -196,7 +184,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewPS384(rsaPrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -209,7 +196,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewPS384(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewPS384(nil, rsaPublicKey1),
 				wantHeader: jwt.Header{
@@ -222,7 +208,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewPS512(rsaPrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -235,7 +220,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewPS512(rsaPrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewPS512(nil, rsaPublicKey1),
 				wantHeader: jwt.Header{
@@ -250,7 +234,6 @@ func TestSign(t *testing.T) {
 		"ECDSA": []testCase{
 			{
 				alg:       jwt.NewES256(es256PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewES256(nil, es256PublicKey1),
 				wantHeader: jwt.Header{
@@ -263,7 +246,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewES256(es256PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewES256(es256PrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -276,7 +258,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewES384(es384PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewES384(nil, es384PublicKey1),
 				wantHeader: jwt.Header{
@@ -289,7 +270,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewES384(es384PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewES384(es384PrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -302,7 +282,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewES512(es512PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewES512(nil, es512PublicKey1),
 				wantHeader: jwt.Header{
@@ -315,7 +294,6 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewES512(es512PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewES512(es512PrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -330,7 +308,6 @@ func TestSign(t *testing.T) {
 		"Ed25519": []testCase{
 			{
 				alg:       jwt.NewEd25519(ed25519PrivateKey1, nil),
-				hd:        jwt.Header{},
 				payload:   tp,
 				verifyAlg: jwt.NewEd25519(ed25519PrivateKey1, nil),
 				wantHeader: jwt.Header{
@@ -359,7 +336,7 @@ func TestSign(t *testing.T) {
 						hd      jwt.Header
 						payload testPayload
 					)
-					hd, err = jwt.Verify(token, &payload, tc.verifyAlg)
+					hd, err = jwt.Verify(token, tc.verifyAlg, &payload)
 					if want, got := tc.verifyErr, err; got != want {
 						t.Fatalf("want %v, got %v", want, got)
 					}

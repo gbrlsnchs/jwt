@@ -13,7 +13,7 @@ type VerifyOption func(*RawToken) error
 
 // Verify verifies a token's signature using alg. Before verification, opts is iterated and
 // each option in it is run.
-func Verify(token []byte, payload interface{}, alg Algorithm, opts ...VerifyOption) (Header, error) {
+func Verify(token []byte, alg Algorithm, payload interface{}, opts ...VerifyOption) (Header, error) {
 	rt := &RawToken{
 		alg: alg,
 	}
