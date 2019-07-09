@@ -8,6 +8,7 @@
 
 ## Compatibility
 [![Version Compatibility](https://img.shields.io/badge/go%20modules-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
+[![vgo](https://img.shields.io/badge/vgo-go1.10-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 [![go get](https://img.shields.io/badge/go%20get-go1.9.7+,%20go1.10.3+%20and%20go1.11-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 
 ## About
@@ -49,6 +50,16 @@ $ go get -u github.com/gbrlsnchs/jwt/v3
 
 ```sh
 $ GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.10 with <code>vgo</code></b></summary>
+<p>
+
+```sh
+$ vgo get -u github.com/gbrlsnchs/jwt/v3
 ```
 
 </p>
