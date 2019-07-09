@@ -533,9 +533,9 @@ func TestVerify(t *testing.T) {
 		},
 		"ECDSA": []testCase{
 			{
-				alg:       jwt.NewES256(es256PrivateKey1, nil),
+				alg:       jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES256(nil, es256PublicKey1),
+				verifyAlg: jwt.NewES256(jwt.ECDSAPublicKey(es256PublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES256",
 					Type:      "JWT",
@@ -545,9 +545,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewES256(es256PrivateKey1, nil),
+				alg:       jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES384(nil, es256PublicKey1),
+				verifyAlg: jwt.NewES384(jwt.ECDSAPublicKey(es256PublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES256",
 					Type:      "JWT",
@@ -557,9 +557,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES256(es256PrivateKey1, nil),
+				alg:       jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES256(nil, es256PublicKey2),
+				verifyAlg: jwt.NewES256(jwt.ECDSAPublicKey(es256PublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES256",
 					Type:      "JWT",
@@ -569,9 +569,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES256(es256PrivateKey1, nil),
+				alg:       jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES256(es256PrivateKey1, nil),
+				verifyAlg: jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES256",
 					Type:      "JWT",
@@ -581,9 +581,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewES256(es256PrivateKey1, nil),
+				alg:       jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES256(es256PrivateKey2, nil),
+				verifyAlg: jwt.NewES256(jwt.ECDSAPrivateKey(es256PrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES256",
 					Type:      "JWT",
@@ -593,9 +593,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES384(es384PrivateKey1, nil),
+				alg:       jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES384(nil, es384PublicKey1),
+				verifyAlg: jwt.NewES384(jwt.ECDSAPublicKey(es384PublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES384",
 					Type:      "JWT",
@@ -605,9 +605,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewES384(es384PrivateKey1, nil),
+				alg:       jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES256(nil, es384PublicKey1),
+				verifyAlg: jwt.NewES256(jwt.ECDSAPublicKey(es384PublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES384",
 					Type:      "JWT",
@@ -617,9 +617,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES384(es384PrivateKey1, nil),
+				alg:       jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES384(nil, es384PublicKey2),
+				verifyAlg: jwt.NewES384(jwt.ECDSAPublicKey(es384PublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES384",
 					Type:      "JWT",
@@ -629,9 +629,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES384(es384PrivateKey1, nil),
+				alg:       jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES384(es384PrivateKey1, nil),
+				verifyAlg: jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES384",
 					Type:      "JWT",
@@ -641,9 +641,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewES384(es384PrivateKey1, nil),
+				alg:       jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES384(es384PrivateKey2, nil),
+				verifyAlg: jwt.NewES384(jwt.ECDSAPrivateKey(es384PrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES384",
 					Type:      "JWT",
@@ -653,9 +653,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES512(es512PrivateKey1, nil),
+				alg:       jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES512(nil, es512PublicKey1),
+				verifyAlg: jwt.NewES512(jwt.ECDSAPublicKey(es512PublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES512",
 					Type:      "JWT",
@@ -665,9 +665,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewES512(es512PrivateKey1, nil),
+				alg:       jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES384(nil, es512PublicKey1),
+				verifyAlg: jwt.NewES384(jwt.ECDSAPublicKey(es512PublicKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES512",
 					Type:      "JWT",
@@ -677,9 +677,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES512(es512PrivateKey1, nil),
+				alg:       jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES512(nil, es512PublicKey2),
+				verifyAlg: jwt.NewES512(jwt.ECDSAPublicKey(es512PublicKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES512",
 					Type:      "JWT",
@@ -689,9 +689,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   jwt.ErrECDSAVerification,
 			},
 			{
-				alg:       jwt.NewES512(es512PrivateKey1, nil),
+				alg:       jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES512(es512PrivateKey1, nil),
+				verifyAlg: jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey1)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES512",
 					Type:      "JWT",
@@ -701,9 +701,9 @@ func TestVerify(t *testing.T) {
 				verifyErr:   nil,
 			},
 			{
-				alg:       jwt.NewES512(es512PrivateKey1, nil),
+				alg:       jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey1)),
 				payload:   tp,
-				verifyAlg: jwt.NewES512(es512PrivateKey2, nil),
+				verifyAlg: jwt.NewES512(jwt.ECDSAPrivateKey(es512PrivateKey2)),
 				wantHeader: jwt.Header{
 					Algorithm: "ES512",
 					Type:      "JWT",

@@ -18,8 +18,22 @@ var (
 	// ErrECDSAVerification is the error for an invalid ECDSA signature.
 	ErrECDSAVerification = errors.New("jwt: ECDSA verification failed")
 
-	_ Algorithm = new(ecdsaSHA)
+	_ Algorithm = new(ECDSASHA)
 )
+
+// ECDSAPrivateKey is an option to set a private key to the ECDSA-SHA algorithm.
+func ECDSAPrivateKey(priv *ecdsa.PrivateKey) func(*ECDSASHA) {
+	return func(es *ECDSASHA) {
+		es.priv = priv
+	}
+}
+
+// ECDSAPublicKey is an option to set a public key to the ECDSA-SHA algorithm.
+func ECDSAPublicKey(pub *ecdsa.PublicKey) func(*ECDSASHA) {
+	return func(es *ECDSASHA) {
+		es.pub = pub
+	}
+}
 
 func byteSize(bitSize int) int {
 	byteSize := bitSize / 8
@@ -29,7 +43,8 @@ func byteSize(bitSize int) int {
 	return byteSize
 }
 
-type ecdsaSHA struct {
+// ECDSASHA is an algorithm that uses ECDSA to sign SHA hashes.
+type ECDSASHA struct {
 	name string
 	priv *ecdsa.PrivateKey
 	pub  *ecdsa.PublicKey
@@ -39,42 +54,44 @@ type ecdsaSHA struct {
 	pool *hashPool
 }
 
-func newECDSASHA(name string, priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey, sha crypto.Hash) *ecdsaSHA {
-	if pub == nil {
-		pub = &priv.PublicKey
-	}
-	return &ecdsaSHA{
+func newECDSASHA(name string, opts []func(*ECDSASHA), sha crypto.Hash) *ECDSASHA {
+	es := ECDSASHA{
 		name: name,
-		priv: priv,
-		pub:  pub,
 		sha:  sha,
-		size: byteSize(pub.Params().BitSize) * 2,
 		pool: newHashPool(sha.New),
 	}
+	for _, opt := range opts {
+		opt(&es)
+	}
+	if es.pub == nil {
+		es.pub = &es.priv.PublicKey
+	}
+	es.size = byteSize(es.pub.Params().BitSize) * 2
+	return &es
 }
 
 // NewES256 creates a new algorithm using ECDSA and SHA-256.
-func NewES256(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Algorithm {
-	return newECDSASHA("ES256", priv, pub, crypto.SHA256)
+func NewES256(opts ...func(*ECDSASHA)) *ECDSASHA {
+	return newECDSASHA("ES256", opts, crypto.SHA256)
 }
 
 // NewES384 creates a new algorithm using ECDSA and SHA-384.
-func NewES384(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Algorithm {
-	return newECDSASHA("ES384", priv, pub, crypto.SHA384)
+func NewES384(opts ...func(*ECDSASHA)) *ECDSASHA {
+	return newECDSASHA("ES384", opts, crypto.SHA384)
 }
 
 // NewES512 creates a new algorithm using ECDSA and SHA-512.
-func NewES512(priv *ecdsa.PrivateKey, pub *ecdsa.PublicKey) Algorithm {
-	return newECDSASHA("ES512", priv, pub, crypto.SHA512)
+func NewES512(opts ...func(*ECDSASHA)) *ECDSASHA {
+	return newECDSASHA("ES512", opts, crypto.SHA512)
 }
 
 // Name returns the algorithm's name.
-func (es *ecdsaSHA) Name() string {
+func (es *ECDSASHA) Name() string {
 	return es.name
 }
 
 // Sign signs headerPayload using the ECDSA-SHA algorithm.
-func (es *ecdsaSHA) Sign(headerPayload []byte) ([]byte, error) {
+func (es *ECDSASHA) Sign(headerPayload []byte) ([]byte, error) {
 	if es.priv == nil {
 		return nil, ErrECDSANilPrivKey
 	}
@@ -82,12 +99,12 @@ func (es *ecdsaSHA) Sign(headerPayload []byte) ([]byte, error) {
 }
 
 // Size returns the signature's byte size.
-func (es *ecdsaSHA) Size() int {
+func (es *ECDSASHA) Size() int {
 	return es.size
 }
 
 // Verify verifies a signature based on headerPayload using ECDSA-SHA.
-func (es *ecdsaSHA) Verify(headerPayload, sig []byte) (err error) {
+func (es *ECDSASHA) Verify(headerPayload, sig []byte) (err error) {
 	if es.pub == nil {
 		return ErrECDSANilPubKey
 	}
@@ -111,7 +128,7 @@ func (es *ecdsaSHA) Verify(headerPayload, sig []byte) (err error) {
 	return nil
 }
 
-func (es *ecdsaSHA) sign(headerPayload []byte) ([]byte, error) {
+func (es *ECDSASHA) sign(headerPayload []byte) ([]byte, error) {
 	sum, err := es.pool.sign(headerPayload)
 	if err != nil {
 		return nil, err
