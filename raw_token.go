@@ -14,7 +14,7 @@ type RawToken struct {
 	alg Algorithm
 
 	pl  *Payload
-	vds []ValidatorFunc
+	vds []Validator
 }
 
 func (rt *RawToken) header() []byte        { return rt.token[:rt.sep1] }

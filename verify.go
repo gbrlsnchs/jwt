@@ -61,7 +61,7 @@ func ValidateHeader(rt *RawToken) error {
 }
 
 // ValidatePayload runs validators against a Payload after it's been decoded.
-func ValidatePayload(pl *Payload, vds ...ValidatorFunc) VerifyOption {
+func ValidatePayload(pl *Payload, vds ...Validator) VerifyOption {
 	return func(rt *RawToken) error {
 		rt.pl = pl
 		rt.vds = vds
