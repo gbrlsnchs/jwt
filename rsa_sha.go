@@ -14,6 +14,8 @@ var (
 	ErrRSANilPrivKey = errors.New("jwt: RSA private key is nil")
 	// ErrRSANilPubKey is the error for trying to verify a JWT with a nil public key.
 	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
+	// ErrRSAVerification is the error for an invalid RSA signature.
+	ErrRSAVerification = errors.New("jwt: RSA verification failed")
 
 	_ Algorithm = new(rsaSHA)
 )
@@ -117,7 +119,12 @@ func (rs *rsaSHA) Verify(headerPayload, sig []byte) (err error) {
 		return err
 	}
 	if rs.opts != nil {
-		return rsa.VerifyPSS(rs.pub, rs.sha, sum, sig, rs.opts)
+		err = rsa.VerifyPSS(rs.pub, rs.sha, sum, sig, rs.opts)
+	} else {
+		err = rsa.VerifyPKCS1v15(rs.pub, rs.sha, sum, sig)
 	}
-	return rsa.VerifyPKCS1v15(rs.pub, rs.sha, sum, sig)
+	if err != nil {
+		return ErrRSAVerification
+	}
+	return nil
 }
