@@ -201,16 +201,37 @@ func main() {
 </p>
 </details>
 
+<details><summary><b>Using an <code>Algorithm</code> resolver</b></summary>
+<p>
+
 ```go
-import "github.com/gbrlsnchs/jwt/v3"
+import (
+	"errors"
 
-var hs = jwt.NewHS256([]byte("secret"))
+	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/jwtutil"
+)
 
-func main() {
+var (
 	// ...
 
-	var hd jwt.Header
-	if err := jwt.Verify(token, hs, jwt.DecodeHeader(&hd, true)); err != nil {
+	rs256 = jwt.NewRS256(jwt.RSAPublicKey(myRSAPublicKey))
+	es256 = jwt.NewES256(jwt.ECDSAPublicKey(myECDSAPublicKey))
+)
+
+func main() {
+	rv := &jwtutil.Resolver{New: func(hd jwt.Header) {
+		switch hd.KeyID {
+		case "foo":
+			return rs256, nil
+		case "bar":
+			return es256, nil
+		default:
+			return nil, errors.New(`invalid "kid"`)
+		}
+	}}
+	var pl jwt.Payload
+	if _, err := jwt.Verify(token, rv, &pl); err != nil {
 		// ...
 	}
 
