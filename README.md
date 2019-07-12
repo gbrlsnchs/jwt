@@ -1,36 +1,22 @@
 # jwt (JSON Web Token for Go)
+[![JWT compatible](https://jwt.io/img/badge.svg)](https://jwt.io)  
 
-<p align="center">
-  <img src="encoded_jwt.png" width="75%" height="75%">
-</p>
+[![CircleCI](https://circleci.com/gh/gbrlsnchs/jwt.svg?style=shield)](https://circleci.com/gh/gbrlsnchs/jwt)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gbrlsnchs/jwt)](https://goreportcard.com/report/github.com/gbrlsnchs/jwt)
+[![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
+[![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-<p align="center">
-  <img src="gopher_head.png" width="25%" height="25%">
-</p>
-
-<p align="center">
-  <a target="_blank" href="https://travis-ci.org/gbrlsnchs/jwt"><img alt="Build Status" src="https://travis-ci.org/gbrlsnchs/jwt.svg?branch=master"></a>
-  <a target="_blank" href="https://goreportcard.com/report/github.com/gbrlsnchs/jwt"><img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/gbrlsnchs/jwt"></a>
-  <a target="_blank" href="https://sourcegraph.com/github.com/gbrlsnchs/jwt?badge"><img alt="Sourcegraph" src="https://sourcegraph.com/github.com/gbrlsnchs/jwt/-/badge.svg"></a>
-  <a target="_blank" href="https://godoc.org/github.com/gbrlsnchs/jwt"><img alt="GoDoc" src="https://godoc.org/github.com/gbrlsnchs/jwt?status.svg"></a>
-  <a target="_blank" href="https://golang.org/doc/go1.11"><img alt="Minimal Version" src="https://img.shields.io/badge/compatible%20with-go1.11%2B-5272b4.svg"></a>
-  <a target="_blank" href="https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img alt="Join the chat at https://gitter.im/gbrlsnchs/jwt" src="https://badges.gitter.im/gbrlsnchs/jwt.svg"></a>
-</p>
-
-<p align="center">
-  <a target="_blank" href="https://jwt.io"><img alt="JWT compatible" src="https://jwt.io/img/badge.svg"></a>
-</p>
-
-## Important
-Branch `master` is unstable, **always** use tagged versions. That way it is possible to differentiate pre-release tags from production ones.
-In other words, API changes all the time in `master`. It's a place for public experiment. Thus, make use of the latest stable version via Go modules.
+## Compatibility
+[![Version Compatibility](https://img.shields.io/badge/go%20modules-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
+[![vgo](https://img.shields.io/badge/vgo-go1.10-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
+[![go get](https://img.shields.io/badge/go%20get-go1.9.7+,%20go1.10.3+%20and%20go1.11-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
 
 Although there are many JWT packages out there for Go, many lack support for some signing, verifying or validation methods and, when they don't, they're overcomplicated. This package tries to mimic the ease of use from [Node JWT library](https://github.com/auth0/node-jsonwebtoken)'s API while following the [Effective Go](https://golang.org/doc/effective_go.html) guidelines.
 
-Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
+Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided (not yet but is in the roadmap, see #17). Instead, [JWS](https://tools.ietf.org/html/rfc7515) is used, narrowed down to the [JWT specification](https://tools.ietf.org/html/rfc7519).
 
 ### Supported signing methods
 |         | SHA-256            | SHA-384            | SHA-512            |
@@ -41,116 +27,220 @@ Support for [JWE](https://tools.ietf.org/html/rfc7516) isn't provided. Instead, 
 | ECDSA   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | EdDSA   | :heavy_minus_sign: | :heavy_minus_sign: | :heavy_check_mark: |
 
+## Important
+Branch `master` is unstable, **always** use tagged versions. That way it is possible to differentiate pre-release tags from production ones.
+In other words, API changes all the time in `master`. It's a place for public experiment. Thus, make use of the latest stable version via Go modules.
+
 ## Usage
 Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Installing
-`GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3`
+<details><summary><b>Go 1.12 onward</b></summary>
+<p>
 
-### Importing
+```sh
+$ go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.11</b></summary>
+<p>
+
+```sh
+$ GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.10 with <code>vgo</code></b></summary>
+<p>
+
+```sh
+$ vgo get -u github.com/gbrlsnchs/jwt/v3
+```
+
+</p>
+</details>
+
+<details><summary><b>Go 1.9.7+, Go 1.10.3+ (without <code>vgo</code>) and Go 1.11 (when <code>GO111MODULE=off</code>)</b></summary>
+<p>
+
+```sh
+$ go get -u github.com/gbrlsnchs/jwt/v3
+```
+
+#### Important
+Your project must be inside the `GOPATH`.
+
+</p>
+</details>
+
+### Signing
 ```go
 import (
-	// ...
+	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
 )
-```
 
-### Signing a simple JWT
-```go
-now := time.Now()
-hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-h := jwt.Header{KeyID: "kid"}
-p := jwt.Payload{
-	Issuer:         "gbrlsnchs",
-	Subject:        "someone",
-	Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
-	ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-	NotBefore:      now.Add(30 * time.Minute).Unix(),
-	IssuedAt:       now.Unix(),
-	JWTID:          "foobar",
-}
-token, err := jwt.Sign(h, p, hs256)
-if err != nil {
-	// Handle error.
-}
-log.Printf("token = %s", token)
-```
-
-### Signing a JWT with public claims
-#### First, create a custom type and embed a JWT pointer in it
-```go
 type CustomPayload struct {
 	jwt.Payload
-	IsLoggedIn  bool   `json:"isLoggedIn"`
-	CustomField string `json:"customField,omitempty"`
+	Foo string `json:"foo,omitempty"`
+	Bar int    `json:"bar,omitempty"`
 }
-```
 
-#### Now initialize, marshal and sign it
-```go
-now := time.Now()
-hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-h := jwt.Header{KeyID: "kid"}
-p := CustomPayload{
-	Payload: jwt.Payload{
-		Issuer:         "gbrlsnchs",
-		Subject:        "someone",
-		Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
-		ExpirationTime: now.Add(24 * 30 * 12 * time.Hour).Unix(),
-		NotBefore:      now.Add(30 * time.Minute).Unix(),
-		IssuedAt:       now.Unix(),
-		JWTID:          "foobar",
-	},
-	IsLoggedIn:  true,
-	CustomField: "myCustomField",
-}
-token, err := jwt.Sign(h, p, hs256)
-if err != nil {
-	// Handle error.
-}
-log.Printf("token = %s", token)
-```
+var hs = jwt.NewHS256([]byte("secret"))
 
-### Verifying and validating a JWT
-```go
-now := time.Now()
-hs256 := jwt.NewHMAC(jwt.SHA256, []byte("secret"))
-token := []byte("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." +
-	"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
-	"lZ1zDoGNAv3u-OclJtnoQKejE8_viHlMtGlAxE8AE0Q")
-
-raw, err := jwt.Parse(token) 
-if err != nil {
-	// Handle error.
-}
-if err = raw.Verify(hs256); err != nil {
-	// Handle error.
-}
-var (
-	h jwt.Header
-	p CustomPayload
-)
-if h, err = raw.Decode(&p); err != nil {
-	// Handle error.
-}
-fmt.Println(h.Algorithm)
-fmt.Println(h.KeyID)
-
-iatValidator := jwt.IssuedAtValidator(now)
-expValidator := jwt.ExpirationTimeValidator(now, true)
-audValidator := jwt.AudienceValidator(jwt.Audience{"https://golang.org", "https://jwt.io", "https://google.com", "https://reddit.com"})
-if err := p.Validate(iatValidator, expValidator, audValidator); err != nil {
-	switch err {
-	case jwt.ErrIatValidation:
-		// handle "iat" validation error
-	case jwt.ErrExpValidation:
-		// handle "exp" validation error
-	case jwt.ErrAudValidation:
-		// handle "aud" validation error
+func main() {
+	now := time.Now()
+	pl := CustomPayload{
+		Payload: jwt.Payload{
+			Issuer:         "gbrlsnchs",
+			Subject:        "someone",
+			Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
+			ExpirationTime: jwt.NumericDate(now.Add(24 * 30 * 12 * time.Hour)),
+			NotBefore:      jwt.NumericDate(now.Add(30 * time.Minute)),
+			IssuedAt:       jwt.NumericDate(now),
+			JWTID:          "foobar",
+		},
+		Foo: "foo",
+		Bar: 1337,
 	}
+
+	token, err := jwt.Sign(pl, hs)
+	if err != nil {
+		// ...
+	}
+
+	// ...
 }
 ```
+
+### Verifying
+```go
+import "github.com/gbrlsnchs/jwt/v3"
+
+type CustomPayload struct {
+	jwt.Payload
+	Foo string `json:"foo,omitempty"`
+	Bar int    `json:"bar,omitempty"`
+}
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	var pl CustomPayload
+	hd, err := jwt.Verify(token, hs, &pl)
+	if err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+### Other use case examples
+<details><summary><b>Setting "cty" and "kid" claims</b></summary>
+<p>
+
+The "cty" and "kid" claims can be set by passing options to the `jwt.Sign` function:
+```go
+import (
+	"time"
+
+	"github.com/gbrlsnchs/jwt/v3"
+)
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	pl := jwt.Payload{
+		Subject:  "gbrlsnchs",
+		Issuer:   "gsr.dev",
+		IssuedAt: jwt.NumericDate(time.Now()),
+	}
+
+	token, err := jwt.Sign(pl, hs, jwt.ContentType("JWT"), jwt.KeyID("my_key"))
+	if err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+</p>
+</details>
+
+<details><summary><b>Validating "alg" before verifying</b></summary>
+<p>
+
+For validating the "alg" field in a JOSE header **before** verification, the `jwt.ValidateHeader` option must be passed to `jwt.Verify`.
+```go
+import "github.com/gbrlsnchs/jwt/v3"
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	var pl jwt.Payload
+	if _, err := jwt.Verify(token, hs, &pl, jwt.ValidateHeader); err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+</p>
+</details>
+
+<details><summary><b>Using an <code>Algorithm</code> resolver</b></summary>
+<p>
+
+```go
+import (
+	"errors"
+
+	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/jwtutil"
+)
+
+var (
+	// ...
+
+	rs256 = jwt.NewRS256(jwt.RSAPublicKey(myRSAPublicKey))
+	es256 = jwt.NewES256(jwt.ECDSAPublicKey(myECDSAPublicKey))
+)
+
+func main() {
+	rv := &jwtutil.Resolver{New: func(hd jwt.Header) {
+		switch hd.KeyID {
+		case "foo":
+			return rs256, nil
+		case "bar":
+			return es256, nil
+		default:
+			return nil, errors.New(`invalid "kid"`)
+		}
+	}}
+	var pl jwt.Payload
+	if _, err := jwt.Verify(token, rv, &pl); err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+</p>
+</details>
 
 ## Contributing
 ### How to help

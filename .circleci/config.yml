@@ -1,0 +1,60 @@
+version: 2.1
+
+executors:
+  golang:
+    parameters:
+      version:
+        description: Go version
+        type: string
+    docker:
+      - image: circleci/golang:<< parameters.version >>
+
+commands:
+  test:
+    steps:
+      - run: make
+      - run: make test
+
+workflows:
+  test:
+    jobs:
+      - go1_9
+      - go1_10
+      - go1_11
+      - go1_12
+
+jobs:
+  go1_12: &template
+    executor:
+      name: golang
+      version: "1.12"
+    steps:
+      - checkout
+      - test
+
+  go1_11:
+    <<: *template
+    executor:
+      name: golang
+      version: "1.11"
+
+  go1_10: &nomod_template
+    <<: *template
+    environment:
+      GO111MODULE: off
+      GO_COMMAND: vgo
+    executor:
+      name: golang
+      version: "1.10"
+    working_directory: /go/src/github.com/gbrlsnchs/jwt
+    steps:
+      - checkout
+      - run: go get -u golang.org/x/crypto/ed25519
+      - run: go get -u golang.org/x/xerrors
+      - test
+
+  go1_9:
+    <<: *nomod_template
+    executor:
+      name: golang
+      version: "1.9"

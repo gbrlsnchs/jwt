@@ -1,40 +1,52 @@
 package jwt
 
-import "github.com/gbrlsnchs/jwt/v3/internal"
+import (
+	"errors"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
+)
 
 // ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
-var ErrMalformed = internal.NewError("jwt: malformed token")
+var ErrMalformed = errors.New("jwt: malformed token")
 
 // RawToken is a representation of a parsed JWT string.
 type RawToken struct {
 	token      []byte
 	sep1, sep2 int
-	valid      bool
 
-	hd Header
+	hd  Header
+	alg Algorithm
+
+	pl  *Payload
+	vds []Validator
 }
 
-// Decode decodes a raw JWT into a payload and returns its header.
-func (raw RawToken) Decode(payload interface{}) error {
-	if !raw.valid {
-		return ErrMalformed
+func (rt *RawToken) header() []byte        { return rt.token[:rt.sep1] }
+func (rt *RawToken) headerPayload() []byte { return rt.token[:rt.sep2] }
+func (rt *RawToken) payload() []byte       { return rt.token[rt.sep1+1 : rt.sep2] }
+func (rt *RawToken) sig() []byte           { return rt.token[rt.sep2+1:] }
+
+func (rt *RawToken) setToken(token []byte, sep1, sep2 int) {
+	rt.sep1 = sep1
+	rt.sep2 = sep1 + 1 + sep2
+	rt.token = token
+}
+
+func (rt *RawToken) decode(payload interface{}) (err error) {
+	if err = internal.Decode(rt.payload(), payload); err != nil {
+		return err
 	}
-	return internal.Decode(raw.payload(), payload)
+	for _, vd := range rt.vds {
+		if err = vd(rt.pl); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-// Header returns a JOSE Header extracted from a JWT.
-func (raw RawToken) Header() Header {
-	return raw.hd
-}
-
-func (raw RawToken) header() []byte        { return raw.token[:raw.sep1] }
-func (raw RawToken) headerPayload() []byte { return raw.token[:raw.sep2] }
-func (raw RawToken) payload() []byte       { return raw.token[raw.sep1+1 : raw.sep2] }
-func (raw RawToken) sig() []byte           { return raw.token[raw.sep2+1:] }
-
-func (raw RawToken) withToken(token []byte, sep1, sep2 int) RawToken {
-	raw.sep1 = sep1
-	raw.sep2 = sep1 + 1 + sep2
-	raw.token = token
-	return raw
+func (rt *RawToken) decodeHeader() error {
+	if err := internal.Decode(rt.header(), &rt.hd); err != nil {
+		return err
+	}
+	return nil
 }

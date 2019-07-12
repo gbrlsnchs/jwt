@@ -3,35 +3,11 @@ package jwt_test
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
 )
 
-type testPayload struct {
-	jwt.Payload
-	String string `json:"string,omitempty"`
-	Int    int    `json:"int,omitempty"`
-}
-
-var (
-	now = time.Now()
-	tp  = testPayload{
-		Payload: jwt.Payload{
-			Issuer:         "gbrlsnchs",
-			Subject:        "someone",
-			Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
-			ExpirationTime: jwt.NumericDate(now.Add(24 * 30 * 12 * time.Hour)),
-			NotBefore:      jwt.NumericDate(now.Add(30 * time.Minute)),
-			IssuedAt:       jwt.NumericDate(now),
-			JWTID:          "foobar",
-		},
-		String: "foobar",
-		Int:    1337,
-	}
-)
-
-func TestSign(t *testing.T) {
+func TestVerify(t *testing.T) {
 	type testCase struct {
 		alg     jwt.Algorithm
 		payload interface{}
@@ -791,27 +767,20 @@ func TestSign(t *testing.T) {
 	for k, v := range testCases {
 		t.Run(k, func(t *testing.T) {
 			for _, tc := range v {
-				t.Run(tc.alg.Name(), func(t *testing.T) {
+				t.Run(tc.verifyAlg.Name(), func(t *testing.T) {
 					token, err := jwt.Sign(tc.payload, tc.alg)
-					if want, got := tc.signErr, err; got != want {
-						t.Fatalf("want %v, got %v", want, got)
-					}
 					if err != nil {
-						return
+						t.Fatal(err)
 					}
-
-					var (
-						hd      jwt.Header
-						payload testPayload
-					)
-					hd, err = jwt.Verify(token, tc.verifyAlg, &payload)
+					var pl testPayload
+					hd, err := jwt.Verify(token, tc.verifyAlg, &pl)
 					if want, got := tc.verifyErr, err; got != want {
-						t.Fatalf("want %v, got %v", want, got)
+						t.Errorf("want %v, got %v", want, got)
 					}
 					if want, got := tc.wantHeader, hd; !reflect.DeepEqual(got, want) {
 						t.Errorf("want %#+v, got %#+v", want, got)
 					}
-					if want, got := tc.wantPayload, payload; !reflect.DeepEqual(got, want) {
+					if want, got := tc.wantPayload, pl; !reflect.DeepEqual(got, want) {
 						t.Errorf("want %#+v, got %#+v", want, got)
 					}
 				})

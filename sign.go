@@ -5,8 +5,34 @@ import (
 	"encoding/json"
 )
 
-// Sign generates a JWT from hd and payload and signs it with alg.
-func Sign(alg Algorithm, hd Header, payload interface{}) ([]byte, error) {
+// SignOption is a functional option for signing.
+type SignOption func(*Header)
+
+// ContentType sets the "cty" claim for a Header before signing.
+func ContentType(cty string) SignOption {
+	return func(hd *Header) {
+		hd.ContentType = cty
+	}
+}
+
+// KeyID sets the "kid" claim for a Header before signing.
+func KeyID(kid string) SignOption {
+	return func(hd *Header) {
+		hd.KeyID = kid
+	}
+}
+
+// Sign signs a payload with alg.
+func Sign(payload interface{}, alg Algorithm, opts ...SignOption) ([]byte, error) {
+	var hd Header
+	for _, opt := range opts {
+		opt(&hd)
+	}
+	if rv, ok := alg.(Resolver); ok {
+		if err := rv.Resolve(hd); err != nil {
+			return nil, err
+		}
+	}
 	// Override some values or set them if empty.
 	hd.Algorithm = alg.Name()
 	hd.Type = "JWT"
@@ -14,6 +40,10 @@ func Sign(alg Algorithm, hd Header, payload interface{}) ([]byte, error) {
 	hb, err := json.Marshal(hd)
 	if err != nil {
 		return nil, err
+	}
+
+	if payload == nil {
+		payload = Payload{}
 	}
 	// Marshal the claims part of the JWT.
 	pb, err := json.Marshal(payload)
