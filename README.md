@@ -144,6 +144,40 @@ func main() {
 }
 ```
 
+### Verifying with options
+```go
+import "github.com/gbrlsnchs/jwt/v3"
+
+type CustomPayload struct {
+	jwt.Payload
+	Foo string `json:"foo,omitempty"`
+	Bar int    `json:"bar,omitempty"`
+}
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	var pl CustomPayload
+	var now    = time.Now()
+	var audience = "https://golang.org"
+
+	// Validate the expiry time and issuer
+	iatValidator := jwt.IssuedAtValidator(now)
+	expValidator := jwt.ExpirationTimeValidator(now)
+	audValidator := jwt.AudienceValidator(jwt.Audience{audience})
+	// Building jwt.VerifyOption
+	verifyOptions := jwt.ValidatePayload(&pl.Payload, iatValidator, expValidator, audValidator)
+
+	hd, err := jwt.Verify(token, hs, &pl, verifyOptions)
+	if err != nil {
+		// ...
+	}
+
+	// ...
+}
+
 ### Other use case examples
 <details><summary><b>Setting "cty" and "kid" claims</b></summary>
 <p>
