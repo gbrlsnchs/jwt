@@ -144,40 +144,6 @@ func main() {
 }
 ```
 
-### Verifying with options
-```go
-import "github.com/gbrlsnchs/jwt/v3"
-
-type CustomPayload struct {
-	jwt.Payload
-	Foo string `json:"foo,omitempty"`
-	Bar int    `json:"bar,omitempty"`
-}
-
-var hs = jwt.NewHS256([]byte("secret"))
-
-func main() {
-	// ...
-
-	var pl CustomPayload
-	var now    = time.Now()
-	var audience = "https://golang.org"
-
-	// Validate the expiry time and issuer
-	iatValidator := jwt.IssuedAtValidator(now)
-	expValidator := jwt.ExpirationTimeValidator(now)
-	audValidator := jwt.AudienceValidator(jwt.Audience{audience})
-	// Building jwt.VerifyOption
-	verifyOptions := jwt.ValidatePayload(&pl.Payload, iatValidator, expValidator, audValidator)
-
-	hd, err := jwt.Verify(token, hs, &pl, verifyOptions)
-	if err != nil {
-		// ...
-	}
-
-	// ...
-}
-
 ### Other use case examples
 <details><summary><b>Setting "cty" and "kid" claims</b></summary>
 <p>
@@ -200,6 +166,55 @@ func main() {
 	}
 
 	token, err := jwt.Sign(pl, hs, jwt.ContentType("JWT"), jwt.KeyID("my_key"))
+	if err != nil {
+		// ...
+	}
+
+	// ...
+}
+```
+
+</p>
+</details>
+
+<details><summary><b>Validating claims</b></summary>
+<p>
+
+
+```go
+import (
+	"time"
+
+	"github.com/gbrlsnchs/jwt/v3"
+)
+
+type CustomPayload struct {
+	jwt.Payload
+	Foo string `json:"foo,omitempty"`
+	Bar int    `json:"bar,omitempty"`
+}
+
+var hs = jwt.NewHS256([]byte("secret"))
+
+func main() {
+	// ...
+
+	var (
+		now = time.Now()
+		aud = jwt.Audience{"https://golang.org"}
+
+		// Validate claims "iat", "exp" and "aud".
+		iatValidator = jwt.IssuedAtValidator(now)
+		expValidator = jwt.ExpirationTimeValidator(now)
+		audValidator = jwt.AudienceValidator(aud)
+
+		// Use jwt.ValidatePayload to build a jwt.VerifyOption.
+		// Validators are run in the order informed.
+		pl              CustomPayload
+		validatePayload = jwt.ValidatePayload(&pl.Payload, iatValidator, expValidator, audValidator)
+	)
+
+	hd, err := jwt.Verify(token, hs, &pl, validatePayload)
 	if err != nil {
 		// ...
 	}
