@@ -1,9 +1,10 @@
 export GO111MODULE ?= on
 
-all: export GO111MODULE := off
 all:
-	go get -u golang.org/x/tools/cmd/goimports
-	go get -u golang.org/x/lint/golint
+	go get golang.org/x/tools/gopls@latest
+	go get golang.org/x/tools/cmd/goimports
+	go get golang.org/x/lint/golint
+	go mod download
 
 fix:
 	@goimports -w *.go
@@ -11,9 +12,10 @@ fix:
 lint:
 	@! goimports -d . | grep -vF "no errors"
 	@golint -set_exit_status ./...
+	@go vet
 
 bench:
 	@go test -v -run=^$$ -bench=.
 
 test: lint
-	@go test -v ./...
+	@go test ./...
