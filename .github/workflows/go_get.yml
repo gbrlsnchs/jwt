@@ -1,0 +1,23 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [macOS-latest, ubuntu-latest, windows-latest]
+        go_version: [1.9.7, 1.10.3]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v1
+      - if: matrix.os == 'ubuntu-latest'
+        uses: docker://golang:${{ matrix.go_version }}-alpine
+      - if: matrix.os != 'ubuntu-latest'
+        uses: actions/setup-go@v1
+      - name: Lint and test
+        env:
+          MAGEFILE_VERBOSE: true
+        run: |
+          go get -u github.com/magefile/mage
+          mage install
+          mage lint
+          mage test
