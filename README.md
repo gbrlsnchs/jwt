@@ -269,7 +269,7 @@ var (
 )
 
 func main() {
-	rv := &jwtutil.Resolver{New: func(hd jwt.Header) {
+	rv := &jwtutil.Resolver{New: func(hd jwt.Header) (jwt.Algorithm, error) {
 		switch hd.KeyID {
 		case "foo":
 			return rs256, nil
