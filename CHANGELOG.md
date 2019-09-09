@@ -9,24 +9,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Signing and verifying using [RSA-PSS](https://en.wikipedia.org/wiki/Probabilistic_signature_scheme).
 - Signing and verifying using [Ed25519](https://ed25519.cr.yp.to/).
 - `Audience` type for handling the `aud` claim [according to the RFC](https://tools.ietf.org/html/rfc7519#section-4.1.3).
-- `Size` method to `Signer` interface.
-- `Verifier` interface.
+- `Algorithm` interface.
 - `RawToken` type.
-- SHA constants.
+- `Payload` and `Header` structs.
+- `Resolver` interface.
+- `jwtutil` package and a type that implements `Resolver` that dynamically resolves which algorithm to use.
 
 ### Changed
 - Improve performance by storing SHA hash functions in `sync.Pool`.
-- Restructure `JWT` type by putting claims fields in a new struct.
 - Change signing/verifying methods constructors' names.
-- Unify signign/verifying methods constructors.
-- Change `Signer` interface.
 - Sign tokens with global function `Sign`.
 - Verify tokens with global function `Verify`.
+
+### Fixed
+- Allowing arbitrary payload.
 
 ### Removed
 - Support for `go1.10`.
 - `Marshal` and `Unmarshal` functions.
 - `Marshaler` and `Unmarshaler` interfaces.
+- `Signer` interface.
 
 ## [2.0.0] - 2018-09-14
 ### Added
