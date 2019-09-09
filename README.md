@@ -1,15 +1,11 @@
 # jwt (JSON Web Token for Go)
 [![JWT compatible](https://jwt.io/img/badge.svg)](https://jwt.io)  
 
-[![CircleCI](https://circleci.com/gh/gbrlsnchs/jwt.svg?style=shield)](https://circleci.com/gh/gbrlsnchs/jwt)
+[![Github Actions Status](https://github.com/gbrlsnchs/jwt/workflows/Linux,%20macOS%20and%20Windows/badge.svg)](https://github.com/gbrlsnchs/jwt/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gbrlsnchs/jwt)](https://goreportcard.com/report/github.com/gbrlsnchs/jwt)
 [![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
+[![Version compatibility with Go 1.11 onward using modules](https://img.shields.io/badge/compatible%20with-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-## Compatibility
-[![Version Compatibility](https://img.shields.io/badge/go%20modules-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
-[![vgo](https://img.shields.io/badge/vgo-go1.10-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
-[![go get](https://img.shields.io/badge/go%20get-go1.9.7+,%20go1.10.3+%20and%20go1.11-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 
 ## About
 This package is a JWT signer, verifier and validator for [Go](https://golang.org) (or Golang).
@@ -35,48 +31,12 @@ In other words, API changes all the time in `master`. It's a place for public ex
 Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
 
 ### Installing
-<details><summary><b>Go 1.12 onward</b></summary>
-<p>
-
-```sh
-$ go get -u github.com/gbrlsnchs/jwt/v3
-```
-
-</p>
-</details>
-
-<details><summary><b>Go 1.11</b></summary>
-<p>
-
-```sh
-$ GO111MODULE=on go get -u github.com/gbrlsnchs/jwt/v3
-```
-
-</p>
-</details>
-
-<details><summary><b>Go 1.10 with <code>vgo</code></b></summary>
-<p>
-
-```sh
-$ vgo get -u github.com/gbrlsnchs/jwt/v3
-```
-
-</p>
-</details>
-
-<details><summary><b>Go 1.9.7+, Go 1.10.3+ (without <code>vgo</code>) and Go 1.11 (when <code>GO111MODULE=off</code>)</b></summary>
-<p>
-
-```sh
-$ go get -u github.com/gbrlsnchs/jwt/v3
-```
-
 #### Important
-Your project must be inside the `GOPATH`.
+For Go 1.11, make sure the environment variable `GO111MODULE` is set as `on` when running the install command.
 
-</p>
-</details>
+```sh
+$ go get -u github.com/gbrlsnchs/jwt/v3
+```
 
 ### Signing
 ```go
