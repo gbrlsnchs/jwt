@@ -1,6 +1,7 @@
 package jwt_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -788,6 +789,19 @@ func TestVerify(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("non-JSON payload", func(t *testing.T) {
+		var (
+			header  = "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0"
+			payload = "MTMzNw"
+			token   = fmt.Sprintf("%s.%s.", header, payload)
+			v       interface{}
+		)
+		_, err := jwt.Verify([]byte(token), jwt.None(), &v)
+		if want, got := jwt.ErrNotJSONObject, err; got != want {
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
 }
 
 func TestValidatePayload(t *testing.T) {

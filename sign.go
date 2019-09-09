@@ -50,6 +50,9 @@ func Sign(payload interface{}, alg Algorithm, opts ...SignOption) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
+	if !isJSONObject(pb) {
+		return nil, ErrNotJSONObject
+	}
 
 	enc := base64.RawURLEncoding
 	h64len := enc.EncodedLen(len(hb))

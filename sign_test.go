@@ -60,6 +60,18 @@ func TestSign(t *testing.T) {
 			},
 			{
 				alg:       jwt.NewHS256(hmacKey1),
+				payload:   1337,
+				verifyAlg: jwt.NewHS256(hmacKey1),
+				wantHeader: jwt.Header{
+					Algorithm: "HS256",
+					Type:      "JWT",
+				},
+				wantPayload: tp,
+				signErr:     jwt.ErrNotJSONObject,
+				verifyErr:   nil,
+			},
+			{
+				alg:       jwt.NewHS256(hmacKey1),
 				payload:   tp,
 				verifyAlg: jwt.NewHS256(hmacKey2),
 				wantHeader: jwt.Header{

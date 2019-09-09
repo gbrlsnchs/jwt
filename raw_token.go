@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"encoding/json"
 	"errors"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
@@ -33,7 +34,14 @@ func (rt *RawToken) setToken(token []byte, sep1, sep2 int) {
 }
 
 func (rt *RawToken) decode(payload interface{}) (err error) {
-	if err = internal.Decode(rt.payload(), payload); err != nil {
+	pb, err := internal.DecodeToBytes(rt.payload())
+	if err != nil {
+		return err
+	}
+	if !isJSONObject(pb) {
+		return ErrNotJSONObject
+	}
+	if err = json.Unmarshal(pb, payload); err != nil {
 		return err
 	}
 	for _, vd := range rt.vds {
