@@ -57,7 +57,7 @@ func newRSASHA(name string, opts []func(*RSASHA), sha crypto.Hash, pss bool) *RS
 	if rs.pub == nil {
 		rs.pub = &rs.priv.PublicKey
 	}
-	rs.size = internal.RSASignatureSize(rs.pub) // cache size
+	rs.size = rs.pub.Size() // cache size
 	if pss {
 		rs.opts = &rsa.PSSOptions{
 			SaltLength: rsa.PSSSaltLengthAuto,
