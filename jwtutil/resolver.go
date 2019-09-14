@@ -16,6 +16,9 @@ var ErrNilAlg = internal.NewError("algorithm is nil")
 
 // Name returns an Algorithm's name.
 func (rv *Resolver) Name() string {
+	if rv.alg == nil {
+		return ""
+	}
 	return rv.alg.Name()
 }
 

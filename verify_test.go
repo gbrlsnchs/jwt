@@ -9,6 +9,42 @@ import (
 	"github.com/gbrlsnchs/jwt/v3"
 )
 
+type testPayload struct {
+	jwt.Payload
+	String string `json:"string,omitempty"`
+	Int    int    `json:"int,omitempty"`
+}
+
+type testCase struct {
+	alg     jwt.Algorithm
+	payload interface{}
+
+	verifyAlg   jwt.Algorithm
+	opts        []func(*jwt.RawToken)
+	wantHeader  jwt.Header
+	wantPayload testPayload
+
+	signErr   error
+	verifyErr error
+}
+
+var (
+	now = time.Now()
+	tp  = testPayload{
+		Payload: jwt.Payload{
+			Issuer:         "gbrlsnchs",
+			Subject:        "someone",
+			Audience:       jwt.Audience{"https://golang.org", "https://jwt.io"},
+			ExpirationTime: jwt.NumericDate(now.Add(24 * 30 * 12 * time.Hour)),
+			NotBefore:      jwt.NumericDate(now.Add(30 * time.Minute)),
+			IssuedAt:       jwt.NumericDate(now),
+			JWTID:          "foobar",
+		},
+		String: "foobar",
+		Int:    1337,
+	}
+)
+
 func TestVerify(t *testing.T) {
 	type testCase struct {
 		alg     jwt.Algorithm
