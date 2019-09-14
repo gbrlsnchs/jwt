@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	// ErrEd25519PrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrEd25519PrivKey = errors.New("jwt: Ed25519 private key is nil")
-	// ErrEd25519PubKey is the error for trying to verify a JWT with a nil public key.
-	ErrEd25519PubKey = errors.New("jwt: Ed25519 public key is nil")
+	// ErrEd25519NilPrivKey is the error for trying to sign a JWT with a nil private key.
+	ErrEd25519NilPrivKey = errors.New("jwt: Ed25519 private key is nil")
+	// ErrEd25519NilPubKey is the error for trying to verify a JWT with a nil public key.
+	ErrEd25519NilPubKey = errors.New("jwt: Ed25519 public key is nil")
 	// ErrEd25519Verification is the error for when verification with Ed25519 fails.
 	ErrEd25519Verification = errors.New("jwt: Ed25519 verification failed")
 
@@ -60,7 +60,7 @@ func (*Ed25519) Name() string {
 // Sign signs headerPayload using the Ed25519 algorithm.
 func (ed *Ed25519) Sign(headerPayload []byte) ([]byte, error) {
 	if ed.priv == nil {
-		return nil, ErrEd25519PrivKey
+		return nil, ErrEd25519NilPrivKey
 	}
 	return ed25519.Sign(ed.priv, headerPayload), nil
 }
@@ -73,7 +73,7 @@ func (*Ed25519) Size() int {
 // Verify verifies a payload and a signature.
 func (ed *Ed25519) Verify(payload, sig []byte) (err error) {
 	if ed.pub == nil {
-		return ErrEd25519PubKey
+		return ErrEd25519NilPubKey
 	}
 	if sig, err = internal.DecodeToBytes(sig); err != nil {
 		return err
