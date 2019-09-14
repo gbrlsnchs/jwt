@@ -17,9 +17,9 @@ jobs:
         env:
           MAGEFILE_VERBOSE: true
         run: |
-          GOBIN="$(pwd)/bin" go install github.com/magefile/mage
-          ./bin/mage install
-          ./bin/mage lint
+          GOBIN="$(pwd)/.bin" go install github.com/magefile/mage
+          ./.bin/mage install
+          ./.bin/mage lint
 
   test:
     needs: lint
@@ -40,5 +40,5 @@ jobs:
           MAGEFILE_VERBOSE: true
         shell: bash
         run: |
-          GOBIN="$(pwd)/bin" go install github.com/magefile/mage
-          ./bin/mage test
+          GOBIN="$(pwd)/.bin" go install github.com/magefile/mage
+          ./.bin/mage test

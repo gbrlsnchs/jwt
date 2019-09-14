@@ -16,6 +16,8 @@ const (
 	goplsImportPath     = "golang.org/x/tools/gopls"
 	goimportsImportPath = "golang.org/x/tools/cmd/goimports"
 	golintImportPath    = "golang.org/x/lint/golint"
+
+	bin = ".bin"
 )
 
 var (
@@ -38,7 +40,7 @@ func Fix() error {
 		return err
 	}
 
-	goimportsCmd := filepath.Join(root, "bin", "goimports")
+	goimportsCmd := filepath.Join(root, bin, "goimports")
 	return sh.Run(goimportsCmd, "-w", root)
 }
 
@@ -53,7 +55,7 @@ func Install() error {
 		goimportsImportPath,
 		golintImportPath,
 	}
-	gobin := filepath.Join(root, "bin")
+	gobin := filepath.Join(root, bin)
 	for _, dep := range deps {
 		if err := sh.RunWith(
 			map[string]string{"GOBIN": gobin},
@@ -71,7 +73,7 @@ func Lint() error {
 	if err != nil {
 		return err
 	}
-	goimportsCmd := filepath.Join(root, "bin", "goimports")
+	goimportsCmd := filepath.Join(root, bin, "goimports")
 	goimportsDiff, err := sh.Output(goimportsCmd, "-d", root)
 	if err != nil {
 		return err
@@ -79,7 +81,7 @@ func Lint() error {
 	if goimportsDiff != "" {
 		return fmt.Errorf("\n%s", goimportsDiff)
 	}
-	golintCmd := filepath.Join(root, "bin", "golint")
+	golintCmd := filepath.Join(root, bin, "golint")
 	return sh.Run(golintCmd, "-set_exit_status", filepath.Join(root, "..."))
 }
 
