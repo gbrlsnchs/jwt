@@ -3,6 +3,8 @@ package jwt
 import (
 	"encoding/base64"
 	"encoding/json"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 // SignOption is a functional option for signing.
@@ -30,7 +32,7 @@ func Sign(payload interface{}, alg Algorithm, opts ...SignOption) ([]byte, error
 	}
 	if rv, ok := alg.(Resolver); ok {
 		if err := rv.Resolve(hd); err != nil {
-			return nil, err
+			return nil, internal.Errorf("jwt: failed to resolve: %w", err)
 		}
 	}
 	// Override some values or set them if empty.
