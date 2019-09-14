@@ -2,10 +2,10 @@ package jwt_test
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
 
 	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestAudienceMarshal(t *testing.T) {
@@ -20,7 +20,7 @@ func TestAudienceMarshal(t *testing.T) {
 		if b, err = json.Marshal(v); err != nil {
 			t.Fatal(err)
 		}
-		checkAudMarshal(t, "{}", b)
+		checkAudMarshal(t, b, "{}")
 
 	})
 
@@ -44,12 +44,12 @@ func TestAudienceMarshal(t *testing.T) {
 				if b, err = tc.aud.MarshalJSON(); err != nil {
 					t.Fatal(err)
 				}
-				checkAudMarshal(t, tc.expected, b)
+				checkAudMarshal(t, b, tc.expected)
 			}
 			if b, err = json.Marshal(tc.aud); err != nil {
 				t.Fatal(err)
 			}
-			checkAudMarshal(t, tc.expected, b)
+			checkAudMarshal(t, b, tc.expected)
 		})
 	}
 }
@@ -69,23 +69,23 @@ func TestAudienceUnmarshal(t *testing.T) {
 			if err := aud.UnmarshalJSON(tc.jstr); err != nil {
 				t.Fatal(err)
 			}
-			checkAudUnmarshal(t, tc.expected, aud)
+			checkAudUnmarshal(t, aud, tc.expected)
 			if err := json.Unmarshal(tc.jstr, &aud); err != nil {
 				t.Fatal(err)
 			}
-			checkAudUnmarshal(t, tc.expected, aud)
+			checkAudUnmarshal(t, aud, tc.expected)
 		})
 	}
 }
 
-func checkAudMarshal(t *testing.T, want string, got []byte) {
-	if want != string(got) {
-		t.Errorf("want %q, got %q", want, got)
+func checkAudMarshal(t *testing.T, got []byte, want string) {
+	if string(got) != want {
+		t.Errorf("jwt.Audience.Marshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
 	}
 }
 
-func checkAudUnmarshal(t *testing.T, want, got jwt.Audience) {
-	if !reflect.DeepEqual(want, got) {
-		t.Errorf("want %v, got %v", want, got)
+func checkAudUnmarshal(t *testing.T, got, want jwt.Audience) {
+	if !cmp.Equal(got, want) {
+		t.Errorf("jwt.Audience.Unmarshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
 	}
 }

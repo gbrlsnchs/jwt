@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
+	"github.com/google/go-cmp/cmp"
 )
 
 var (
@@ -41,11 +42,11 @@ func TestDecode(t *testing.T) {
 				dt  decodeTest
 				err = internal.Decode([]byte(b64), &dt)
 			)
-			if want, got := tc.errors, err != nil; want != got {
+			if want, got := tc.errors, internal.ErrorAs(err, new(base64.CorruptInputError)); got != want {
 				t.Fatalf("want %t, got %t: %v", want, got, err)
 			}
-			if want, got := tc.expected, dt.X; want != got {
-				t.Errorf("want %q, got %q", want, got)
+			if want, got := tc.expected, dt.X; got != want {
+				t.Errorf("internal.Decode mismatch (-want +got):\n%s", cmp.Diff(want, got))
 			}
 		})
 	}

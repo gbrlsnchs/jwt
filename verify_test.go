@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/internal"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -85,8 +86,8 @@ func TestVerify(t *testing.T) {
 			v       interface{}
 		)
 		_, err := jwt.Verify([]byte(token), jwt.None(), &v)
-		if want, got := jwt.ErrNotJSONObject, err; got != want {
-			t.Errorf("want %v, got %v", want, got)
+		if want, got := jwt.ErrNotJSONObject, err; !internal.ErrorIs(got, want) {
+			t.Errorf("jwt.Verify JSON payload mismatch (-want +got):\n%s", cmp.Diff(want, got))
 		}
 	})
 }
@@ -154,8 +155,8 @@ func TestValidatePayload(t *testing.T) {
 				t.Fatal(err)
 			}
 			_, err = jwt.Verify(token, hs256, tc.pl, jwt.ValidatePayload(tc.pl, tc.vds...))
-			if want, got := tc.err, err; got != want {
-				t.Errorf("want %v, got %v", want, got)
+			if want, got := tc.err, err; !internal.ErrorIs(got, want) {
+				t.Errorf("jwt.Verify with validators mismatch (-want +got):\n%s", cmp.Diff(want, got))
 			}
 		})
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gbrlsnchs/jwt/v3"
 	"github.com/gbrlsnchs/jwt/v3/internal"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestTimeMarshalJSON(t *testing.T) {
@@ -31,7 +32,7 @@ func TestTimeMarshalJSON(t *testing.T) {
 				t.Fatal(err)
 			}
 			if want, got := tc.want, n; got != want {
-				t.Errorf("want %d, got %d", want, got)
+				t.Errorf("jwt.Time.Marshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
 			}
 		})
 	}
@@ -45,9 +46,9 @@ func TestTimeUnmarshalJSON(t *testing.T) {
 		isNil bool
 	}{
 		{now.Unix(), jwt.Time{now}, false},
-		{internal.Epoch.Unix() - 1337, jwt.Time{internal.Epoch}, false},
+		{internal.Epoch.Unix() - 0xDEAD, jwt.Time{internal.Epoch}, false},
 		{internal.Epoch.Unix(), jwt.Time{internal.Epoch}, false},
-		{internal.Epoch.Unix() + 1337, jwt.Time{internal.Epoch.Add(1337 * time.Second)}, false},
+		{internal.Epoch.Unix() + 0xDEAD, jwt.Time{internal.Epoch.Add(0xDEAD * time.Second)}, false},
 		{0, jwt.Time{}, true},
 	}
 	for _, tc := range testCases {
@@ -64,8 +65,8 @@ func TestTimeUnmarshalJSON(t *testing.T) {
 			if err = tt.UnmarshalJSON(b); err != nil {
 				t.Fatal(err)
 			}
-			if want, got := tc.want, tt; got.Unix() != want.Unix() {
-				t.Errorf("want %d, got %d", want.Unix(), got.Unix())
+			if want, got := tc.want.Unix(), tt.Unix(); got != want {
+				t.Errorf("jwt.Time.Unmarshal mismatch (-want +got):\n%s", cmp.Diff(want, got))
 			}
 		})
 	}

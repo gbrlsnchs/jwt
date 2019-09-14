@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/internal"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestValidators(t *testing.T) {
@@ -49,8 +51,8 @@ func TestValidators(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.claim, func(t *testing.T) {
-			if want, got := tc.err, tc.vl(tc.pl); want != got {
-				t.Errorf("want %v, got %v", want, got)
+			if want, got := tc.err, tc.vl(tc.pl); !internal.ErrorIs(got, want) {
+				t.Errorf(cmp.Diff(want, got))
 			}
 		})
 	}
