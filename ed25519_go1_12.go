@@ -3,19 +3,17 @@
 package jwt
 
 import (
-	"errors"
-
 	"github.com/gbrlsnchs/jwt/v3/internal"
 	"golang.org/x/crypto/ed25519"
 )
 
 var (
 	// ErrEd25519NilPrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrEd25519NilPrivKey = errors.New("jwt: Ed25519 private key is nil")
+	ErrEd25519NilPrivKey = internal.NewError("jwt: Ed25519 private key is nil")
 	// ErrEd25519NilPubKey is the error for trying to verify a JWT with a nil public key.
-	ErrEd25519NilPubKey = errors.New("jwt: Ed25519 public key is nil")
+	ErrEd25519NilPubKey = internal.NewError("jwt: Ed25519 public key is nil")
 	// ErrEd25519Verification is the error for when verification with Ed25519 fails.
-	ErrEd25519Verification = errors.New("jwt: Ed25519 verification failed")
+	ErrEd25519Verification = internal.NewError("jwt: Ed25519 verification failed")
 
 	_ Algorithm = new(Ed25519)
 )

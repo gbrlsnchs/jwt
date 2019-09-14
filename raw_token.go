@@ -2,13 +2,12 @@ package jwt
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 // ErrMalformed indicates a token doesn't have a valid format, as per the RFC 7519.
-var ErrMalformed = errors.New("jwt: malformed token")
+var ErrMalformed = internal.NewError("jwt: malformed token")
 
 // RawToken is a representation of a parsed JWT string.
 type RawToken struct {

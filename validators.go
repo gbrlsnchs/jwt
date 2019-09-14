@@ -1,25 +1,26 @@
 package jwt
 
 import (
-	"errors"
 	"time"
+
+	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 var (
 	// ErrAudValidation is the error for an invalid "aud" claim.
-	ErrAudValidation = errors.New("jwt: aud claim is invalid")
+	ErrAudValidation = internal.NewError("jwt: aud claim is invalid")
 	// ErrExpValidation is the error for an invalid "exp" claim.
-	ErrExpValidation = errors.New("jwt: exp claim is invalid")
+	ErrExpValidation = internal.NewError("jwt: exp claim is invalid")
 	// ErrIatValidation is the error for an invalid "iat" claim.
-	ErrIatValidation = errors.New("jwt: iat claim is invalid")
+	ErrIatValidation = internal.NewError("jwt: iat claim is invalid")
 	// ErrIssValidation is the error for an invalid "iss" claim.
-	ErrIssValidation = errors.New("jwt: iss claim is invalid")
+	ErrIssValidation = internal.NewError("jwt: iss claim is invalid")
 	// ErrJtiValidation is the error for an invalid "jti" claim.
-	ErrJtiValidation = errors.New("jwt: jti claim is invalid")
+	ErrJtiValidation = internal.NewError("jwt: jti claim is invalid")
 	// ErrNbfValidation is the error for an invalid "nbf" claim.
-	ErrNbfValidation = errors.New("jwt: nbf claim is invalid")
+	ErrNbfValidation = internal.NewError("jwt: nbf claim is invalid")
 	// ErrSubValidation is the error for an invalid "sub" claim.
-	ErrSubValidation = errors.New("jwt: sub claim is invalid")
+	ErrSubValidation = internal.NewError("jwt: sub claim is invalid")
 )
 
 // Validator is a function that validates a Payload pointer.

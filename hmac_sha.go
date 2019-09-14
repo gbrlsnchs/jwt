@@ -3,7 +3,6 @@ package jwt
 import (
 	"crypto"
 	"crypto/hmac"
-	"errors"
 	"hash"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
@@ -11,9 +10,9 @@ import (
 
 var (
 	// ErrHMACMissingKey is the error for trying to sign or verify a JWT with an empty key.
-	ErrHMACMissingKey = errors.New("jwt: HMAC key is empty")
+	ErrHMACMissingKey = internal.NewError("jwt: HMAC key is empty")
 	// ErrHMACVerification is the error for an invalid signature.
-	ErrHMACVerification = errors.New("jwt: HMAC verification failed")
+	ErrHMACVerification = internal.NewError("jwt: HMAC verification failed")
 
 	_ Algorithm = new(HMACSHA)
 )

@@ -4,18 +4,17 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
-	"errors"
 
 	"github.com/gbrlsnchs/jwt/v3/internal"
 )
 
 var (
 	// ErrRSANilPrivKey is the error for trying to sign a JWT with a nil private key.
-	ErrRSANilPrivKey = errors.New("jwt: RSA private key is nil")
+	ErrRSANilPrivKey = internal.NewError("jwt: RSA private key is nil")
 	// ErrRSANilPubKey is the error for trying to verify a JWT with a nil public key.
-	ErrRSANilPubKey = errors.New("jwt: RSA public key is nil")
+	ErrRSANilPubKey = internal.NewError("jwt: RSA public key is nil")
 	// ErrRSAVerification is the error for an invalid RSA signature.
-	ErrRSAVerification = errors.New("jwt: RSA verification failed")
+	ErrRSAVerification = internal.NewError("jwt: RSA verification failed")
 
 	_ Algorithm = new(RSASHA)
 )
