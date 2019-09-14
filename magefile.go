@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/magefile/mage/sh"
 )
@@ -91,7 +92,9 @@ func Test() error {
 	if err != nil {
 		return err
 	}
-	return sh.Run(goCmd, "test", filepath.Join(root, "..."))
+	flags := strings.Split(os.Getenv("TEST_FLAGS"), " ")
+	args := append([]string{"test"}, flags...)
+	return sh.Run(goCmd, append(args, filepath.Join(root, "..."))...)
 }
 
 func findRoot(dir string) (string, error) {
