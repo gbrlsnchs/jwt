@@ -8,4 +8,5 @@ require (
 	golang.org/x/lint v0.0.0-20190409202823-959b441ac422
 	golang.org/x/tools v0.0.0-20190710153321-831012c29e42
 	golang.org/x/tools/gopls v0.1.3
+	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
 )
