@@ -5,7 +5,11 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 
+	"testing"
+
 	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/internal"
+	"github.com/google/go-cmp/cmp"
 )
 
 var (
@@ -201,6 +205,47 @@ var (
 		},
 	}
 )
+
+func TestNewECDSASHA(t *testing.T) {
+	testCases := []struct {
+		builder func(...func(*jwt.ECDSASHA)) *jwt.ECDSASHA
+		opts    func(*jwt.ECDSASHA)
+		err     error
+	}{
+		{jwt.NewES256, nil, jwt.ErrECDSANilPrivKey},
+		{jwt.NewES256, jwt.ECDSAPrivateKey(nil), jwt.ErrECDSANilPrivKey},
+		{jwt.NewES256, jwt.ECDSAPrivateKey(es256PrivateKey1), nil},
+		{jwt.NewES256, jwt.ECDSAPublicKey(es256PublicKey1), nil},
+		{jwt.NewES384, nil, jwt.ErrECDSANilPrivKey},
+		{jwt.NewES384, jwt.ECDSAPrivateKey(nil), jwt.ErrECDSANilPrivKey},
+		{jwt.NewES384, jwt.ECDSAPrivateKey(es384PrivateKey1), nil},
+		{jwt.NewES384, jwt.ECDSAPublicKey(es384PublicKey1), nil},
+		{jwt.NewES512, nil, jwt.ErrECDSANilPrivKey},
+		{jwt.NewES512, jwt.ECDSAPrivateKey(nil), jwt.ErrECDSANilPrivKey},
+		{jwt.NewES512, jwt.ECDSAPrivateKey(es512PrivateKey1), nil},
+		{jwt.NewES512, jwt.ECDSAPublicKey(es512PublicKey1), nil},
+	}
+	for _, tc := range testCases {
+		funcName := funcName(tc.builder)
+		t.Run(funcName, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r != nil {
+					err, ok := r.(error)
+					if !ok {
+						t.Fatal("r is not an error")
+					}
+					if want, got := tc.err, err; !internal.ErrorIs(got, want) {
+						t.Fatalf("jwt.%s err mismatch (-want +got):\n%s", funcName, cmp.Diff(want, got))
+					}
+				}
+			}()
+			_ = tc.builder(tc.opts)
+			if tc.err != nil {
+				t.Fatalf("jwt.%s didn't panicked", funcName)
+			}
+		})
+	}
+}
 
 func genECDSAKeys(c elliptic.Curve) (*ecdsa.PrivateKey, *ecdsa.PublicKey) {
 	priv, err := ecdsa.GenerateKey(c, rand.Reader)

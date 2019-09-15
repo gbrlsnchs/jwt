@@ -42,9 +42,14 @@ type Ed25519 struct {
 func NewEd25519(opts ...func(*Ed25519)) *Ed25519 {
 	var ed Ed25519
 	for _, opt := range opts {
-		opt(&ed)
+		if opt != nil {
+			opt(&ed)
+		}
 	}
 	if ed.pub == nil {
+		if len(ed.priv) == 0 {
+			panic(ErrEd25519NilPrivKey)
+		}
 		ed.pub = ed.priv.Public().(ed25519.PublicKey)
 	}
 	return &ed

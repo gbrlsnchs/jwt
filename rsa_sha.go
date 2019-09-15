@@ -51,9 +51,14 @@ func newRSASHA(name string, opts []func(*RSASHA), sha crypto.Hash, pss bool) *RS
 		pool: newHashPool(sha.New),
 	}
 	for _, opt := range opts {
-		opt(&rs)
+		if opt != nil {
+			opt(&rs)
+		}
 	}
 	if rs.pub == nil {
+		if rs.priv == nil {
+			panic(ErrRSANilPrivKey)
+		}
 		rs.pub = &rs.priv.PublicKey
 	}
 	rs.size = rs.pub.Size() // cache size

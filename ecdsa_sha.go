@@ -60,9 +60,14 @@ func newECDSASHA(name string, opts []func(*ECDSASHA), sha crypto.Hash) *ECDSASHA
 		pool: newHashPool(sha.New),
 	}
 	for _, opt := range opts {
-		opt(&es)
+		if opt != nil {
+			opt(&es)
+		}
 	}
 	if es.pub == nil {
+		if es.priv == nil {
+			panic(ErrECDSANilPrivKey)
+		}
 		es.pub = &es.priv.PublicKey
 	}
 	es.size = byteSize(es.pub.Params().BitSize) * 2

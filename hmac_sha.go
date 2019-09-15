@@ -27,6 +27,9 @@ type HMACSHA struct {
 }
 
 func newHMACSHA(name string, key []byte, sha crypto.Hash) *HMACSHA {
+	if len(key) == 0 {
+		panic(ErrHMACMissingKey)
+	}
 	return &HMACSHA{
 		name: name, // cache name
 		key:  key,

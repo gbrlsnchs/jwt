@@ -4,7 +4,11 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 
+	"testing"
+
 	"github.com/gbrlsnchs/jwt/v3"
+	"github.com/gbrlsnchs/jwt/v3/internal"
+	"github.com/google/go-cmp/cmp"
 )
 
 var (
@@ -412,6 +416,47 @@ var (
 		},
 	}
 )
+
+func TestNewRSASHA(t *testing.T) {
+	testCases := []struct {
+		builder func(...func(*jwt.RSASHA)) *jwt.RSASHA
+		opts    func(*jwt.RSASHA)
+		err     error
+	}{
+		{jwt.NewRS256, nil, jwt.ErrRSANilPrivKey},
+		{jwt.NewRS256, jwt.RSAPrivateKey(nil), jwt.ErrRSANilPrivKey},
+		{jwt.NewRS256, jwt.RSAPrivateKey(rsaPrivateKey1), nil},
+		{jwt.NewRS256, jwt.RSAPublicKey(rsaPublicKey1), nil},
+		{jwt.NewRS384, nil, jwt.ErrRSANilPrivKey},
+		{jwt.NewRS384, jwt.RSAPrivateKey(nil), jwt.ErrRSANilPrivKey},
+		{jwt.NewRS384, jwt.RSAPrivateKey(rsaPrivateKey1), nil},
+		{jwt.NewRS384, jwt.RSAPublicKey(rsaPublicKey1), nil},
+		{jwt.NewRS512, nil, jwt.ErrRSANilPrivKey},
+		{jwt.NewRS512, jwt.RSAPrivateKey(nil), jwt.ErrRSANilPrivKey},
+		{jwt.NewRS512, jwt.RSAPrivateKey(rsaPrivateKey1), nil},
+		{jwt.NewRS512, jwt.RSAPublicKey(rsaPublicKey1), nil},
+	}
+	for _, tc := range testCases {
+		funcName := funcName(tc.builder)
+		t.Run(funcName, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r != nil {
+					err, ok := r.(error)
+					if !ok {
+						t.Fatal("r is not an error")
+					}
+					if want, got := tc.err, err; !internal.ErrorIs(got, want) {
+						t.Fatalf("jwt.%s err mismatch (-want +got):\n%s", funcName, cmp.Diff(want, got))
+					}
+				}
+			}()
+			_ = tc.builder(tc.opts)
+			if tc.err != nil {
+				t.Fatalf("jwt.%s didn't panicked", funcName)
+			}
+		})
+	}
+}
 
 func genRSAKeys() (*rsa.PrivateKey, *rsa.PublicKey) {
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
