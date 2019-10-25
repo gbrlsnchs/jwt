@@ -9,8 +9,8 @@ indent_style = space
 [{README.md,*.go,Makefile}]
 indent_style = tab
 
-[{README.md,*.go}]
-indent_size = 8
+[{README.md,*.go,COMMIT_EDITMSG}]
+tab_width = 8
 
 [Makefile]
 indent_size = 4
