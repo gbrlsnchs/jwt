@@ -3,7 +3,7 @@
 
 [![Github Actions Status](https://github.com/gbrlsnchs/jwt/workflows/Linux,%20macOS%20and%20Windows/badge.svg)](https://github.com/gbrlsnchs/jwt/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gbrlsnchs/jwt)](https://goreportcard.com/report/github.com/gbrlsnchs/jwt)
-[![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://godoc.org/github.com/gbrlsnchs/jwt)
+[![GoDoc](https://godoc.org/github.com/gbrlsnchs/jwt?status.svg)](https://pkg.go.dev/github.com/gbrlsnchs/jwt/v3)
 [![Version compatibility with Go 1.11 onward using modules](https://img.shields.io/badge/compatible%20with-go1.11+-5272b4.svg)](https://github.com/gbrlsnchs/jwt#installing)
 [![Join the chat at https://gitter.im/gbrlsnchs/jwt](https://badges.gitter.im/gbrlsnchs/jwt.svg)](https://gitter.im/gbrlsnchs/jwt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -28,7 +28,7 @@ Branch `master` is unstable, **always** use tagged versions. That way it is poss
 In other words, API changes all the time in `master`. It's a place for public experiment. Thus, make use of the latest stable version via Go modules.
 
 ## Usage
-Full documentation [here](https://godoc.org/github.com/gbrlsnchs/jwt).
+Full documentation [here](https://pkg.go.dev/github.com/gbrlsnchs/jwt/v3).
 
 ### Installing
 #### Important
