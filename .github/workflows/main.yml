@@ -4,7 +4,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        go: ['1.12', '1.13']
+        go: ['1.11', '1.12', '1.13', '1.14', '1.15', '1.16']
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
-        go: ['1.11', '1.12', '1.13']
+        go: ['1.11', '1.12', '1.13', '1.14', '1.15', '1.16']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
