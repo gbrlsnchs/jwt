@@ -57,7 +57,7 @@ func NewEd25519(opts ...func(*Ed25519)) *Ed25519 {
 
 // Name returns the algorithm's name.
 func (*Ed25519) Name() string {
-	return "Ed25519"
+	return "EdDSA"
 }
 
 // Sign signs headerPayload using the Ed25519 algorithm.

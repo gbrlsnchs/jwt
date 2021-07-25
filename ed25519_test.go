@@ -18,7 +18,7 @@ var (
 			payload:   tp,
 			verifyAlg: jwt.NewEd25519(jwt.Ed25519PrivateKey(ed25519PrivateKey1)),
 			wantHeader: jwt.Header{
-				Algorithm: "Ed25519",
+				Algorithm: "EdDSA",
 				Type:      "JWT",
 			},
 			wantPayload: tp,
@@ -30,7 +30,7 @@ var (
 			payload:   tp,
 			verifyAlg: jwt.NewEd25519(jwt.Ed25519PublicKey(ed25519PublicKey1)),
 			wantHeader: jwt.Header{
-				Algorithm: "Ed25519",
+				Algorithm: "EdDSA",
 				Type:      "JWT",
 			},
 			wantPayload: tp,
@@ -42,7 +42,7 @@ var (
 			payload:   tp,
 			verifyAlg: jwt.NewEd25519(jwt.Ed25519PrivateKey(ed25519PrivateKey2)),
 			wantHeader: jwt.Header{
-				Algorithm: "Ed25519",
+				Algorithm: "EdDSA",
 				Type:      "JWT",
 			},
 			wantPayload: testPayload{},
@@ -54,7 +54,7 @@ var (
 			payload:   tp,
 			verifyAlg: jwt.NewEd25519(jwt.Ed25519PublicKey(ed25519PublicKey2)),
 			wantHeader: jwt.Header{
-				Algorithm: "Ed25519",
+				Algorithm: "EdDSA",
 				Type:      "JWT",
 			},
 			wantPayload: testPayload{},
